@@ -1,0 +1,183 @@
+{% extends "sidebar.html" %}
+{% load static %}
+
+{% block content %}
+<body class="p-8 bg-gray-100">
+    <div class="mt-3 mb-5 text-center">
+        <button type="button" id="download" class="bg-blue-500 text-white px-6 py-2 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">Download as a PDF</button>
+    </div>
+
+     <!-- Input Fields for User Data -->
+     <div class="mb-12">    
+        <div class="mb-8 text-center">
+            <label for="application_date" class="block text-sm font-medium text-gray-700">Enter Application date:</label>
+            <input type="text" id="application_date" class="mt-2 p-2 w-full max-w-xs mx-auto border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder-gray-500 text-sm" required placeholder="e.g.  {{current_time |date:"j-F-Y"}}">
+        </div>
+        <div class="mb-8 text-center">
+            <label for="granted_leaves" class="block text-sm font-medium text-gray-700">Granted Leaves:</label>
+            <input type="text" id="granted_leaves" class="mt-2 p-2 w-full max-w-xs mx-auto border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder-gray-500 text-sm" required placeholder="e.g.  20 days">
+        </div>
+        <div class="mb-8 text-center">
+            <label for="effect_from" class="block text-sm font-medium text-gray-700">Effect from:</label>
+            <input type="text" id="effect_from" class="mt-2 p-2 w-full max-w-xs mx-auto border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder-gray-500 text-sm" required placeholder="e.g.  4-Nov-2025 to 4-Nov-2024">
+        </div>
+    </div>  
+
+    <div id="print" class="max-w-screen-md mx-auto bg-white p-12 border border-gray-300">
+        <!-- Header Section -->
+        <div class="mb-4">
+            <div class="flex justify-between items-center">
+                <div>
+                    <img src="{% static 'reporting/images/NBP.png' %}" alt="NBP Logo" class="h-21">
+                </div>
+                <div class="text-right mt-9">
+                    <p class="font-semibold pr-6">Operations Group</p>
+                </div>
+            </div>
+            <!-- Full-width border under the header section -->
+            <hr class="border-t border-gray-400">
+            <div class="text-sm mt-1 flex justify-between items-center">
+                <p class="font-semibold">National Bank of Pakistan</p>
+                <p class="font-semibold pr-3">Administration Division</p>
+            </div>
+            <div class="text-sm mt-1 mb-12">
+                <p>No. OPG/EX-PAK/ADMN/FRZ/2022/7514</p>
+                <p class="font-semibold">{{current_time |date:"F j, Y" }}</p>  
+            </div>
+        </div>
+
+        <!-- Title -->
+        <u><h1 class="text-center text-xl font-bold mb-5">MEMORANDUM</h1></u>
+
+        <!-- Body Text -->
+        <p class="mb-4" style="text-align: justify;">
+            With reference to his application dated <b><span id="application_date_text">______________</span></b> Mr. {{employee.full_name}}, OG-II/{{employee.employee_type}} SAP ID: {{employee.SAP_ID}}, 
+            NBP, Regional Office, Faisalabad is advised that he has been granted <span id="granted_leaves_text">______________</span> (Ex-Pakistan Leave) for study purpose - Research Master Program in Management, from IAE AIX-Marseille Graduate School 
+            of Management, France with effect from <span id="effect_from_text">_____________</span>.
+        </p>
+        <p class="mb-4" style="text-align: justify;">
+            He will accordingly stand relieved to his duties as of close of office today i.e. <b>Jan 9, 2022</b> to avail sanctioned leaves. It is further advised that no extension in leave will be allowed to him under any circumstances.
+        </p>
+        <p class="mb-4" style="text-align: justify;">
+            During his absence, Miss. Saira Rafiq, OG-I, SAP ID: 18245, will look after his assignment.
+        </p>
+
+        
+        <div class="mt-10 text-right mb-4">
+            <select id="form_type" name="form_type" class="w-1/4 bg-white border border-blue-500 py-2 px-4 rounded-lg focus:outline-none focus:border-blue-700 transition-colors duration-300 shadow-md">
+                <option value="">Admin Signature</option>
+                {% for employee in admin_signuture %}
+                    <option value="{{ employee.SAP_ID }}">{{ employee.full_name }} ({{ employee.SAP_ID }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+
+        <!-- Signature Section -->
+        <div id="employee-details" class="mb-1 text-right">
+            <!-- Data will be inserted here dynamically-->
+        </div>
+    
+
+        <!-- Recipient Information Section -->
+        <div class="mt-8">
+            <p class="font-semibold">Mr. {{employee.full_name}}</p>
+            <p class="text-sm">OG-II/{{employee.employee_type}}</p>
+            <p class="text-sm">SAP ID: {{employee.SAP_ID}}</p>
+        </div>
+
+        <!-- Footer Section -->
+        <hr class="border-t border-gray-400 mt-20 mb-2">
+        <div class="text-center text-xs text-gray-600">
+            <p class="font-semibold">National Bank of Pakistan</p>
+            <p>Head Office: I.I. Chundrigar Road, Karachi. Ph: 9212100 (50 lines)</p>
+            <p>Website: www.nbp.com.pk</p>
+        </div>
+    </div>
+
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    document.getElementById('download').addEventListener('click', function() {
+        const application_date = document.getElementById('application_date').value;
+        const granted_leaves = document.getElementById('granted_leaves').value;
+        const effect_from = document.getElementById('effect_from').value;
+
+        const form = document.querySelector('select');
+        form.style.visibility = 'hidden'; // Make the select element invisible but keep its position
+        
+        if(application_date && granted_leaves && effect_from){
+            document.getElementById('application_date_text').textContent = application_date;
+            document.getElementById('granted_leaves_text').textContent = granted_leaves;
+            document.getElementById('effect_from_text').textContent = effect_from;
+            
+        
+        
+            const element = document.getElementById('print');
+            
+            // Options for generating PDF
+            const options = {
+                margin:       10,
+                filename:     '{{employee.full_name}}.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2 }, // For high-quality rendering
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+        
+            // Generate the PDF
+            html2pdf().from(element).set(options).save().then(() => {
+                // You can add some code here if needed after the PDF is saved
+            });
+        } else {
+            // Show an alert if either field is empty
+            alert("Please fill out the fields ");
+        }
+    });
+
+    
+    document.getElementById('application_date').addEventListener('input', function() {
+        document.getElementById('application_date_text').textContent = this.value || "______________";
+    });
+
+    document.getElementById('granted_leaves').addEventListener('input', function() {
+        document.getElementById('granted_leaves_text').textContent = this.value || "______________";
+    });
+
+    document.getElementById('effect_from').addEventListener('input', function() {
+        document.getElementById('effect_from_text').textContent = this.value || "______________";
+    });
+
+
+    // Ajax data
+    $(document).ready(function() {
+        $('#form_type').on('change', function() {
+            var sapId = $(this).val();
+            if (sapId) {
+                $.ajax({
+                    url: "{% url 'reporting:get_employee_data' %}", 
+                    data: {
+                        'sap_id': sapId
+                    },
+                    dataType: 'json',
+                    success: function(data) {
+                        // Update the employee details section with retrieved data
+                        $('#employee-details').html(`
+                            <p>_________________________</p>
+                            <p class="font-semibold">${data.full_name}</p>
+                            <p class="text-sm">${data.designation}/Administration</p>
+                        `);
+                    },
+                    error: function() {
+                        $('#employee-details').html('<p class="text-red-500">Error loading data.</p>');
+                    }
+                });
+            } else {
+                $('#employee-details').empty();
+            }
+        });
+    });
+
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.js"></script>
+{% endblock content %}

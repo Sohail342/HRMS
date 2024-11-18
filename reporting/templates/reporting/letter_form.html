@@ -1,0 +1,66 @@
+{% extends "sidebar.html" %}
+
+{% block content %}
+<div class="p-8 bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg">
+        <h2 class="text-center text-2xl font-bold text-gray-800 mb-6">Choose Letter type</h2>
+
+        {% if errors %}
+        <div class="text-red-500 mb-4">
+            <p>{{ errors }}</p>
+        </div>
+        {% endif %}
+
+        <form method="POST" action="">
+            {% csrf_token %}
+
+            <!-- Form Type Dropdown -->
+            <div class="mb-4">
+                <label for="form_type" class="block text-sm font-semibold text-gray-700">Select letter type:</label>
+                <select id="form_type" name="form_type"
+                    class="w-full mt-4 bg-white border border-blue-500 py-2 px-4 rounded-lg focus:outline-none focus:border-blue-600 transition-colors">
+                    <option value="leave_memorandum">Leave Memorandum</option>
+                    <option value="joining_memorandum">Joining Memorandum</option>
+                    <option value="order_office_memorandun">Order Office Memorandum</option>
+                    <option value="approval_permission_hospitalization">Approval Permission Hospitalization</option>
+                    <option value="grant_of_extension">Grant of Extension</option>
+                    <option value="maternity_Leave">Maternity Leave Memorandum</option>
+                    <option value="request_for_issuance">Request For Issuance</option>
+                    <option value="reimbursement">Reimbursement of Hospitalization</option>
+                    <option value="reimbursement_against_purchase">Reimbursement Against Purchase</option>
+                    <option value="payment_of_bill">Payment of Bill</option>
+                    <option value="relieving_order">Relieving Order</option>
+                    <option value="permission_of_hospitalization">Permission of Hospitalization</option>
+                </select>
+            </div>
+
+            <!-- SAP ID Input -->
+            <div class="mb-4">
+                <label for="sap_id" class="block mt-8 text-sm font-semibold text-gray-700">Enter SAP ID for Employee:</label>
+                <input type="number" name="sap_id" id="sap_id"
+                    class="w-full mt-4 bg-white border border-blue-500 py-2 px-4 rounded-lg focus:outline-none focus:border-blue-600 transition-colors"
+                    placeholder="Enter SAP ID" required>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="text-center">
+                <button type="submit"
+                    class="bg-blue-500 text-white px-6 py-2 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-colors">
+                    Proceed
+                </button>
+            </div>
+        </form>
+
+        <!-- Buttons in a row -->
+        <div class="flex justify-center space-x-4 mt-6">
+            <!-- Add Employee Button -->
+            <a href="{% url 'admin:HRIS_App_employee_add' %}">
+                <button type="button"
+                    class="bg-blue-500 text-white px-6 py-2 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-colors">
+                    Add Employee
+                </button>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
