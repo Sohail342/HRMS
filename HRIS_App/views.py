@@ -2,8 +2,6 @@ from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 import csv
-from django.db.models.functions import Length, Cast
-from django.db.models import CharField
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
 from .models import (
@@ -17,7 +15,8 @@ from .models import (
 )
 
 def employees_view(request):
-    employees = Employee.objects.all().order_by('SAP_ID')
+    user_region = request.user.branch.branch_region
+    employees = Employee.objects.filter(branch__branch_region=user_region).order_by('SAP_ID')
     search_query = request.GET.get('search', '')
     employee_type = request.GET.get('employee_type', '')
     designation = request.GET.get('designation', '')
@@ -65,7 +64,7 @@ def employees_view(request):
                     'employee_grade': emp.employee_grade.grade_name if emp.employee_grade else "N/A",
                     'branch': emp.branch.branch_name if emp.branch else "N/A",
                     'qualifications': [qual.name for qual in emp.qualifications.all()],
-                    'mobile_no': emp.mobile_no,
+                    'mobile_no': emp.mobile_number,
                     'phone_no_official': emp.phone_no_official,
                     'phone_no_emergency_contact': emp.phone_no_emergency_contact,
                     'employee_email': emp.employee_email,
@@ -94,7 +93,7 @@ def employees_view(request):
         "designations": Designation.objects.all(),
         'cadre': Cadre.objects.all(),
         'employeeGrade': EmployeeGrade.objects.all(),
-        'branches': Branch.objects.all(),
+        'branches': Branch.objects.filter(branch_region=user_region),
         'qualifications': Qualification.objects.all(),
     }
 

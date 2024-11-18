@@ -145,6 +145,7 @@ class MyUserManager(BaseUserManager):
 
 class Employee(AbstractBaseUser):
     # Core user fields
+    
     email = models.EmailField(verbose_name="Email", max_length=255, unique=True)
     name = models.CharField(max_length=200)
     is_active = models.BooleanField(default=True)
@@ -157,7 +158,7 @@ class Employee(AbstractBaseUser):
     full_name = models.CharField(max_length=100, blank=True, null=True)
     cnic_no = models.CharField(max_length=13, unique=True, blank=True, null=True)
     husband_or_father_name = models.CharField(max_length=100, blank=True, null=True)
-    SAP_ID = models.IntegerField(default=None, unique=True, blank=True, null=True)
+    SAP_ID = models.IntegerField(default=None, unique=True, blank=True, null=True,)
     designation = models.ForeignKey(
         'Designation', on_delete=models.SET_NULL, null=True, blank=True, to_field='title'
     )
@@ -208,16 +209,16 @@ class Employee(AbstractBaseUser):
         return self.is_admin
     
 
-    # def save(self, *args, **kwargs):
-    # # Hash the password only if it's being set and is not already hashed
-    #     if self.pk is None or (self._password_set and not self.password.startswith('pbkdf2_')):
-    #         self.set_password(self.password)  # Hash the password
-    #         self._password_set = False  # Reset flag after hashing
-    #     super(Employee, self).save(*args, **kwargs)
+    def save(self, *args, **kwargs):
+        # Hash the password only if it's not already hashed
+        if self.pk is None or (self.password and not self.password.startswith('pbkdf2_')):
+            self.set_password(self.password)  # Hash the password
+        super(Employee, self).save(*args, **kwargs)
 
 
-    # def set_password(self, raw_password):
-    #     super().set_password(raw_password)
-    #     self._password_set = True  
+
+    def set_password(self, raw_password):
+        super().set_password(raw_password)
+        self._password_set = True  
 
 

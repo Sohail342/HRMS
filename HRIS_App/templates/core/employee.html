@@ -120,7 +120,8 @@
                         <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Name</th>
                         <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">F.Name</th>
 
-                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">
+                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">	
+                            Employee type
                             <select id="employeeTypeFilter" name="employee_type"
                                 class="border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ease-in-out max-h-32 overflow-y-auto"
                                 onchange="filterEmployees()">
@@ -164,6 +165,7 @@
                                 {% endfor %}
                             </select>
                         </th>
+                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Region</th>
                         <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Branch
                             <select id="branchFilter" name="branch" class="w-24 border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out text-gray-700 bg-white hover:bg-gray-50" onchange="filterEmployees()">
                                 <option value="">All</option>
@@ -209,6 +211,7 @@
                             <td class="border border-gray-300 px-4 py-2 text-sm md:text-base">{{ employee.designation }}</td>
                             <td class="border border-gray-300 px-4 py-2 text-sm md:text-base">{{ employee.cadre }}</td>
                             <td class="border border-gray-300 px-4 py-2 text-sm md:text-base">{{ employee.employee_grade }}</td>
+                            <td class="border border-gray-300 px-4 py-2 text-sm md:text-base">{{ employee.branch.branch_region }}</td>
                             <td class="border border-gray-300 px-4 py-2 text-sm md:text-base">{{ employee.branch }}</td>
                             <td class="border border-gray-300 px-4 py-2 text-sm md:text-base">
                                 {% for qualification in employee.qualifications.all %}
