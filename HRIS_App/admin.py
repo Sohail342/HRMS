@@ -28,17 +28,17 @@ class FunctionalGroupAdmin(ImportExportModelAdmin, ModelAdmin):
 class DivisionAdmin(ImportExportModelAdmin, ModelAdmin):
     export_form_class = ExportForm
     import_form_class = ImportForm
-    list_display = ('id', 'name', 'functional_group', 'description')
-    list_filter = ('name', 'functional_group__name')
-    search_fields = ('id', 'name', 'functional_group__name')
+    list_display = ('id', 'division_name', 'functional_group', 'description')
+    list_filter = ('division_name', 'functional_group__name')
+    search_fields = ('id', 'division_name', 'functional_group__name')
 
 @admin.register(Wing)
 class WingAdmin(ImportExportModelAdmin, ModelAdmin):
     export_form_class = ExportForm
     import_form_class = ImportForm
     list_display = ('id', 'name', 'division', 'description')
-    search_fields = ('id', 'name', 'division__name')
-    list_filter = ('name', 'division__name')
+    search_fields = ('id', 'name', 'division__division_name')
+    list_filter = ('name', 'division__division_name')
 
 @admin.register(Region)
 class RegionAdmin(ImportExportModelAdmin, ModelAdmin):

@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.http import JsonResponse
 from django.views.generic import DetailView, ListView
 from HRIS_App.models import Employee
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView
 
 
@@ -84,10 +85,12 @@ class RelievingOrderMemorandum(MemorandumMixin, DetailView):
 
 
 
-class LetterForm(ListView):
+class LetterForm(LoginRequiredMixin, ListView):
+    
     model = Employee
     context_object_name = 'employees'
     template_name = 'reporting/letter_form.html'
+    login_url = 'account:login'
     
     FORM_TYPE_MAPPING = {
         'leave_memorandum': 'reporting:leave_memorandum',

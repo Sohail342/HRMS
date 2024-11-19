@@ -25,15 +25,6 @@
         <label style="display: none;">Employee Grade</label>
        
         <!-- Mandatory Columns End -->
-
-        <div class="inline-flex items-center">
-            <input type="checkbox" name="columns" value="CNIC No" checked class="form-checkbox text-indigo-600 h-4 w-4">
-            <span class="ml-2 text-gray-700">CNIC No</span>
-        </div>
-        <div class="inline-flex items-center">
-            <input type="checkbox" name="columns" value="F.Name" checked class="form-checkbox text-indigo-600 h-4 w-4">
-            <span class="ml-2 text-gray-700">F.Name</span>
-        </div>
         <div class="inline-flex items-center">
             <input type="checkbox" name="columns" value="Employee Type" checked class="form-checkbox text-indigo-600 h-4 w-4">
             <span class="ml-2 text-gray-700">Employee Type</span>
@@ -42,51 +33,16 @@
             <input type="checkbox" name="columns" value="Designation" checked class="form-checkbox text-indigo-600 h-4 w-4">
             <span class="ml-2 text-gray-700">Designation</span>
         </div>
-        <div class="inline-flex items-center">
-            <input type="checkbox" name="columns" value="Cadre" checked class="form-checkbox text-indigo-600 h-4 w-4">
-            <span class="ml-2 text-gray-700">Cadre</span>
-        </div>
     
         <!-- Row 2 -->
         <div class="inline-flex items-center">
             <input type="checkbox" name="columns" value="Branch" checked class="form-checkbox text-indigo-600 h-4 w-4">
             <span class="ml-2 text-gray-700">Branch</span>
         </div>
+        
         <div class="inline-flex items-center">
-            <input type="checkbox" name="columns" value="Qualifications" checked class="form-checkbox text-indigo-600 h-4 w-4">
-            <span class="ml-2 text-gray-700">Qualifications</span>
-        </div>
-        <div class="inline-flex items-center">
-            <input type="checkbox" name="columns" value="Mobile No" checked class="form-checkbox text-indigo-600 h-4 w-4">
-            <span class="ml-2 text-gray-700">Mobile No</span>
-        </div>
-        <div class="inline-flex items-center">
-            <input type="checkbox" name="columns" value="Official Phone No" checked class="form-checkbox text-indigo-600 h-4 w-4">
-            <span class="ml-2 text-gray-700">Official Phone No</span>
-        </div>
-        <div class="inline-flex items-center">
-            <input type="checkbox" name="columns" value="Emergency Contact No" checked class="form-checkbox text-indigo-600 h-4 w-4">
-            <span class="ml-2 text-gray-700">Emergency Contact No</span>
-        </div>
-        <div class="inline-flex items-center">
-            <input type="checkbox" name="columns" value="Email" checked class="form-checkbox text-indigo-600 h-4 w-4">
-            <span class="ml-2 text-gray-700">Email</span>
-        </div>
-        <div class="inline-flex items-center">
-            <input type="checkbox" name="columns" value="Last Promotion Date" checked class="form-checkbox text-indigo-600 h-4 w-4">
-            <span class="ml-2 text-gray-700">Last Promotion Date</span>
-        </div>
-        <div class="inline-flex items-center">
-            <input type="checkbox" name="columns" value="Current Posting Date" checked class="form-checkbox text-indigo-600 h-4 w-4">
-            <span class="ml-2 text-gray-700">Current Posting Date</span>
-        </div>
-        <div class="inline-flex items-center">
-            <input type="checkbox" name="columns" value="Current Assignment Date" checked class="form-checkbox text-indigo-600 h-4 w-4">
-            <span class="ml-2 text-gray-700">Current Assignment Date</span>
-        </div>
-        <div class="inline-flex items-center">
-            <input type="checkbox" name="columns" value="Retirement Date" checked class="form-checkbox text-indigo-600 h-4 w-4">
-            <span class="ml-2 text-gray-700">Retirement Date</span>
+            <input type="checkbox" name="columns" value="Joining Date" checked class="form-checkbox text-indigo-600 h-4 w-4">
+            <span class="ml-2 text-gray-700">Date of Joining</span>
         </div>
     </div>
     
@@ -109,17 +65,25 @@
                 </div>
             </div>
         </form>
-
+        <h1 class="text-xl text-center font-bold mb-4">{{request.user.branch.branch_region}} Region</h1>
         <!-- Table -->
         <div class="overflow-x-auto">
             <table class="min-w-full border-collapse border border-gray-300">
                 <thead>
                     <tr class="bg-gray-200 text-gray-700">
+                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Branch Code</th>
+                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Branch
+                            <select id="branchFilter" name="branch" class="w-24 border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out text-gray-700 bg-white hover:bg-gray-50" onchange="filterEmployees()">
+                                <option value="">All</option>
+                                {% for branch in branches %}
+                                    <option value="{{ branch.branch_name }}" {% if branch_filter == branch.branch_name %}selected{% endif %}>
+                                        {{ branch.branch_name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </th>
                         <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">SAP ID</th>
-                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">CNIC No</th>
                         <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Name</th>
-                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">F.Name</th>
-
                         <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">	
                             Employee type
                             <select id="employeeTypeFilter" name="employee_type"
@@ -132,7 +96,6 @@
                                     </option>
                                 {% endfor %}
                             </select>
-
                         </th>
                         <th class="border border-gray-300 px-10 py-3 text-left text-sm md:text-base">Designation
                             <select id="designationFilter" name="designation" class="w-24 border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out text-gray-700 bg-white hover:bg-gray-50" onchange="filterEmployees()">
@@ -140,17 +103,6 @@
                                 {% for designation in designations %}
                                     <option value="{{ designation.title }}" {% if designation_filter == designation.title %}selected{% endif %}>
                                         {{ designation.title }}
-                                    </option>
-                                {% endfor %}
-                            </select>
-                            
-                        </th>
-                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Cadre
-                            <select id="cadreFilter" name="cadre" class="w-24 border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out text-gray-700 bg-white hover:bg-gray-50" onchange="filterEmployees()">
-                                <option value="">All</option>
-                                {% for cad in cadre %}
-                                    <option value="{{ cad.name }}" {% if cadre_filter == cad.name %}selected{% endif %}>
-                                        {{ cad.name }}
                                     </option>
                                 {% endfor %}
                             </select>
@@ -165,67 +117,25 @@
                                 {% endfor %}
                             </select>
                         </th>
-                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Region</th>
-                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Branch
-                            <select id="branchFilter" name="branch" class="w-24 border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out text-gray-700 bg-white hover:bg-gray-50" onchange="filterEmployees()">
-                                <option value="">All</option>
-                                {% for branch in branches %}
-                                    <option value="{{ branch.branch_name }}" {% if branch_filter == branch.branch_name %}selected{% endif %}>
-                                        {{ branch.branch_name }}
-                                    </option>
-                                {% endfor %}
-                            </select>
-                        </th>
-                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Qualifications
-                            <select id="qualificationFilter" name="qualification" class="w-24 border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out text-gray-700 bg-white hover:bg-gray-50" onchange="filterEmployees()">
-                                <option value="">All</option>
-                                {% for qualification in qualifications %}
-                                    <option value="{{ qualification.name }}" {% if qualification_filter == qualification.name %}selected{% endif %}>
-                                        {{ qualification.name }}
-                                    </option>
-                                {% endfor %}
-                            </select>
-                        </th>
-                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Mobile No</th>
-                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Official Phone No</th>
-                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Emergency Contact No</th>
-                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Email</th>
-                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Last Promotion Date</th>
-                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Current Posting Date</th>
-                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Current Assignment Date</th>
-                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Retirement Date</th>
+                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Date of Joining</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% if page_obj %}
                         {% for employee in page_obj %}
                         <tr class="hover:bg-gray-100 transition duration-150 ease-in-out">
+                            
+                            <td class="border border-gray-300 px-4 py-2 text-sm md:text-base">{{ employee.branch_code }}</td>
+                            <td class="border border-gray-300 px-4 py-2 text-sm md:text-base">{{ employee.branch }}</td>
                             <td class="border border-gray-300 px-4 py-2 text-sm md:text-base">
                                 <a href="{% url 'HRMS:employee_detail' employee.SAP_ID %}" class="text-blue-600 hover:underline">{{ employee.SAP_ID }}</a>
                             
                             </td>
-                            <td class="border border-gray-300 px-4 py-2 text-sm md:text-base">{{ employee.cnic_no }}</td>
                             <td class="border border-gray-300 px-4 py-2 text-sm md:text-base">{{ employee.full_name }}</td>
-                            <td class="border border-gray-300 px-4 py-2 text-sm md:text-base">{{ employee.husband_or_father_name }}</td>
                             <td class="border border-gray-300 px-4 py-2 text-sm md:text-base">{{ employee.employee_type }}</td>
                             <td class="border border-gray-300 px-4 py-2 text-sm md:text-base">{{ employee.designation }}</td>
-                            <td class="border border-gray-300 px-4 py-2 text-sm md:text-base">{{ employee.cadre }}</td>
                             <td class="border border-gray-300 px-4 py-2 text-sm md:text-base">{{ employee.employee_grade }}</td>
-                            <td class="border border-gray-300 px-4 py-2 text-sm md:text-base">{{ employee.branch.branch_region }}</td>
-                            <td class="border border-gray-300 px-4 py-2 text-sm md:text-base">{{ employee.branch }}</td>
-                            <td class="border border-gray-300 px-4 py-2 text-sm md:text-base">
-                                {% for qualification in employee.qualifications.all %}
-                                    {{ qualification }}{% if not forloop.last %}, {% endif %}
-                                {% endfor %}
-                            </td>
-                            <td class="border border-gray-300 px-4 py-2 text-sm md:text-base">{{ employee.mobile_no }}</td>
-                            <td class="border border-gray-300 px-4 py-2 text-sm md:text-base">{{ employee.phone_no_official }}</td>
-                            <td class="border border-gray-300 px-4 py-2 text-sm md:text-base">{{ employee.phone_no_emergency_contact }}</td>
-                            <td class="border border-gray-300 px-4 py-2 text-sm md:text-base">{{ employee.employee_email }}</td>
-                            <td class="border border-gray-300 px-4 py-2 text-sm md:text-base">{{ employee.date_of_last_promotion }}</td>
-                            <td class="border border-gray-300 px-4 py-2 text-sm md:text-base">{{ employee.date_current_posting }}</td>
-                            <td class="border border-gray-300 px-4 py-2 text-sm md:text-base">{{ employee.date_current_assignment }}</td>
-                            <td class="border border-gray-300 px-4 py-2 text-sm md:text-base">{{ employee.date_of_retirement }}</td>
+                            <td class="border border-gray-300 px-4 py-2 text-sm md:text-base">{{ employee.date_of_joining }}</td>
                         </tr>
                         {% endfor %}
                     {% else %}
@@ -269,14 +179,12 @@
     // Get values from each select element
     const employeeType = document.getElementById("employeeTypeFilter").value;
     const designation = document.getElementById("designationFilter").value;
-    const cadre = document.getElementById("cadreFilter").value;
     const employeeGrade = document.getElementById("employeeGradeFilter").value;
     const branch = document.getElementById("branchFilter").value;
-    const qualification = document.getElementById("qualificationFilter").value;
     const searchQuery = document.querySelector("input[name='search']").value;
 
     // Construct the request URL with filters
-    const requestUrl = `?employee_type=${employeeType}&designation=${designation}&cadre=${cadre}&employeeGrade=${employeeGrade}&branch=${branch}&qualification=${qualification}&search=${searchQuery}`;
+    const requestUrl = `?employee_type=${employeeType}&designation=${designation}&employeeGrade=${employeeGrade}&branch=${branch}&search=${searchQuery}`;
         console.log("URL: ", requestUrl)
     // Fetch data from the server
     fetch(requestUrl, {
@@ -290,26 +198,16 @@
         if (data.employees.length) {
             data.employees.forEach(employee => {
                 const row = `<tr class="hover:bg-slate-100">
+                    <td class="border border-slate-300 px-4 py-2 text-sm md:text-base">${employee.branch_code}</td>
+                    <td class="border border-slate-300 px-4 py-2 text-sm md:text-base">${employee.branch}</td>
                     <td class="border border-slate-300 px-4 py-2 text-sm md:text-base">
                         <a href="${employee.SAP_ID}" class="text-blue-600 hover:underline">${employee.SAP_ID}</a>
                     </td>
-                    <td class="border border-slate-300 px-4 py-2 text-sm md:text-base">${employee.cnic_no}</td>
                     <td class="border border-slate-300 px-4 py-2 text-sm md:text-base">${employee.full_name}</td>
-                    <td class="border border-slate-300 px-4 py-2 text-sm md:text-base">${employee.husband_or_father_name}</td>
                     <td class="border border-slate-300 px-4 py-2 text-sm md:text-base">${employee.employee_type}</td>
                     <td class="border border-slate-300 px-4 py-2 text-sm md:text-base">${employee.designation}</td>
-                    <td class="border border-slate-300 px-4 py-2 text-sm md:text-base">${employee.cadre}</td>
                     <td class="border border-slate-300 px-4 py-2 text-sm md:text-base">${employee.employee_grade}</td>
-                    <td class="border border-slate-300 px-4 py-2 text-sm md:text-base">${employee.branch}</td>
-                    <td class="border border-slate-300 px-4 py-2 text-sm md:text-base">${employee.qualifications.join(', ')}</td>
-                    <td class="border border-slate-300 px-4 py-2 text-sm md:text-base">${employee.mobile_no}</td>
-                    <td class="border border-slate-300 px-4 py-2 text-sm md:text-base">${employee.phone_no_official}</td>
-                    <td class="border border-slate-300 px-4 py-2 text-sm md:text-base">${employee.phone_no_emergency_contact}</td>
-                    <td class="border border-slate-300 px-4 py-2 text-sm md:text-base">${employee.employee_email}</td>
-                    <td class="border border-slate-300 px-4 py-2 text-sm md:text-base">${employee.date_of_last_promotion}</td>
-                    <td class="border border-slate-300 px-4 py-2 text-sm md:text-base">${employee.date_current_posting}</td>
-                    <td class="border border-slate-300 px-4 py-2 text-sm md:text-base">${employee.date_current_assignment}</td>
-                    <td class="border border-slate-300 px-4 py-2 text-sm md:text-base">${employee.date_of_retirement}</td>
+                    <td class="border border-slate-300 px-4 py-2 text-sm md:text-base">${employee.date_of_joining}</td>
                 </tr>`;
                 tableBody.insertAdjacentHTML("beforeend", row);
             });
@@ -328,10 +226,8 @@ function downloadCsv(event) {
     // Get values from filter inputs
     const employeeType = document.getElementById("employeeTypeFilter").value;
     const designation = document.getElementById("designationFilter").value; 
-    const cadre = document.getElementById("cadreFilter").value;
     const employeeGrade = document.getElementById("employeeGradeFilter").value;
     const branch = document.getElementById("branchFilter").value;
-    const qualification = document.getElementById("qualificationFilter").value;
     const searchQuery = document.querySelector("input[name='search']").value;
 
     // Get selected columns
@@ -340,7 +236,7 @@ function downloadCsv(event) {
         .filter(value => value);  // Filter out any falsy values
 
     // Construct the request URL with filters and selected columns
-    let requestUrl = `{% url 'HRMS:download_employees_csv' %}?employee_type=${encodeURIComponent(employeeType)}&designation=${encodeURIComponent(designation)}&cadre=${encodeURIComponent(cadre)}&employeeGrade=${encodeURIComponent(employeeGrade)}&branch=${encodeURIComponent(branch)}&qualification=${encodeURIComponent(qualification)}&search=${encodeURIComponent(searchQuery)}`;
+    let requestUrl = `{% url 'HRMS:download_employees_csv' %}?employee_type=${encodeURIComponent(employeeType)}&designation=${encodeURIComponent(designation)}&employeeGrade=${encodeURIComponent(employeeGrade)}&branch=${encodeURIComponent(branch)}&search=${encodeURIComponent(searchQuery)}`;
 
     // Add selected columns to the URL
     if (selectedColumns.length > 0) {

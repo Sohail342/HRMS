@@ -99,12 +99,38 @@
                         </div>
                         Region Related Reports
                     </div>
-                </a>     
+                </a>  
+                {% if not request.user.is_authenticated %}
+                <a href="{% url 'account:login' %}">
+                    <div class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-blue-100">
+                        <div class="grid place-items-center mr-4">
+                            <!-- Login Icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="h-6 w-6 text-gray-700 hover:text-blue-600">
+                                <path d="M15 14h-4v-4h4V6l6 6-6 6v-4zM4 4h10v2H4v12h10v2H4a2 2 0 01-2-2V6a2 2 0 012-2z"/>
+                            </svg>
+                        </div>
+                        Login
+                    </div>
+                </a>
+                {% else %}
+                <a href="{% url 'account:logout' %}">
+                    <div class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-blue-100">
+                        <div class="grid place-items-center mr-4">
+                            <!-- Logout Icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="h-6 w-6 text-gray-700 hover:text-blue-600">
+                                <path d="M10 17l-5-5 5-5v3h9v4H10v3zM20 4h-6V2h6a2 2 0 012 2v16a2 2 0 01-2 2h-6v-2h6V4z"/>
+                            </svg>
+                        </div>
+                        Logout
+                    </div>
+                </a>  
+                {% endif %}       
             </nav>
         </div>
 
         <div class="flex-1 p-4 overflow-y-auto">
             {% block content %}
+            
             {% endblock content %}
         </div>
     </div>

@@ -2,8 +2,11 @@ from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 import csv
+from django.db.models import CharField
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
+from django.db.models.functions import Length, Cast
 from .models import (
     Designation, 
     Employee, 
@@ -14,6 +17,10 @@ from .models import (
     Qualification,
 )
 
+
+
+
+@login_required(login_url='account:login')
 def employees_view(request):
     user_region = request.user.branch.branch_region
     employees = Employee.objects.filter(branch__branch_region=user_region).order_by('SAP_ID')
@@ -55,23 +62,13 @@ def employees_view(request):
             'employees': [
                 {
                     'SAP_ID': emp.SAP_ID,
-                    'cnic_no': emp.cnic_no,
-                    'full_name': emp.full_name,
-                    'husband_or_father_name': emp.husband_or_father_name,
+                    'full_name': emp.full_name if emp.full_name else "N/A",
                     'employee_type': emp.employee_type.name if emp.employee_type else "N/A",
                     'designation': emp.designation.title if emp.designation else "N/A",
-                    'cadre': emp.cadre.name if emp.cadre else "N/A",
                     'employee_grade': emp.employee_grade.grade_name if emp.employee_grade else "N/A",
                     'branch': emp.branch.branch_name if emp.branch else "N/A",
-                    'qualifications': [qual.name for qual in emp.qualifications.all()],
-                    'mobile_no': emp.mobile_number,
-                    'phone_no_official': emp.phone_no_official,
-                    'phone_no_emergency_contact': emp.phone_no_emergency_contact,
-                    'employee_email': emp.employee_email,
-                    'date_of_last_promotion': emp.date_of_last_promotion,
-                    'date_current_posting': emp.date_current_posting,
-                    'date_current_assignment': emp.date_current_assignment,
-                    'date_of_retirement': emp.date_of_retirement,
+                    'Branch_code':emp.branch.branch_code if emp.branch.branch_code else "N/A",
+                    'date_of_joining': emp.date_of_joining,
                 }
                 for emp in page_obj.object_list
             ],
@@ -97,7 +94,7 @@ def employees_view(request):
         'qualifications': Qualification.objects.all(),
     }
 
-    return render(request, 'core/employee.html', context)
+    return render(request, 'HRIS_App/employee.html', context)
 
 
 
@@ -110,10 +107,8 @@ def download_employees_csv(request):
     
     employee_type = request.GET.get('employee_type', None)
     designation = request.GET.get('designation', None)
-    cadre = request.GET.get('cadre', None)
     employee_grade = request.GET.get('employeeGrade', None)
     branch = request.GET.get('branch', None)
-    qualification = request.GET.get('qualification', None)
     search_query = request.GET.get('search', None)
  
     employees = Employee.objects.all().order_by('SAP_ID')
@@ -121,14 +116,11 @@ def download_employees_csv(request):
     # Apply filters
     if branch:
         employees = employees.filter(branch__branch_name__icontains=branch)
-    if qualification:
-        employees = employees.filter(qualifications__name__icontains=qualification)
+
     if search_query:
         employees = employees.filter(SAP_ID__icontains=search_query)
     if employee_type:
         employees = employees.filter(employee_type=employee_type)
-    if cadre:
-        employees = employees.filter(cadre__name=cadre)
     if designation:
         employees = employees.filter(designation__title=designation)
     if employee_grade:
@@ -149,23 +141,12 @@ def download_employees_csv(request):
     # Define a mapping of column names to the employee model fields
     column_mapping = {
         'SAP ID': 'SAP_ID',
-        'CNIC No': 'cnic_no',
         'Full Name': 'full_name',
-        'F.Name': 'husband_or_father_name',
         'Employee Type': 'employee_type',
         'Designation': 'designation',
-        'Cadre': 'cadre',
         'Employee Grade': 'employee_grade',
         'Branch': 'branch',
-        'Qualifications': 'qualifications',
-        'Mobile No': 'mobile_no',
-        'Official Phone No': 'phone_no_official',
-        'Emergency Contact No': 'phone_no_emergency_contact',
-        'Email': 'employee_email',
-        'Last Promotion Date': 'date_of_last_promotion',
-        'Current Posting Date': 'date_current_posting',
-        'Current Assignment Date': 'date_current_assignment',
-        'Retirement Date': 'date_of_retirement',
+        'Joining Date': 'date_of_joining',
     }
 
     # Write header row with only selected columns
@@ -184,21 +165,20 @@ def download_employees_csv(request):
 
 
 
-
 def index(request):
-    # employees = Employee.objects.count()
-    # new_employees = Employee.objects.annotate(sap_id_length=Length(Cast('SAP_ID', output_field=CharField()))).filter(sap_id_length__gt=5).count()
+    employees = Employee.objects.count()
+    new_employees = Employee.objects.annotate(sap_id_length=Length(Cast('SAP_ID', output_field=CharField()))).filter(sap_id_length__gt=5).count()
 
     context = {
-        'new_employees':"new_employees",
-        'employees':"employees"
+        'new_employees':new_employees,
+        'employees':employees
     }
     
     return render(request, 'index.html', context)
 
 
 
-
+@login_required(login_url='account:login')
 def employee_detail_view(request, sap_id):
     employee = get_object_or_404(Employee, SAP_ID=sap_id)
-    return render(request, 'core/employee_details.html', {'employee': employee})
+    return render(request, 'HRIS_App/employee_details.html', {'employee': employee})

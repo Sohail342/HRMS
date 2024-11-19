@@ -20,7 +20,7 @@ class FunctionalGroup(models.Model):
 
 
 class Division(models.Model):
-    name = models.CharField(max_length=100, unique=True)
+    division_name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True, null=True,default=None)
     functional_group = models.ForeignKey(FunctionalGroup, on_delete=models.CASCADE, related_name='divisions')
 
@@ -31,7 +31,7 @@ class Division(models.Model):
 class Wing(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
-    division = models.ForeignKey(Division, on_delete=models.CASCADE, related_name='wings', to_field='name')
+    division = models.ForeignKey(Division, to_field='division_name', on_delete=models.CASCADE, related_name='wings')
 
     def __str__(self):
         return self.name
@@ -185,7 +185,8 @@ class Employee(AbstractBaseUser):
     phone_no_official = models.CharField(max_length=15, blank=True, null=True, default="1111")
     phone_no_emergency_contact = models.CharField(max_length=15, blank=True, null=True, default="1111")
     employee_email = models.EmailField(max_length=100, blank=True, null=True, default="aa@aa.aa")
-    date_of_retirement = models.DateField(default="1900-01-01", blank=True, null=True)
+    date_of_joining = models.DateField(default="1900-01-01", blank=True, null=True)
+    user_group = models.CharField(max_length=200, default=None, blank=True, null=True)
 
     objects = MyUserManager()
 
