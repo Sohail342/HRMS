@@ -23,7 +23,8 @@ from .models import (
 @login_required(login_url='account:login')
 def employees_view(request):
     user_region = request.user.branch.branch_region
-    employees = Employee.objects.filter(branch__branch_region=user_region).order_by('SAP_ID')
+    user_group = request.user.user_group
+    employees = Employee.objects.filter(branch__branch_region=user_region, user_group=user_group).order_by('SAP_ID')
     search_query = request.GET.get('search', '')
     employee_type = request.GET.get('employee_type', '')
     designation = request.GET.get('designation', '')
