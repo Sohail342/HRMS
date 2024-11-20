@@ -22,9 +22,9 @@ from .models import (
 
 @login_required(login_url='account:login')
 def employees_view(request):
-    user_region = request.user.branch.branch_region
+    user_region = request.user.region   
     user_group = request.user.user_group
-    employees = Employee.objects.filter(branch__branch_region=user_region, user_group=user_group).order_by('SAP_ID')
+    employees = Employee.objects.filter(region=user_region, user_group=user_group).order_by('SAP_ID')
     search_query = request.GET.get('search', '')
     employee_type = request.GET.get('employee_type', '')
     designation = request.GET.get('designation', '')
@@ -57,13 +57,15 @@ def employees_view(request):
             'employees': [
                 {
                     'SAP_ID': emp.SAP_ID,
-                    'full_name': emp.name if emp.name else "N/A",
+                    'name': emp.name if emp.name else "N/A",
                     'employee_type': emp.employee_type.name if emp.employee_type else "N/A",
                     'designation': emp.designation.title if emp.designation else "N/A",
                     'employee_grade': emp.employee_grade.grade_name if emp.employee_grade else "N/A",
                     'branch': emp.branch.branch_name if emp.branch else "N/A",
-                    'Branch_code':emp.branch.branch_code if emp.branch.branch_code else "N/A",
+                    'Branch_code':emp.branch.branch_code if emp.branch else "N/A",
                     'date_of_joining': emp.date_of_joining,
+                    'pending_inquiry': 'Yes' if emp.pending_inquiry else "No",
+                    'remarks':emp.remarks,
                 }
                 for emp in page_obj.object_list
             ],

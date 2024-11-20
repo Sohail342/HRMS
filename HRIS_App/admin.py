@@ -1,9 +1,10 @@
 from django.contrib import admin
 from unfold.admin import ModelAdmin
-from django.contrib.admin import AdminSite
+from .resources import BranchResource, FunctionalGroupResource, RegionResource
 from import_export.admin import ImportExportModelAdmin
 from unfold.contrib.import_export.forms import ExportForm, ImportForm
 from .forms import AdminEmployeeForm, NonAdminEmployeeForm
+from django import forms
 from .models import (
     Group, FunctionalGroup, Division, Wing, Region, Branch,
     Designation, Cadre, EmployeeType, EmployeeGrade, Qualification, Employee
@@ -19,6 +20,7 @@ class GroupAdmin(ImportExportModelAdmin, ModelAdmin):
 
 @admin.register(FunctionalGroup)
 class FunctionalGroupAdmin(ImportExportModelAdmin, ModelAdmin):
+    resource_class  = FunctionalGroupResource
     export_form_class = ExportForm
     import_form_class = ImportForm
     list_display = ('id','name', 'group', 'allias')
@@ -43,14 +45,17 @@ class WingAdmin(ImportExportModelAdmin, ModelAdmin):
 
 @admin.register(Region)
 class RegionAdmin(ImportExportModelAdmin, ModelAdmin):
+    resource_class = RegionResource
     export_form_class = ExportForm
     import_form_class = ImportForm
     list_display = ('id', 'name', 'region_category')
     list_filter = ('name', 'region_category','functional_group__name')
     search_fields = ('id', 'name', 'region_category','functional_group__name')
 
+
 @admin.register(Branch)
 class BranchAdmin(ImportExportModelAdmin, ModelAdmin):
+    resource_class = BranchResource 
     export_form_class = ExportForm
     import_form_class = ImportForm
     list_display = ("branch_code", 'branch_name', 'branch_region__name', 'branch_address')
@@ -101,7 +106,7 @@ class QualificationAdmin(ImportExportModelAdmin, ModelAdmin):
 class EmployeeAdmin(ImportExportModelAdmin, ModelAdmin):
     export_form_class = ExportForm
     import_form_class = ImportForm
-    list_display = ('SAP_ID', 'name', 'branch', 'designation', 'employee_grade', 'employee_type', 'date_of_joining', 'designation', 'is_admin_employee',)
+    list_display = ('SAP_ID', 'name', 'branch', 'branch__branch_region', 'designation', 'employee_grade', 'employee_type', 'date_of_joining', 'designation', 'is_admin_employee')
     list_filter = ('is_admin_employee', 'is_active', 'branch')
 
     def get_form(self, request, obj=None, **kwargs):
@@ -112,6 +117,30 @@ class EmployeeAdmin(ImportExportModelAdmin, ModelAdmin):
             self.form = AdminEmployeeForm
         else:  # Use the non-admin employee form
             self.form = NonAdminEmployeeForm
-        return super().get_form(request, obj, **kwargs)
-    
+
+        form_class = super().get_form(request, obj, **kwargs)
+
+        # Ensure the 'branch' field is always optional
+        form_class.base_fields['branch'].required = False
+
+        if obj and obj.branch:
+            region = obj.branch.branch_region
+            if region and region.head_office:
+                form_class.base_fields['branch'].widget = forms.HiddenInput()
+            else:
+                form_class.base_fields['branch'].queryset = Branch.objects.filter(branch_region=region)
+        else:
+            form_class.base_fields['branch'].queryset = Branch.objects.all()
+
+        return form_class
+
+    def save_model(self, request, obj, form, change):
+        """
+        Save the model while ensuring password handling.
+        """
+        # Handle the password hashing logic if necessary
+        if form.cleaned_data.get('password'):
+            obj.set_password(form.cleaned_data['password'])  # Hash the password
+        obj.save()
+
 admin.site.register(Employee, EmployeeAdmin)

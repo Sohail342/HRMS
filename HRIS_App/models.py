@@ -25,7 +25,7 @@ class Division(models.Model):
     functional_group = models.ForeignKey(FunctionalGroup, on_delete=models.CASCADE, related_name='divisions')
 
     def __str__(self):
-        return self.name
+        return self.division_name
 
 
 class Wing(models.Model):
@@ -42,16 +42,19 @@ class Region(models.Model):
     region_category = models.CharField(max_length=100, blank=True, null=True)
     functional_group = models.ManyToManyField(FunctionalGroup, related_name='regions')
 
+    # Flag for head office
+    head_office = models.BooleanField(default=False)
+
     def __str__(self):
         return self.name
 
 
 class Branch(models.Model):
-    branch_code = models.IntegerField()
+    branch_code = models.IntegerField(unique=True)
     branch_name = models.CharField(max_length=100, unique=True)
     branch_Category = models.CharField(max_length=100, default=None)
     branch_address = models.TextField(blank=True, null=True)
-    branch_region = models.ForeignKey(Region, on_delete=models.CASCADE, to_field='name')
+    branch_region = models.ForeignKey(Region, on_delete=models.CASCADE, to_field='name', null=True,  blank=True)
 
     def __str__(self):
         return self.branch_name
@@ -108,25 +111,54 @@ class Qualification(models.Model):
 class MyUserManager(BaseUserManager):
     def create_user(self, email, name, password=None, password2=None, is_admin_employee=False):
         """
-        Creates and saves a User with the given email, terms_conditions
-        name and password.
+        Creates and saves a User with the given email, name, and password.
+        If the user already exists, it ensures the password is not overwritten.
         """
         if not email:
             raise ValueError("Users must have an email address")
 
+        # Check if user exists or create a new user instance
         user = self.model(
             email=self.normalize_email(email),
             name=name,
             is_admin_employee=is_admin_employee,
         )
-        
-        if is_admin_employee and password:  # Only set a password if the user is an admin employee
+
+        # Only set password if provided and if user is admin
+        if password:
             user.set_password(password)
         else:
-            user.set_unusable_password()
+            user.set_unusable_password()  # If no password is provided, make the password unusable.
 
         user.save(using=self._db)
         return user
+
+    def update_user(self, user, name=None, email=None, password=None, is_admin_employee=None):
+        """
+        Update an existing user without resetting the password unless specified.
+        """
+        updated = False
+
+        if name:
+            user.name = name
+            updated = True
+        if email:
+            user.email = self.normalize_email(email)
+            updated = True
+        if is_admin_employee is not None:
+            user.is_admin_employee = is_admin_employee
+            updated = True
+        if password:
+            user.set_password(password)  # Only update the password if provided
+            updated = True
+
+        # Only save the user if something was updated
+        if updated:
+            user.save(using=self._db)
+        
+        return user
+
+
 
     def create_superuser(self, email, name,  password=None):
         """
@@ -181,6 +213,9 @@ class Employee(AbstractBaseUser):
     qualifications = models.ManyToManyField(
         'Qualification', related_name='employees', blank=True
     )
+    region = models.ForeignKey(
+        'Region', on_delete=models.CASCADE, null=True, blank=True, related_name='employees'
+    )
     date_of_last_promotion = models.DateField(default="1900-01-01", blank=True, null=True)
     date_current_posting = models.DateField(default="1900-01-01", blank=True, null=True)
     date_current_assignment = models.DateField(default="1900-01-01", blank=True, null=True)
@@ -217,6 +252,7 @@ class Employee(AbstractBaseUser):
     
 
     def save(self, *args, **kwargs):
+
         # Hash the password only if it's not already hashed
         if self.pk is None or (self.password and not self.password.startswith('pbkdf2_')):
             self.set_password(self.password)  # Hash the password

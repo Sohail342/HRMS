@@ -65,7 +65,7 @@
                 </div>
             </div>
         </form>
-        <h1 class="text-xl text-center font-bold mb-4">{{request.user.branch.branch_region}} Region</h1>
+        <h1 class="text-xl text-center font-bold mb-4">{{request.user.region}} Region</h1>
         <!-- Table -->
         <div class="overflow-x-auto">
             <table class="min-w-full border-collapse border border-gray-300">
@@ -127,7 +127,7 @@
                         {% for employee in page_obj %}
                         <tr class="hover:bg-gray-100 transition duration-150 ease-in-out">
                             
-                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.branch_code }}</td>
+                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.branch.branch_code }}</td>
                             <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.branch }}</td>
                             <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">
                                 <a href="{% url 'HRMS:employee_detail' employee.SAP_ID %}" class="text-blue-600 hover:underline">{{ employee.SAP_ID }}</a>
@@ -208,7 +208,7 @@
         if (data.employees.length) {
             data.employees.forEach(employee => {
                 const row = `<tr class="hover:bg-slate-100">
-                    <td class="border border-slate-300 px-6 py-6 text-sm md:text-base">${employee.branch_code}</td>
+                    <td class="border border-slate-300 px-6 py-6 text-sm md:text-base">${employee.Branch_code}</td>
                     <td class="border border-slate-300 px-6 py-6 text-sm md:text-base">${employee.branch}</td>
                     <td class="border border-slate-300 px-6 py-6 text-sm md:text-base">
                         <a href="${employee.SAP_ID}" class="text-blue-600 hover:underline">${employee.SAP_ID}</a>
@@ -218,6 +218,8 @@
                     <td class="border border-slate-300 px-6 py-6 text-sm md:text-base">${employee.designation}</td>
                     <td class="border border-slate-300 px-6 py-6 text-sm md:text-base">${employee.employee_grade}</td>
                     <td class="border border-slate-300 px-6 py-6 text-sm md:text-base">${employee.date_of_joining}</td>
+                    <td class="border border-slate-300 px-6 py-6 text-sm md:text-base">${employee.pending_inquiry}</td>
+                    <td class="border border-slate-300 px-6 py-6 text-sm md:text-base">${employee.remarks}</td>
                 </tr>`;
                 tableBody.insertAdjacentHTML("beforeend", row);
             });
