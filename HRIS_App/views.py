@@ -28,22 +28,16 @@ def employees_view(request):
     search_query = request.GET.get('search', '')
     employee_type = request.GET.get('employee_type', '')
     designation = request.GET.get('designation', '')
-    cadre = request.GET.get('cadre', '')
     employee_grade = request.GET.get('employeeGrade', '')
     branch = request.GET.get('branch', '')
-    qualification = request.GET.get('qualification', '')
 
     # Apply filters
     if branch:
         employees = employees.filter(branch__branch_name__icontains=branch)
-    if qualification:
-        employees = employees.filter(qualifications__name__icontains=qualification)
     if search_query:
         employees = employees.filter(SAP_ID__icontains=search_query)
     if employee_type:
         employees = employees.filter(employee_type=employee_type)
-    if cadre:
-        employees = employees.filter(cadre__name=cadre)
     if designation:
         employees = employees.filter(designation__title=designation)
     if employee_grade:
@@ -81,7 +75,6 @@ def employees_view(request):
         }
         return JsonResponse(data)
 
-    # Prepare context for rendering
     context = {
         "page_obj": page_obj,
         "search_query": search_query,
@@ -142,7 +135,7 @@ def download_employees_csv(request):
     # Define a mapping of column names to the employee model fields
     column_mapping = {
         'SAP ID': 'SAP_ID',
-        'Full Name': 'full_name',
+        'Full Name': 'name',
         'Employee Type': 'employee_type',
         'Designation': 'designation',
         'Employee Grade': 'employee_grade',

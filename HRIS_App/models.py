@@ -191,6 +191,8 @@ class Employee(AbstractBaseUser):
     employee_email = models.EmailField(max_length=100, blank=True, null=True, default="aa@aa.aa")
     date_of_joining = models.DateField(default="1900-01-01", blank=True, null=True)
     user_group = models.CharField(max_length=200, default=None, blank=True, null=True)
+    pending_inquiry = models.BooleanField(default=False)
+    remarks = models.TextField(blank=True, null=True)
 
     objects = MyUserManager()
 

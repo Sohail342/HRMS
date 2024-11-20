@@ -30,6 +30,8 @@ class AdminEmployeeForm(forms.ModelForm):
             'employee_email', 
             'date_of_joining', 
             'user_group',
+            'pending_inquiry',
+            'remarks',
              
         )
     
@@ -47,4 +49,4 @@ class AdminEmployeeForm(forms.ModelForm):
 class NonAdminEmployeeForm(forms.ModelForm):
     class Meta:
         model = Employee
-        fields = ('SAP_ID', 'name', 'branch', 'designation', 'employee_type',  'employee_grade', 'email', 'date_of_joining', 'designation', 'is_admin_employee',)
+        fields = ('SAP_ID', 'name', 'branch', 'designation', 'employee_type',  'employee_grade', 'email', 'date_of_joining', 'designation', 'is_admin_employee', 'pending_inquiry', 'remarks',)

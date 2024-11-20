@@ -71,7 +71,7 @@
             <table class="min-w-full border-collapse border border-gray-300">
                 <thead>
                     <tr class="bg-gray-200 text-gray-700">
-                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Branch Code</th>
+                        <th class="border border-gray-300 px-10 py-8 text-left text-sm md:text-base">Branch Code</th>
                         <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Branch
                             <select id="branchFilter" name="branch" class="w-24 border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out text-gray-700 bg-white hover:bg-gray-50" onchange="filterEmployees()">
                                 <option value="">All</option>
@@ -118,6 +118,8 @@
                             </select>
                         </th>
                         <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Date of Joining</th>
+                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Pending Inquiry</th>
+                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Remarks</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -125,22 +127,30 @@
                         {% for employee in page_obj %}
                         <tr class="hover:bg-gray-100 transition duration-150 ease-in-out">
                             
-                            <td class="border border-gray-300 px-4 py-2 text-sm md:text-base">{{ employee.branch_code }}</td>
-                            <td class="border border-gray-300 px-4 py-2 text-sm md:text-base">{{ employee.branch }}</td>
-                            <td class="border border-gray-300 px-4 py-2 text-sm md:text-base">
+                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.branch_code }}</td>
+                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.branch }}</td>
+                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">
                                 <a href="{% url 'HRMS:employee_detail' employee.SAP_ID %}" class="text-blue-600 hover:underline">{{ employee.SAP_ID }}</a>
                             
                             </td>
-                            <td class="border border-gray-300 px-4 py-2 text-sm md:text-base">{{ employee.name }}</td>
-                            <td class="border border-gray-300 px-4 py-2 text-sm md:text-base">{{ employee.employee_type }}</td>
-                            <td class="border border-gray-300 px-4 py-2 text-sm md:text-base">{{ employee.designation }}</td>
-                            <td class="border border-gray-300 px-4 py-2 text-sm md:text-base">{{ employee.employee_grade }}</td>
-                            <td class="border border-gray-300 px-4 py-2 text-sm md:text-base">{{ employee.date_of_joining }}</td>
+                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.name }}</td>
+                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.employee_type }}</td>
+                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.designation }}</td>
+                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.employee_grade }}</td>
+                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.date_of_joining }}</td>
+                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">
+                                {% if employee.pending_inquiry %}
+                                    <span class="text-green-600 font-semibold">Yes</span>
+                                {% else %}
+                                    <span class="text-red-600 font-semibold">No</span>
+                                {% endif %}
+                            </td>
+                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.remarks }}</td>
                         </tr>
                         {% endfor %}
                     {% else %}
                         <tr>
-                            <td colspan="18" class="border border-gray-300 px-4 py-2 text-center">No employees found</td>
+                            <td colspan="18" class="border border-gray-300 px-6 py-6 text-center">No employees found</td>
                         </tr>
                     {% endif %}
                 </tbody>
@@ -198,21 +208,21 @@
         if (data.employees.length) {
             data.employees.forEach(employee => {
                 const row = `<tr class="hover:bg-slate-100">
-                    <td class="border border-slate-300 px-4 py-2 text-sm md:text-base">${employee.branch_code}</td>
-                    <td class="border border-slate-300 px-4 py-2 text-sm md:text-base">${employee.branch}</td>
-                    <td class="border border-slate-300 px-4 py-2 text-sm md:text-base">
+                    <td class="border border-slate-300 px-6 py-6 text-sm md:text-base">${employee.branch_code}</td>
+                    <td class="border border-slate-300 px-6 py-6 text-sm md:text-base">${employee.branch}</td>
+                    <td class="border border-slate-300 px-6 py-6 text-sm md:text-base">
                         <a href="${employee.SAP_ID}" class="text-blue-600 hover:underline">${employee.SAP_ID}</a>
                     </td>
-                    <td class="border border-slate-300 px-4 py-2 text-sm md:text-base">${employee.full_name}</td>
-                    <td class="border border-slate-300 px-4 py-2 text-sm md:text-base">${employee.employee_type}</td>
-                    <td class="border border-slate-300 px-4 py-2 text-sm md:text-base">${employee.designation}</td>
-                    <td class="border border-slate-300 px-4 py-2 text-sm md:text-base">${employee.employee_grade}</td>
-                    <td class="border border-slate-300 px-4 py-2 text-sm md:text-base">${employee.date_of_joining}</td>
+                    <td class="border border-slate-300 px-6 py-6 text-sm md:text-base">${employee.name}</td>
+                    <td class="border border-slate-300 px-6 py-6 text-sm md:text-base">${employee.employee_type}</td>
+                    <td class="border border-slate-300 px-6 py-6 text-sm md:text-base">${employee.designation}</td>
+                    <td class="border border-slate-300 px-6 py-6 text-sm md:text-base">${employee.employee_grade}</td>
+                    <td class="border border-slate-300 px-6 py-6 text-sm md:text-base">${employee.date_of_joining}</td>
                 </tr>`;
                 tableBody.insertAdjacentHTML("beforeend", row);
             });
         } else {
-            tableBody.innerHTML = `<tr><td colspan="12" class="border border-slate-300 px-4 py-2 text-center">No employees found</td></tr>`;
+            tableBody.innerHTML = `<tr><td colspan="12" class="border border-slate-300 px-6 py-6 text-center">No employees found</td></tr>`;
         }
     })
     .catch((error) => {
