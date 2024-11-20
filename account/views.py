@@ -17,10 +17,9 @@ def login_view(request):
             user = authenticate(request=request, username=email, password=password)
 
             if user is not None:
-                if not user.is_approved:
-                    messages.error(request, "Your account is not approved yet.")
-                    return redirect(reverse('account:login'))
-
+                if not user.is_admin_employee:
+                    messages.error(request, "You are not allow to login.")
+                    return redirect('account:login')
                 login(request, user)
                 return redirect('HRMS:home')
             else:

@@ -106,7 +106,7 @@ class Qualification(models.Model):
 
 
 class MyUserManager(BaseUserManager):
-    def create_user(self, email, name, password=None, password2=None):
+    def create_user(self, email, name, password=None, password2=None, is_admin_employee=False):
         """
         Creates and saves a User with the given email, terms_conditions
         name and password.
@@ -117,9 +117,14 @@ class MyUserManager(BaseUserManager):
         user = self.model(
             email=self.normalize_email(email),
             name=name,
+            is_admin_employee=is_admin_employee,
         )
         
-        user.set_password(password)
+        if is_admin_employee and password:  # Only set a password if the user is an admin employee
+            user.set_password(password)
+        else:
+            user.set_unusable_password()
+
         user.save(using=self._db)
         return user
 
@@ -131,12 +136,12 @@ class MyUserManager(BaseUserManager):
         user = self.create_user(
             email,
             name=name,
+            is_admin_employee=True,
         )
 
         user.set_password(password)
 
         user.is_admin = True
-        user.is_approved = True 
         user.is_active = True 
         user.save(using=self._db)
         return user
@@ -150,12 +155,11 @@ class Employee(AbstractBaseUser):
     name = models.CharField(max_length=200)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
-    is_approved = models.BooleanField(default=False)
+    is_admin_employee = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     # Employee-related fields
-    full_name = models.CharField(max_length=100, blank=True, null=True)
     cnic_no = models.CharField(max_length=13, unique=True, blank=True, null=True)
     husband_or_father_name = models.CharField(max_length=100, blank=True, null=True)
     SAP_ID = models.IntegerField(default=None, unique=True, blank=True, null=True,)

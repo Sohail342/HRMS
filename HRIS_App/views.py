@@ -63,7 +63,7 @@ def employees_view(request):
             'employees': [
                 {
                     'SAP_ID': emp.SAP_ID,
-                    'full_name': emp.full_name if emp.full_name else "N/A",
+                    'full_name': emp.name if emp.name else "N/A",
                     'employee_type': emp.employee_type.name if emp.employee_type else "N/A",
                     'designation': emp.designation.title if emp.designation else "N/A",
                     'employee_grade': emp.employee_grade.grade_name if emp.employee_grade else "N/A",
