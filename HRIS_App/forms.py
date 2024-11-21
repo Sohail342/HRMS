@@ -1,5 +1,5 @@
 from django import forms
-from .models import Employee, Region, Branch
+from .models import Employee,  Branch
 
 class AdminEmployeeForm(forms.ModelForm):
     class Meta:
@@ -25,13 +25,13 @@ class AdminEmployeeForm(forms.ModelForm):
             'date_current_posting', 
             'date_current_assignment', 
             'mobile_number', 
-            'admin_signature', 
-            'phone_no_official', 
+            'admin_signature',  
             'phone_no_emergency_contact', 
             'employee_email', 
             'date_of_joining', 
             'user_group',
             'pending_inquiry',
+            'transferred_status',
             'remarks',
         )
 

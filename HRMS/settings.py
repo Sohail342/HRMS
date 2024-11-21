@@ -31,7 +31,6 @@ INSTALLED_APPS = [
     'django_extensions',
     
     'tailwind',
-    # 'theme',
     'django_browser_reload',
     'import_export',
     "widget_tweaks",
@@ -39,6 +38,7 @@ INSTALLED_APPS = [
     'HRIS_App',
     'reporting',
     'account',
+    'transfer_employees',
 ]
 
 

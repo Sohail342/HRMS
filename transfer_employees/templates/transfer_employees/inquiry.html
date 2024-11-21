@@ -1,0 +1,53 @@
+{% extends "sidebar.html" %}
+
+{% block content %}
+<div class="max-w-lg mx-auto bg-white p-6 shadow-md rounded-md border border-gray-300">
+    
+    <!-- Message to the user about Pending Inquiry -->
+    <div class="bg-yellow-100 text-yellow-800 p-4 mb-4 rounded-md border border-yellow-200">
+        <strong>Note:</strong> To submit the form, you need to select "Yes" for the Pending Inquiry field.
+    </div>
+
+    <form method="post" action="">
+        {% csrf_token %}
+
+        <!-- Pending Inquiry Field -->
+        <div class="mb-4">
+            <label for="{{ form.pending_inquiry.id_for_label }}" 
+                   class="block text-sm font-medium text-gray-700 mb-2 
+                          peer-placeholder-shown:text-blue-500 peer-placeholder-shown:font-semibold peer-focus:text-blue-600 peer-focus:font-semibold">
+                Pending Inquiry
+            </label>
+            {{ form.pending_inquiry }}
+        </div>
+
+        <!-- Remarks Field -->
+        <div class="mb-4">
+            <label for="{{ form.remarks.id_for_label }}" 
+                   class="block text-sm font-medium text-gray-700 mb-2 
+                          peer-placeholder-shown:text-blue-500 peer-placeholder-shown:font-semibold peer-focus:text-blue-600 peer-focus:font-semibold">
+                Remarks
+            </label>
+            {{ form.remarks }}
+        </div>
+
+        <!-- Transferred Status Field -->
+        <div class="mb-4">
+            <label for="{{ form.transferred_status.id_for_label }}" 
+                   class="block text-sm font-medium text-gray-700 mb-2 
+                          peer-placeholder-shown:text-blue-500 peer-placeholder-shown:font-semibold peer-focus:text-blue-600 peer-focus:font-semibold">
+                Transfer Status
+            </label>
+            {{ form.transferred_status }}
+        </div>
+
+        <!-- Submit Button -->
+        <div>
+            <button type="submit" 
+                    class="w-full bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-150">
+                Submit
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock content %}

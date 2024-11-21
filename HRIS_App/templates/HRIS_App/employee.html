@@ -120,6 +120,7 @@
                         <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Date of Joining</th>
                         <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Pending Inquiry</th>
                         <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Remarks</th>
+                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Update Pending Remarks</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -146,6 +147,11 @@
                                 {% endif %}
                             </td>
                             <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.remarks }}</td>
+                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">
+                                {% if not employee.pending_inquiry %}
+                                <a  href="{% url 'transfer_employees:transfer' employee.SAP_ID %}" class="bg-blue-500 text-white px-4 py-1 rounded-md hover:bg-blue-600 transition duration-150">Update</a>
+                                {% endif %}
+                            </td> 
                         </tr>
                         {% endfor %}
                     {% else %}
@@ -207,6 +213,7 @@
 
         if (data.employees.length) {
             data.employees.forEach(employee => {
+                const pendingInquiryClass = employee.pending_inquiry === "No" ? "text-red-600 font-semibold" : "text-green-600 font-semibold";
                 const row = `<tr class="hover:bg-slate-100">
                     <td class="border border-slate-300 px-6 py-6 text-sm md:text-base">${employee.Branch_code}</td>
                     <td class="border border-slate-300 px-6 py-6 text-sm md:text-base">${employee.branch}</td>
@@ -218,7 +225,7 @@
                     <td class="border border-slate-300 px-6 py-6 text-sm md:text-base">${employee.designation}</td>
                     <td class="border border-slate-300 px-6 py-6 text-sm md:text-base">${employee.employee_grade}</td>
                     <td class="border border-slate-300 px-6 py-6 text-sm md:text-base">${employee.date_of_joining}</td>
-                    <td class="border border-slate-300 px-6 py-6 text-sm md:text-base">${employee.pending_inquiry}</td>
+                    <td class="border border-slate-300 px-6 py-6 text-sm md:text-base ${pendingInquiryClass}">${employee.pending_inquiry}</td>
                     <td class="border border-slate-300 px-6 py-6 text-sm md:text-base">${employee.remarks}</td>
                 </tr>`;
                 tableBody.insertAdjacentHTML("beforeend", row);

@@ -192,6 +192,12 @@ class Employee(AbstractBaseUser):
     updated_at = models.DateTimeField(auto_now=True)
 
     # Employee-related fields
+
+    TRANSFER_CHOICES = [
+        ('within_group', 'Transferred within Group'),
+        ('outside_group', 'Transferred outside Group'),
+    ]
+
     cnic_no = models.CharField(max_length=13, unique=True, blank=True, null=True)
     husband_or_father_name = models.CharField(max_length=100, blank=True, null=True)
     SAP_ID = models.IntegerField(default=None, unique=True, blank=True, null=True,)
@@ -221,13 +227,15 @@ class Employee(AbstractBaseUser):
     date_current_assignment = models.DateField(default="1900-01-01", blank=True, null=True)
     mobile_number = models.CharField(max_length=15, blank=True, null=True, default="1111")
     admin_signature = models.BooleanField(default=False)
-    phone_no_official = models.CharField(max_length=15, blank=True, null=True, default="1111")
     phone_no_emergency_contact = models.CharField(max_length=15, blank=True, null=True, default="1111")
     employee_email = models.EmailField(max_length=100, blank=True, null=True, default="aa@aa.aa")
     date_of_joining = models.DateField(default="1900-01-01", blank=True, null=True)
     user_group = models.CharField(max_length=200, default=None, blank=True, null=True)
+    transferred_status = models.CharField(max_length=20, choices=TRANSFER_CHOICES, blank=True, null=True)
     pending_inquiry = models.BooleanField(default=False)
     remarks = models.TextField(blank=True, null=True)
+    
+    
 
     objects = MyUserManager()
 
@@ -256,9 +264,16 @@ class Employee(AbstractBaseUser):
         # Hash the password only if it's not already hashed
         if self.pk is None or (self.password and not self.password.startswith('pbkdf2_')):
             self.set_password(self.password)  # Hash the password
+
+        '''When Pending case is False, remove remarks and transferred_status'''
+        if not self.pending_inquiry:
+            self.remarks = ""
+            self.transferred_status = ""
+    
+
         super(Employee, self).save(*args, **kwargs)
 
-
+        
 
     def set_password(self, raw_password):
         super().set_password(raw_password)
