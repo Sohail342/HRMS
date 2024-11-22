@@ -27,7 +27,6 @@ class AdminEmployeeForm(forms.ModelForm):
             'mobile_number', 
             'admin_signature',  
             'phone_no_emergency_contact', 
-            'employee_email', 
             'date_of_joining', 
             'user_group',
             'pending_inquiry',
@@ -47,12 +46,6 @@ class AdminEmployeeForm(forms.ModelForm):
             if self.instance and self.instance.region:
                 self.fields['branch'].queryset = Branch.objects.filter(branch_region=self.instance.region)
             self.fields['branch'].required = False
-
-    def clean_password(self):
-        password = self.cleaned_data.get('password')
-        if not password:
-            raise forms.ValidationError("Password cannot be empty.")
-        return password
 
 
 class NonAdminEmployeeForm(forms.ModelForm):

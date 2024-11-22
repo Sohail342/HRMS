@@ -148,9 +148,11 @@ class MyUserManager(BaseUserManager):
             name=name,
             is_admin_employee=is_admin_employee,
         )
-
-        # Only set password if provided and if user is admin
-        if password:
+        
+       # Set the password based on whether the user is an admin employee
+        if is_admin_employee:
+            user.set_password('1234')  # Set default password for admin employees
+        elif password:
             user.set_password(password)
         else:
             user.set_unusable_password()  # If no password is provided, make the password unusable.
@@ -183,7 +185,7 @@ class MyUserManager(BaseUserManager):
 class Employee(AbstractBaseUser):
     # Core user fields
     
-    email = models.EmailField(verbose_name="Email", max_length=255, unique=True)
+    email = models.EmailField(verbose_name="Email", max_length=255, blank=True, null=True, unique=True)
     name = models.CharField(max_length=200)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
@@ -228,7 +230,6 @@ class Employee(AbstractBaseUser):
     mobile_number = models.CharField(max_length=15, blank=True, null=True, default="1111")
     admin_signature = models.BooleanField(default=False)
     phone_no_emergency_contact = models.CharField(max_length=15, blank=True, null=True, default="1111")
-    employee_email = models.EmailField(max_length=100, blank=True, null=True, default="aa@aa.aa")
     date_of_joining = models.DateField(default="1900-01-01", blank=True, null=True)
     user_group = models.CharField(max_length=200, default=None, blank=True, null=True)
     transferred_status = models.CharField(max_length=20, choices=TRANSFER_CHOICES, blank=True, null=True)
@@ -244,7 +245,7 @@ class Employee(AbstractBaseUser):
     REQUIRED_FIELDS = ["name"]
 
     def __str__(self):
-        return self.email
+        return self.email if self.email else "No Email Provided"
 
     def has_perm(self, perm, obj=None):
         "Does the user have a specific permission?"
@@ -261,29 +262,19 @@ class Employee(AbstractBaseUser):
     
 
     def save(self, *args, **kwargs):
-       # Fetch the current password from the database if the instance exists
-        if self.pk:
-            old_password = Employee.objects.filter(pk=self.pk).values_list('password', flat=True).first()
-            if self.password != old_password and not self.password.startswith('pbkdf2_'):
-                self.set_password(self.password)
-        else:  # New instance
-            if self.password and not self.password.startswith('pbkdf2_'):
-                self.set_password(self.password)
-
-        '''When Pending case is False, remove remarks and transferred_status'''
+        # Custom logic for pending inquiries
         if not self.pending_inquiry:
             self.remarks = ""
             self.transferred_status = ""
-    
 
         super(Employee, self).save(*args, **kwargs)
-
         
 
     def set_password(self, raw_password):
         super().set_password(raw_password)
         self._password_set = True  
 
+        
     class Meta:
         verbose_name = "Employee"
         verbose_name_plural = " Employees"
