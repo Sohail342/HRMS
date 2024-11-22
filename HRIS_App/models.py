@@ -8,6 +8,10 @@ class Group(models.Model):
 
     def __str__(self):
         return self.name
+    
+    class Meta:
+        verbose_name = "Group"
+        verbose_name_plural = "  Groups"
 
 
 class FunctionalGroup(models.Model):
@@ -23,6 +27,10 @@ class Division(models.Model):
     division_name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True, null=True,default=None)
     functional_group = models.ForeignKey(FunctionalGroup, on_delete=models.CASCADE, related_name='divisions')
+
+    class Meta:
+        verbose_name = "Division"
+        verbose_name_plural = " Division"
 
     def __str__(self):
         return self.division_name
@@ -47,6 +55,10 @@ class Region(models.Model):
 
     def __str__(self):
         return self.name
+    
+    class Meta:
+        verbose_name = "Region"
+        verbose_name_plural = "  Regions"
 
 
 class Branch(models.Model):
@@ -58,6 +70,10 @@ class Branch(models.Model):
 
     def __str__(self):
         return self.branch_name
+    
+    class Meta:
+        verbose_name = "Branch"
+        verbose_name_plural = " Branches"
 
 
 class Designation(models.Model):
@@ -82,6 +98,11 @@ class EmployeeType(models.Model):
 
     def __str__(self):
         return self.name
+    
+    class Meta:
+        verbose_name = "Employee Type"
+        verbose_name_plural = " Employee Types"
+
 
 
 class EmployeeGrade(models.Model):
@@ -90,6 +111,10 @@ class EmployeeGrade(models.Model):
 
     def __str__(self):
         return self.grade_name
+    
+    class Meta:
+        verbose_name = "Employee Grade"
+        verbose_name_plural = " Employee Grades"
 
 
 class Qualification(models.Model):
@@ -131,31 +156,6 @@ class MyUserManager(BaseUserManager):
             user.set_unusable_password()  # If no password is provided, make the password unusable.
 
         user.save(using=self._db)
-        return user
-
-    def update_user(self, user, name=None, email=None, password=None, is_admin_employee=None):
-        """
-        Update an existing user without resetting the password unless specified.
-        """
-        updated = False
-
-        if name:
-            user.name = name
-            updated = True
-        if email:
-            user.email = self.normalize_email(email)
-            updated = True
-        if is_admin_employee is not None:
-            user.is_admin_employee = is_admin_employee
-            updated = True
-        if password:
-            user.set_password(password)  # Only update the password if provided
-            updated = True
-
-        # Only save the user if something was updated
-        if updated:
-            user.save(using=self._db)
-        
         return user
 
 
@@ -234,6 +234,7 @@ class Employee(AbstractBaseUser):
     transferred_status = models.CharField(max_length=20, choices=TRANSFER_CHOICES, blank=True, null=True)
     pending_inquiry = models.BooleanField(default=False)
     remarks = models.TextField(blank=True, null=True)
+    transfer_remarks = models.TextField(blank=True, null=True)
     
     
 
@@ -260,10 +261,14 @@ class Employee(AbstractBaseUser):
     
 
     def save(self, *args, **kwargs):
-
-        # Hash the password only if it's not already hashed
-        if self.pk is None or (self.password and not self.password.startswith('pbkdf2_')):
-            self.set_password(self.password)  # Hash the password
+       # Fetch the current password from the database if the instance exists
+        if self.pk:
+            old_password = Employee.objects.filter(pk=self.pk).values_list('password', flat=True).first()
+            if self.password != old_password and not self.password.startswith('pbkdf2_'):
+                self.set_password(self.password)
+        else:  # New instance
+            if self.password and not self.password.startswith('pbkdf2_'):
+                self.set_password(self.password)
 
         '''When Pending case is False, remove remarks and transferred_status'''
         if not self.pending_inquiry:
@@ -278,5 +283,9 @@ class Employee(AbstractBaseUser):
     def set_password(self, raw_password):
         super().set_password(raw_password)
         self._password_set = True  
+
+    class Meta:
+        verbose_name = "Employee"
+        verbose_name_plural = " Employees"
 
 

@@ -121,6 +121,8 @@
                         <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Pending Inquiry</th>
                         <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Remarks</th>
                         <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Update Pending Remarks</th>
+                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Transfer</th>
+                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Transfer Remarks</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -148,10 +150,16 @@
                             </td>
                             <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.remarks }}</td>
                             <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">
-                                {% if not employee.pending_inquiry %}
-                                <a  href="{% url 'transfer_employees:transfer' employee.SAP_ID %}" class="bg-blue-500 text-white px-4 py-1 rounded-md hover:bg-blue-600 transition duration-150">Update</a>
+                                
+                                <a  href="{% url 'transfer_employees:pending' employee.SAP_ID %}" class="bg-blue-500 text-white px-4 py-1 rounded-md hover:bg-blue-600 transition duration-150">Update</a>
+                                
+                            </td>
+                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">
+                                {% if not employee.transfer_remarks %}
+                                <a  href="{% url 'transfer_employees:transfer' employee.SAP_ID %}" class="bg-blue-500 text-white px-4 py-1 rounded-md hover:bg-blue-600 transition duration-150">Transfer</a>
                                 {% endif %}
-                            </td> 
+                            </td>  
+                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.transfer_remarks }}</td>
                         </tr>
                         {% endfor %}
                     {% else %}

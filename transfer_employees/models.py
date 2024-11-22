@@ -4,8 +4,7 @@ from HRIS_App.models import Employee
 class Inquiry(models.Model):
     admin_employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='inquiries')
     transferred_employee = models.CharField(max_length=200, default='', blank=True, null=True) 
-    pending_inquiry = models.BooleanField(default=False)
-    remarks = models.TextField(blank=True, null=True)
+    transfer_remarks = models.TextField(blank=True, null=True)
     transferred_status = models.CharField(
         max_length=20,
         choices=[('within_group', 'Transferred Within Group'), ('outside_group', 'Transferred Outside Group')],

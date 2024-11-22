@@ -11,7 +11,7 @@ from django.views.generic import ListView
 #  AJAX request
 def get_employee_data(request):
     sap_id = request.GET.get('sap_id')
-    employee = get_object_or_404(Employee, SAP_ID=sap_id, admin_signuture=True)
+    employee = get_object_or_404(Employee, SAP_ID=sap_id, admin_signature=True)
 
     
     data = {
@@ -32,7 +32,7 @@ class MemorandumMixin:
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['admin_signuture'] = Employee.objects.filter(admin_signuture=True)
+        context['admin_signuture'] = Employee.objects.filter(admin_signature=True)
         context['employees'] = Employee.objects.all()
         context['current_time'] = timezone.now()
         return context

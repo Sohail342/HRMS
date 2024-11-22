@@ -33,6 +33,7 @@ class AdminEmployeeForm(forms.ModelForm):
             'pending_inquiry',
             'transferred_status',
             'remarks',
+            'transfer_remarks',
         )
 
     def __init__(self, *args, **kwargs):
@@ -59,7 +60,7 @@ class NonAdminEmployeeForm(forms.ModelForm):
         model = Employee
         fields = ('SAP_ID', 'name', 'region', 'branch', 'designation', 'employee_type', 
                   'employee_grade', 'email', 'date_of_joining', 'is_admin_employee', 
-                  'pending_inquiry', 'remarks')
+                  'pending_inquiry', 'remarks', 'transfer_remarks')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
