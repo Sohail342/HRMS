@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
@@ -46,6 +47,7 @@ class Wing(models.Model):
 
 
 class Region(models.Model):
+    region_id = models.IntegerField(unique=True, default=None)
     name = models.CharField(max_length=100, unique=True)
     region_category = models.CharField(max_length=100, blank=True, null=True)
     functional_group = models.ManyToManyField(FunctionalGroup, related_name='regions')
@@ -66,7 +68,7 @@ class Branch(models.Model):
     branch_name = models.CharField(max_length=100, unique=True)
     branch_Category = models.CharField(max_length=100, default=None)
     branch_address = models.TextField(blank=True, null=True)
-    branch_region = models.ForeignKey(Region, on_delete=models.CASCADE, to_field='name', null=True,  blank=True)
+    region = models.ForeignKey(Region, on_delete=models.CASCADE, to_field="name", null=True,  blank=True)
 
     def __str__(self):
         return self.branch_name
@@ -134,22 +136,20 @@ class Qualification(models.Model):
 
 
 class MyUserManager(BaseUserManager):
-    def create_user(self, email, name, password=None, password2=None, is_admin_employee=False):
+    def create_user(self, email, name, password=None, is_admin_employee=False):
         """
         Creates and saves a User with the given email, name, and password.
-        If the user already exists, it ensures the password is not overwritten.
         """
         if not email:
             raise ValueError("Users must have an email address")
-
-        # Check if user exists or create a new user instance
+        
         user = self.model(
             email=self.normalize_email(email),
             name=name,
             is_admin_employee=is_admin_employee,
         )
         
-       # Set the password based on whether the user is an admin employee
+        # Set the password
         if is_admin_employee:
             user.set_password('1234')  # Set default password for admin employees
         elif password:
@@ -160,25 +160,18 @@ class MyUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-
-
-    def create_superuser(self, email, name,  password=None):
-        """
-        Creates and saves a superuser with the given email, name
-        and password.
-        """
+    def create_superuser(self, email, name, password=None):
         user = self.create_user(
-            email,
+            email=email,
             name=name,
-            is_admin_employee=True,
+            password=password,
+            is_admin_employee=True,  # Superusers are admin employees
         )
-
-        user.set_password(password)
-
         user.is_admin = True
-        user.is_active = True 
+        user.is_active = True
         user.save(using=self._db)
         return user
+
 
 
 
@@ -216,13 +209,13 @@ class Employee(AbstractBaseUser):
         'EmployeeGrade', on_delete=models.SET_NULL, null=True, blank=True, to_field="grade_name"
     )
     branch = models.ForeignKey(
-        'Branch', on_delete=models.CASCADE, null=True, blank=True, related_name='employees', to_field="branch_name"
+        'Branch', on_delete=models.CASCADE, null=True, blank=True, related_name='employees', to_field="branch_code"
     )
     qualifications = models.ManyToManyField(
         'Qualification', related_name='employees', blank=True
     )
     region = models.ForeignKey(
-        'Region', on_delete=models.CASCADE, null=True, blank=True, related_name='employees'
+        'Region', on_delete=models.CASCADE, null=True, to_field="name",  blank=True, related_name='employees'
     )
     date_of_last_promotion = models.DateField(default="1900-01-01", blank=True, null=True)
     date_current_posting = models.DateField(default="1900-01-01", blank=True, null=True)
@@ -236,7 +229,56 @@ class Employee(AbstractBaseUser):
     pending_inquiry = models.BooleanField(default=False)
     remarks = models.TextField(blank=True, null=True)
     transfer_remarks = models.TextField(blank=True, null=True)
+
+     # New grading field for APA 2024
+    GRADE_CHOICES = [
+        ('A - Excellent', 'A - Excellent'),
+        ('B - Very Good', 'B - Very Good'),
+        ('C - Good', 'C - Good'),
+        ('D - Needs Improvement', 'D - Needs Improvement'),
+        ('E - Unsatisfactory', 'E - Unsatisfactory'),
+    ]
+
+    grade_assignment = models.CharField(max_length=100, choices=GRADE_CHOICES, blank=True, null=True)
+
+    def clean(self):
+        # Call the validation method
+        self.validate_grades()
+
+
+    def validate_grades(self):
+        # Get the total number of employees
+        total_employees = Employee.objects.count()
+
+        # If there are no employees, no validation is necessary
+        if total_employees == 0:
+            return
+
+        # Count the number of employees with each grade
+        grade_counts = Employee.objects.values('grade_assignment').annotate(count=models.Count('id'))
+
+        print(f'Grades: {grade_counts}')
+        # Calculate the total percentage assigned
+        total_percentage = 0
+        for grade in grade_counts:
+            if grade['grade_assignment'] == 'A - Excellent':
+                total_percentage += grade['count'] * 0.20
+            elif grade['grade_assignment'] == 'B - Very Good':
+                total_percentage += grade['count'] * 0.25
+            elif grade['grade_assignment'] == 'C - Good':
+                total_percentage += grade['count'] * 0.40
+            elif grade['grade_assignment'] == 'D - Needs Improvement':
+                total_percentage += grade['count'] * 0.10
+            elif grade['grade_assignment'] == 'E - Unsatisfactory':
+                total_percentage += grade['count'] * 0.05
+
+        # Calculate the percentage based on the total number of employees
+        total_percentage = (total_percentage / total_employees) * 100
     
+
+        # Check if the total percentage exceeds 100%
+        if total_percentage > 100:
+            raise ValidationError("Total grade percentage assigned to employees exceeds 100%.")
     
 
     objects = MyUserManager()
@@ -262,17 +304,20 @@ class Employee(AbstractBaseUser):
     
 
     def save(self, *args, **kwargs):
-        # Custom logic for pending inquiries
+
+        # Clear remarks and transfer status if no pending inquiry
         if not self.pending_inquiry:
             self.remarks = ""
             self.transferred_status = ""
 
-        super(Employee, self).save(*args, **kwargs)
+        self.full_clean()  # Ensure all validations are applied
+        super().save(*args, **kwargs)
+
         
 
-    def set_password(self, raw_password):
-        super().set_password(raw_password)
-        self._password_set = True  
+    # def set_password(self, raw_password):
+    #     super().set_password(raw_password)
+    #     self._password_set = True  
 
         
     class Meta:

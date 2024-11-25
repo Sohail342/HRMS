@@ -44,6 +44,26 @@
             <input type="checkbox" name="columns" value="Joining Date" checked class="form-checkbox text-indigo-600 h-4 w-4">
             <span class="ml-2 text-gray-700">Date of Joining</span>
         </div>
+
+        <div class="inline-flex items-center">
+            <input type="checkbox" name="columns" value="Pending Inquiry" checked class="form-checkbox text-indigo-600 h-4 w-4">
+            <span class="ml-2 text-gray-700">Pending Inquiry</span> 
+        </div>
+
+        <div class="inline-flex items-center">
+            <input type="checkbox" name="columns" value="Remarks" checked class="form-checkbox text-indigo-600 h-4 w-4">
+            <span class="ml-2 text-gray-700">Remarks</span>
+        </div>
+
+        <div class="inline-flex items-center">
+            <input type="checkbox" name="columns" value="Transfer Remarks" checked class="form-checkbox text-indigo-600 h-4 w-4">
+            <span class="ml-2 text-gray-700">Transfer Remarks</span>
+        </div>
+
+        <div class="inline-flex items-center">
+            <input type="checkbox" name="columns" value="APA 2024" checked class="form-checkbox text-indigo-600 h-4 w-4">
+            <span class="ml-2 text-gray-700">APA 2024</span>
+        </div>
     </div>
     
 
@@ -123,6 +143,8 @@
                         <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Update Pending Remarks</th>
                         <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Transfer</th>
                         <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Transfer Remarks</th>
+                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">APA 2024</th>
+                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Update APA 2024</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -150,9 +172,7 @@
                             </td>
                             <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.remarks }}</td>
                             <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">
-                                
                                 <a  href="{% url 'transfer_employees:pending' employee.SAP_ID %}" class="bg-blue-500 text-white px-4 py-1 rounded-md hover:bg-blue-600 transition duration-150">Update</a>
-                                
                             </td>
                             <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">
                                 {% if not employee.transfer_remarks %}
@@ -160,6 +180,10 @@
                                 {% endif %}
                             </td>  
                             <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.transfer_remarks }}</td>
+                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.grade_assignment }}</td>
+                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">
+                                <a  href="{% url 'HRMS:assign_grade' employee.SAP_ID %}" class="bg-blue-500 text-white px-4 py-1 rounded-md hover:bg-blue-600 transition duration-150">Update</a>
+                            </td>
                         </tr>
                         {% endfor %}
                     {% else %}
@@ -235,6 +259,23 @@
                     <td class="border border-slate-300 px-6 py-6 text-sm md:text-base">${employee.date_of_joining}</td>
                     <td class="border border-slate-300 px-6 py-6 text-sm md:text-base ${pendingInquiryClass}">${employee.pending_inquiry}</td>
                     <td class="border border-slate-300 px-6 py-6 text-sm md:text-base">${employee.remarks}</td>
+                    <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">
+                                
+                        <a  href="/inquiry/${employee.SAP_ID}/" class="bg-blue-500 text-white px-4 py-1 rounded-md hover:bg-blue-600 transition duration-150">Update</a>
+                                
+                    </td>
+
+                    <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">
+                        ${!employee.transfer_remarks ? `<a href="/transfer/${employee.SAP_ID}" class="bg-blue-500 text-white px-4 py-1 rounded-md hover:bg-blue-600 transition duration-150">Transfer</a>` : ''}
+                    </td>
+
+                    <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">${employee.transfer_remarks}</td>
+                    <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">${employee.grade_assignment}</td>
+                    <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">
+                                
+                        <a  href="/assign_grade/${employee.SAP_ID}/" class="bg-blue-500 text-white px-4 py-1 rounded-md hover:bg-blue-600 transition duration-150">Update</a>
+                                
+                    </td>
                 </tr>`;
                 tableBody.insertAdjacentHTML("beforeend", row);
             });

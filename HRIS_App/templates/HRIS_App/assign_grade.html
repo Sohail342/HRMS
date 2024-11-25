@@ -1,0 +1,28 @@
+{% extends "sidebar.html" %}
+
+{% block content %}
+<div class="max-w-lg mx-auto bg-white p-6 shadow-md rounded-md border border-gray-300">
+
+    <form method="post" action="">
+        {% csrf_token %}
+
+        <!-- Transferred Status Field -->
+        <div class="mb-4">
+            <label for="{{ form.grade_assignment.id_for_label }}" 
+                   class="block text-sm font-medium text-gray-700 mb-2 
+                          peer-placeholder-shown:text-blue-500 peer-placeholder-shown:font-semibold peer-focus:text-blue-600 peer-focus:font-semibold">
+                APA 2024
+            </label>
+            {{ form.grade_assignment }}
+        </div>
+
+        <!-- Submit Button -->
+        <div>
+            <button type="submit" 
+                    class="w-full bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-150">
+                Submit
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock content %}

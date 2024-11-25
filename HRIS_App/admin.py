@@ -1,6 +1,6 @@
 from django.contrib import admin
 from unfold.admin import ModelAdmin
-from .resources import BranchResource, FunctionalGroupResource, RegionResource
+from .resources import FunctionalGroupResource, RegionResource, BranchResource, EmployeeResource
 from import_export.admin import ImportExportModelAdmin
 from unfold.contrib.import_export.forms import ExportForm, ImportForm
 from .forms import AdminEmployeeForm, NonAdminEmployeeForm
@@ -48,9 +48,9 @@ class RegionAdmin(ImportExportModelAdmin, ModelAdmin):
     resource_class = RegionResource
     export_form_class = ExportForm
     import_form_class = ImportForm
-    list_display = ('id', 'name', 'region_category')
+    list_display = ('region_id', 'name', 'region_category')
     list_filter = ('name', 'region_category','functional_group__name')
-    search_fields = ('id', 'name', 'region_category','functional_group__name')
+    search_fields = ('region_id', 'name', 'region_category','functional_group__name')
 
 
 @admin.register(Branch)
@@ -58,9 +58,9 @@ class BranchAdmin(ImportExportModelAdmin, ModelAdmin):
     resource_class = BranchResource 
     export_form_class = ExportForm
     import_form_class = ImportForm
-    list_display = ("branch_code", 'branch_name', 'branch_region__name', 'branch_address')
-    search_fields = ('id', 'branch_code', 'branch_name', 'branch_region__name')
-    list_filter = ('branch_name', 'branch_region__name')
+    list_display = ("branch_code", 'branch_name', 'region__name', 'branch_address')
+    search_fields = ('id', 'branch_code', 'branch_name', 'region__name')
+    list_filter = ('branch_name', 'region__name')
 
 @admin.register(Designation)
 class DesignationAdmin(ImportExportModelAdmin, ModelAdmin):
@@ -104,15 +104,13 @@ class QualificationAdmin(ImportExportModelAdmin, ModelAdmin):
 
 
 class EmployeeAdmin(ImportExportModelAdmin, ModelAdmin):
+    resource_class = EmployeeResource
     export_form_class = ExportForm
     import_form_class = ImportForm
-    list_display = ('SAP_ID', 'name', 'branch', 'branch__branch_region', 'designation', 'employee_grade', 'employee_type', 'date_of_joining', 'designation', 'is_admin_employee')
+    list_display = ('SAP_ID', 'name', 'branch', 'branch__region', 'designation', 'employee_grade', 'employee_type', 'date_of_joining', 'designation', 'is_admin_employee')
     list_filter = ('is_admin_employee', 'is_active', 'branch')
 
     def get_form(self, request, obj=None, **kwargs):
-        """
-        Use a different form based on whether the employee is admin or non-admin.
-        """
         if obj and obj.is_admin_employee:  # Use the admin employee form
             self.form = AdminEmployeeForm
         else:  # Use the non-admin employee form
@@ -124,7 +122,7 @@ class EmployeeAdmin(ImportExportModelAdmin, ModelAdmin):
         form_class.base_fields['branch'].required = False
 
         if obj and obj.branch:
-            region = obj.branch.branch_region
+            region = obj.branch.region
             if region and region.head_office:
                 form_class.base_fields['branch'].widget = forms.HiddenInput()
             else:
@@ -138,9 +136,19 @@ class EmployeeAdmin(ImportExportModelAdmin, ModelAdmin):
         """
         Save the model while ensuring password handling.
         """
-        # Handle the password hashing logic if necessary
-        if form.cleaned_data.get('password'):
-            obj.set_password(form.cleaned_data['password'])  # Hash the password
+        # Handle the password logic
+        new_password = form.cleaned_data.get('password')
+        
+        if change:  # If updating an existing employee
+            if new_password:  # If a new password is provided
+                obj.set_password(new_password)  # Hash the new password
+        else:  # If creating a new employee
+            if not new_password:  # If no password is provided, set the default password
+                obj.set_password('1234')  # Set your desired default password here
+            else:
+                obj.set_password(new_password)  # Hash the new password if provided
+
         obj.save()
+
 
 admin.site.register(Employee, EmployeeAdmin)

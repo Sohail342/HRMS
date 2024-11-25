@@ -2,6 +2,10 @@ from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 import csv
+from django.shortcuts import redirect
+from django.urls import reverse
+from django.views.generic import UpdateView
+from .forms import AssignGradeForm
 from django.db.models import CharField
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
@@ -66,6 +70,8 @@ def employees_view(request):
                     'date_of_joining': emp.date_of_joining,
                     'pending_inquiry': 'Yes' if emp.pending_inquiry else "No",
                     'remarks':emp.remarks,
+                    'transfer_remarks':emp.transfer_remarks,
+                    'grade_assignment':emp.grade_assignment,
                 }
                 for emp in page_obj.object_list
             ],
@@ -86,7 +92,7 @@ def employees_view(request):
         "designations": Designation.objects.all(),
         'cadre': Cadre.objects.all(),
         'employeeGrade': EmployeeGrade.objects.all(),
-        'branches': Branch.objects.filter(branch_region=user_region),
+        'branches': Branch.objects.filter(region=user_region),
         'qualifications': Qualification.objects.all(),
     }
 
@@ -100,7 +106,7 @@ def employees_view(request):
 
 def download_employees_csv(request):
     # Get all employee data
-    
+    employee_region = request.user.region
     employee_type = request.GET.get('employee_type', None)
     designation = request.GET.get('designation', None)
     employee_grade = request.GET.get('employeeGrade', None)
@@ -121,6 +127,8 @@ def download_employees_csv(request):
         employees = employees.filter(designation__title=designation)
     if employee_grade:
         employees = employees.filter(employee_grade__grade_name=employee_grade)
+    if employee_region:
+        employees = employees.filter(region__name=employee_region)
 
     # Ensure no duplicates if using M2M relationships
     employees = employees.distinct()  
@@ -143,6 +151,10 @@ def download_employees_csv(request):
         'Employee Grade': 'employee_grade',
         'Branch': 'branch',
         'Joining Date': 'date_of_joining',
+        'Pending Inquiry':'pending_inquiry',
+        'Remarks':'remarks',
+        'Transfer Remarks':'transfer_remarks',
+        'APA 2024':"grade_assignment",
     }
 
     # Write header row with only selected columns
@@ -155,8 +167,6 @@ def download_employees_csv(request):
             if col in column_mapping:
                 row.append(getattr(employee, column_mapping[col], ''))
         writer.writerow(row)
-    
-
     return response
 
 
@@ -169,7 +179,6 @@ def index(request):
         'new_employees':new_employees,
         'employees':employees
     }
-    
     return render(request, 'index.html', context)
 
 
@@ -178,3 +187,23 @@ def index(request):
 def employee_detail_view(request, sap_id):
     employee = get_object_or_404(Employee, SAP_ID=sap_id)
     return render(request, 'HRIS_App/employee_details.html', {'employee': employee})
+
+
+
+class AssignGradeView(UpdateView):
+    model = Employee
+    form_class = AssignGradeForm
+    template_name = 'HRIS_App/assign_grade.html'
+
+    def get_object(self, queryset=None):
+        return get_object_or_404(Employee, SAP_ID=self.kwargs['sap_id'])
+    
+    def get_success_url(self):
+        # Return the URL as a string using reverse
+        return reverse('HRMS:employees_view')
+
+    def form_valid(self, form):
+        # Save the form and redirect to the success URL
+        response = super().form_valid(form)
+
+        return redirect(self.get_success_url())

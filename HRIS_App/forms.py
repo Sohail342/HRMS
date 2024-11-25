@@ -28,7 +28,7 @@ class AdminEmployeeForm(forms.ModelForm):
             'admin_signature',  
             'phone_no_emergency_contact', 
             'date_of_joining', 
-            'user_group',
+            'grade_assignment',
             'pending_inquiry',
             'transferred_status',
             'remarks',
@@ -48,11 +48,13 @@ class AdminEmployeeForm(forms.ModelForm):
             self.fields['branch'].required = False
 
 
+
+
 class NonAdminEmployeeForm(forms.ModelForm):
     class Meta:
         model = Employee
         fields = ('SAP_ID', 'name', 'region', 'branch', 'designation', 'employee_type', 
-                  'employee_grade', 'email', 'date_of_joining', 'is_admin_employee', 
+                  'employee_grade', 'email', 'date_of_joining', 'is_admin_employee', 'grade_assignment',
                   'pending_inquiry', 'remarks', 'transfer_remarks')
 
     def __init__(self, *args, **kwargs):
@@ -66,3 +68,18 @@ class NonAdminEmployeeForm(forms.ModelForm):
             if self.instance and self.instance.region:
                 self.fields['branch'].queryset = Branch.objects.filter(branch_region=self.instance.region)
             self.fields['branch'].required = False  
+
+
+class AssignGradeForm(forms.ModelForm):
+    class Meta:
+        model = Employee
+        fields = ['grade_assignment']
+
+    
+    grade_assignment = forms.ChoiceField(
+        choices=Employee.GRADE_CHOICES,  
+        widget=forms.Select(attrs={
+            'class': 'border border-gray-300 rounded-md p-2 text-sm w-full focus:ring-2 focus:ring-blue-500 focus:outline-none'
+        }),
+        required=True
+    )

@@ -9,5 +9,6 @@ urlpatterns = [
     path('employee/', views.employees_view, name="employees_view"),
     path('download_csv/', views.download_employees_csv, name='download_employees_csv'),
     path('employee/<int:sap_id>/', views.employee_detail_view, name='employee_detail'),
+    path('assign_grade/<int:sap_id>/', views.AssignGradeView.as_view(), name="assign_grade")
 ]
 
