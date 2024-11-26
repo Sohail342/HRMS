@@ -158,7 +158,10 @@
                                 <a href="{% url 'HRMS:employee_detail' employee.SAP_ID %}" class="text-blue-600 hover:underline">{{ employee.SAP_ID }}</a>
                             
                             </td>
-                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.name }}</td>
+                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">
+                                <a href="{% url 'HRMS:employee_detail' employee.SAP_ID %}" class="text-blue-600 hover:underline">{{ employee.name }}</a>
+
+                                </td>
                             <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.employee_type }}</td>
                             <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.designation }}</td>
                             <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.employee_grade }}</td>
@@ -180,7 +183,9 @@
                                 {% endif %}
                             </td>  
                             <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.transfer_remarks }}</td>
+                            
                             <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.grade_assignment }}</td>
+                           
                             <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">
                                 <a  href="{% url 'HRMS:assign_grade' employee.SAP_ID %}" class="bg-blue-500 text-white px-4 py-1 rounded-md hover:bg-blue-600 transition duration-150">Update</a>
                             </td>

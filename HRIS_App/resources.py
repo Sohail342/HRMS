@@ -4,7 +4,7 @@ from .models import Employee, Designation, Cadre, EmployeeType, EmployeeGrade, B
 
 class BranchResource(resources.ModelResource):
     # Map the 'branch_region' to use the 'name' field of Region
-    branch_region = fields.Field(
+    region = fields.Field(
         column_name='region',  # CSV column name
         attribute='region',   # Model field
         widget=ForeignKeyWidget(Region, 'name')  # Match using Region's 'region_id' field
@@ -12,8 +12,7 @@ class BranchResource(resources.ModelResource):
 
     class Meta:
         model = Branch
-        fields = ('branch_code', 'branch_name', 'branch_Category', 'branch_address', 'region')  # Fields to import/export
-        import_id_fields = ('branch_code',)  # Unique field for identifying rows during import
+        fields = ('id', 'branch_code', 'branch_name', 'branch_Category', 'branch_address', 'region') 
 
 
 class FunctionalGroupResource(resources.ModelResource):
@@ -25,21 +24,21 @@ class FunctionalGroupResource(resources.ModelResource):
 
     class Meta:
         model = FunctionalGroup
-        fields = ('id', 'name', 'allias', 'group')  # Fields to include in import/export
-        export_order = ('id', 'name', 'allias', 'group')  # Order of fields in the exported file
+        fields = ('id', 'name', 'allias', 'group') 
+        export_order = ('id', 'name', 'allias', 'group') 
 
 
 class RegionResource(resources.ModelResource):
     functional_group = fields.Field(
         column_name='functional_group',
         attribute='functional_group',
-        widget=ManyToManyWidget(FunctionalGroup, separator=',', field='name')  # Handles ManyToManyField using 'name'
+        widget=ManyToManyWidget(FunctionalGroup, separator=',', field='name') 
     )
 
     class Meta:
         model = Region
-        fields = ('id', 'name', 'region_category', 'functional_group')  # Fields to include
-        export_order = ('id', 'name', 'region_category', 'functional_group')  # Export field order
+        fields = ('id', 'name', 'region_category', 'functional_group') 
+        export_order = ('id', 'name', 'region_category', 'functional_group') 
 
 
 class EmployeeResource(resources.ModelResource):
@@ -52,7 +51,7 @@ class EmployeeResource(resources.ModelResource):
     cadre = fields.Field(
         column_name='cadre',
         attribute='cadre',
-        widget=ForeignKeyWidget(Cadre, field='name')  # Adjust the field name based on your Cadre model
+        widget=ForeignKeyWidget(Cadre, field='name')
     )
     employee_type = fields.Field(
         column_name='employee_type',
@@ -72,7 +71,7 @@ class EmployeeResource(resources.ModelResource):
     region = fields.Field(
         column_name='region',
         attribute='region',
-        widget=ForeignKeyWidget(Region, field='name')  # Adjust the field name based on Region's model
+        widget=ForeignKeyWidget(Region, field='name')
     )
     qualifications = fields.Field(
         column_name='qualifications',
@@ -83,12 +82,12 @@ class EmployeeResource(resources.ModelResource):
     class Meta:
         model = Employee
         fields = (
-            'id', 'email', 'name', 'designation', 'cadre', 'employee_type',
+            'id', 'SAP_ID', 'email', 'password', 'name', 'designation', 'cadre', 'employee_type',
             'employee_grade', 'branch', 'region', 'qualifications', 'date_of_joining',
             'mobile_number', 'date_of_last_promotion', 'remarks', 'grade_assignment',
         )
         export_order = (
-            'id', 'email', 'name', 'designation', 'cadre', 'employee_type',
+            'id', 'SAP_ID', 'email', 'name', 'designation', 'cadre', 'employee_type',
             'employee_grade', 'branch', 'region', 'qualifications', 'date_of_joining',
             'mobile_number', 'date_of_last_promotion', 'remarks', 'grade_assignment',
         )

@@ -2,6 +2,10 @@ from django import forms
 from .models import Employee,  Branch
 
 class AdminEmployeeForm(forms.ModelForm):
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'placeholder': 'Enter a Password'}),
+        required=False,
+    )
     class Meta:
         model = Employee
         fields = (
@@ -35,6 +39,13 @@ class AdminEmployeeForm(forms.ModelForm):
             'transfer_remarks',
         )
 
+    def clean_password(self):
+        # If no password is provided, return None to avoid overwriting
+        password = self.cleaned_data.get('password')
+        if password == "":
+            return None
+        return password
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
@@ -44,13 +55,33 @@ class AdminEmployeeForm(forms.ModelForm):
         else:
             # Filter branches by the selected region
             if self.instance and self.instance.region:
-                self.fields['branch'].queryset = Branch.objects.filter(branch_region=self.instance.region)
+                self.fields['branch'].queryset = Branch.objects.filter(region=self.instance.region)
             self.fields['branch'].required = False
+
+    def save_model(self, request, obj, form, change):
+        """
+        Save the model while ensuring password handling.
+        """
+        # Handle the password logic
+        new_password = form.cleaned_data.get('password')
+        
+        if change:  # Updating an existing employee
+            if new_password:  # If a new password is provided
+                obj.set_password(new_password)  # Hash and set the new password
+        else:  # Creating a new employee
+            if not new_password:  # If no password is provided, set the default password
+                obj.set_password('1234')  # Default password for new employees
+            else:
+                obj.set_password(new_password)  # Hash the provided password
+
+        obj.save()
+
 
 
 
 
 class NonAdminEmployeeForm(forms.ModelForm):
+
     class Meta:
         model = Employee
         fields = ('SAP_ID', 'name', 'region', 'branch', 'designation', 'employee_type', 
@@ -66,7 +97,7 @@ class NonAdminEmployeeForm(forms.ModelForm):
         else:
             # Filter branches by region
             if self.instance and self.instance.region:
-                self.fields['branch'].queryset = Branch.objects.filter(branch_region=self.instance.region)
+                self.fields['branch'].queryset = Branch.objects.filter(region=self.instance.region)
             self.fields['branch'].required = False  
 
 

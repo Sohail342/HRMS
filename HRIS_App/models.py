@@ -65,7 +65,7 @@ class Region(models.Model):
 
 class Branch(models.Model):
     branch_code = models.IntegerField(unique=True)
-    branch_name = models.CharField(max_length=100, unique=True)
+    branch_name = models.CharField(max_length=500)
     branch_Category = models.CharField(max_length=100, default=None)
     branch_address = models.TextField(blank=True, null=True)
     region = models.ForeignKey(Region, on_delete=models.CASCADE, to_field="name", null=True,  blank=True)
@@ -257,7 +257,6 @@ class Employee(AbstractBaseUser):
         # Count the number of employees with each grade
         grade_counts = Employee.objects.values('grade_assignment').annotate(count=models.Count('id'))
 
-        print(f'Grades: {grade_counts}')
         # Calculate the total percentage assigned
         total_percentage = 0
         for grade in grade_counts:

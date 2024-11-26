@@ -51,7 +51,7 @@ def employees_view(request):
     employees = employees.distinct()  
 
     # Pagination
-    paginator = Paginator(employees, 10)
+    paginator = Paginator(employees, 100)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
@@ -186,6 +186,7 @@ def index(request):
 @login_required(login_url='account:login')
 def employee_detail_view(request, sap_id):
     employee = get_object_or_404(Employee, SAP_ID=sap_id)
+
     return render(request, 'HRIS_App/employee_details.html', {'employee': employee})
 
 

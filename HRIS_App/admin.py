@@ -48,8 +48,8 @@ class RegionAdmin(ImportExportModelAdmin, ModelAdmin):
     resource_class = RegionResource
     export_form_class = ExportForm
     import_form_class = ImportForm
-    list_display = ('region_id', 'name', 'region_category')
-    list_filter = ('name', 'region_category','functional_group__name')
+    list_display = ('region_id', 'name')
+    list_filter = ('name','functional_group__name')
     search_fields = ('region_id', 'name', 'region_category','functional_group__name')
 
 
@@ -58,15 +58,15 @@ class BranchAdmin(ImportExportModelAdmin, ModelAdmin):
     resource_class = BranchResource 
     export_form_class = ExportForm
     import_form_class = ImportForm
-    list_display = ("branch_code", 'branch_name', 'region__name', 'branch_address')
-    search_fields = ('id', 'branch_code', 'branch_name', 'region__name')
-    list_filter = ('branch_name', 'region__name')
+    list_display = ("branch_code", 'branch_name', 'region__name', 'branch_address', 'branch_Category')
+    search_fields = ('id', 'branch_code', 'branch_name', 'region')
+    list_filter = ('region', 'branch_Category')
 
 @admin.register(Designation)
 class DesignationAdmin(ImportExportModelAdmin, ModelAdmin):
     export_form_class = ExportForm
     import_form_class = ImportForm
-    list_display = ('id', 'title', 'description')
+    list_display = ('id', 'title')
     search_fields = ('id', 'title')
     list_filter = ('title',)
 
@@ -74,7 +74,7 @@ class DesignationAdmin(ImportExportModelAdmin, ModelAdmin):
 class CadreAdmin(ImportExportModelAdmin, ModelAdmin):
     export_form_class = ExportForm
     import_form_class = ImportForm
-    list_display = ('id', 'name', 'description')
+    list_display = ('id', 'name')
     search_fields = ('id', 'name')
     list_filter = ('name', )
 
@@ -82,7 +82,7 @@ class CadreAdmin(ImportExportModelAdmin, ModelAdmin):
 class EmployeeTypeAdmin(ImportExportModelAdmin, ModelAdmin):
     export_form_class = ExportForm
     import_form_class = ImportForm
-    list_display = ('id', 'name', 'description')
+    list_display = ('id', 'name')
     search_fields = ('id', 'name')
     list_filter = ('name', )
 
@@ -107,11 +107,12 @@ class EmployeeAdmin(ImportExportModelAdmin, ModelAdmin):
     resource_class = EmployeeResource
     export_form_class = ExportForm
     import_form_class = ImportForm
-    list_display = ('SAP_ID', 'name', 'branch', 'branch__region', 'designation', 'employee_grade', 'employee_type', 'date_of_joining', 'designation', 'is_admin_employee')
-    list_filter = ('is_admin_employee', 'is_active', 'branch')
+    list_display = ('SAP_ID', 'name', 'branch', 'region', 'designation', 'employee_grade', 'employee_type', 'date_of_joining', 'designation', 'is_admin_employee')
+    list_filter = ('branch__region', 'is_admin_employee', 'is_active', 'branch')
+    search_fields = ("SAP_ID", 'name', 'region__name', 'branch__branch_name')
 
     def get_form(self, request, obj=None, **kwargs):
-        if obj and obj.is_admin_employee:  # Use the admin employee form
+        if obj and obj.is_admin_employee:
             self.form = AdminEmployeeForm
         else:  # Use the non-admin employee form
             self.form = NonAdminEmployeeForm
@@ -126,7 +127,7 @@ class EmployeeAdmin(ImportExportModelAdmin, ModelAdmin):
             if region and region.head_office:
                 form_class.base_fields['branch'].widget = forms.HiddenInput()
             else:
-                form_class.base_fields['branch'].queryset = Branch.objects.filter(branch_region=region)
+                form_class.base_fields['branch'].queryset = Branch.objects.filter(region=region)
         else:
             form_class.base_fields['branch'].queryset = Branch.objects.all()
 
