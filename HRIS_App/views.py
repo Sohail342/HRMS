@@ -103,7 +103,7 @@ def employees_view(request):
 
 
 
-
+# Download Dynamic Fields or column as a CSV file
 def download_employees_csv(request):
     # Get all employee data
     employee_region = request.user.region
@@ -170,14 +170,19 @@ def download_employees_csv(request):
     return response
 
 
-
+# Main dashboard 
 def index(request):
-    employees = Employee.objects.count()
+    employees_count_region = Employee.objects.filter(region=request.user.region).count
+    employees_count = Employee.objects.count()
+    admin_employees = Employee.objects.filter(is_admin_employee=True).count()
     new_employees = Employee.objects.annotate(sap_id_length=Length(Cast('SAP_ID', output_field=CharField()))).filter(sap_id_length__gt=5).count()
 
     context = {
         'new_employees':new_employees,
-        'employees':employees
+        'employees':employees_count,
+        'admin_employees':admin_employees,
+        'employees_region':request.user.region,
+        'employees_count_region':employees_count_region
     }
     return render(request, 'index.html', context)
 
@@ -186,11 +191,10 @@ def index(request):
 @login_required(login_url='account:login')
 def employee_detail_view(request, sap_id):
     employee = get_object_or_404(Employee, SAP_ID=sap_id)
-
     return render(request, 'HRIS_App/employee_details.html', {'employee': employee})
 
 
-
+# Assign Grades Pop up form
 class AssignGradeView(UpdateView):
     model = Employee
     form_class = AssignGradeForm
