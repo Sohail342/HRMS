@@ -217,13 +217,13 @@ class Employee(AbstractBaseUser):
     region = models.ForeignKey(
         'Region', on_delete=models.CASCADE, null=True, to_field="name",  blank=True, related_name='employees'
     )
-    date_of_last_promotion = models.DateField(default="1900-01-01", blank=True, null=True)
-    date_current_posting = models.DateField(default="1900-01-01", blank=True, null=True)
-    date_current_assignment = models.DateField(default="1900-01-01", blank=True, null=True)
+    date_of_last_promotion = models.DateField(blank=True, null=True)
+    date_current_posting = models.DateField(blank=True, null=True)
+    date_current_assignment = models.DateField(blank=True, null=True)
     mobile_number = models.CharField(max_length=15, blank=True, null=True, default="1111")
     admin_signature = models.BooleanField(default=False)
     phone_no_emergency_contact = models.CharField(max_length=15, blank=True, null=True, default="1111")
-    date_of_joining = models.DateField(default="1900-01-01", blank=True, null=True)
+    date_of_joining = models.DateField(blank=True, null=True)
     user_group = models.CharField(max_length=200, default=None, blank=True, null=True)
     transferred_status = models.CharField(max_length=20, choices=TRANSFER_CHOICES, blank=True, null=True)
     pending_inquiry = models.BooleanField(default=False)
