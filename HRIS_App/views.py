@@ -171,8 +171,9 @@ def download_employees_csv(request):
 
 
 # Main dashboard 
+@login_required(login_url='account:login')
 def index(request):
-    employees_count_region = Employee.objects.filter(region=request.user.region).count
+    employees_count_region = Employee.objects.filter(region=request.user.region).count()
     employees_count = Employee.objects.count()
     admin_employees = Employee.objects.filter(is_admin_employee=True).count()
     new_employees = Employee.objects.annotate(sap_id_length=Length(Cast('SAP_ID', output_field=CharField()))).filter(sap_id_length__gt=5).count()

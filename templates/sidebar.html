@@ -67,6 +67,7 @@
                       <span>Add Employee</span>
                   </div>
               </a> 
+              {% if request.user.is_admin %}
               <a href="{% url 'admin:index' %}">
                 <div role="button" tabindex="0"
                   class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-blue-100 focus:bg-blue-100 active:bg-gray-100 hover:text-blue-900 focus:text-blue-900 active:text-blue-900 outline-none">
@@ -79,7 +80,7 @@
                   Admin Panel
                 </div>
               </a>
-                                  
+                     {% endif %}             
               <a href="">
                   <div class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-blue-100">
                       <div class="grid place-items-center mr-4">
