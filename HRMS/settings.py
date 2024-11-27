@@ -87,7 +87,7 @@ WSGI_APPLICATION = 'HRMS.wsgi.application'
 # }
 
 
-DATABASE_URL = "postgresql://HRMS_owner:p0AxNJYdFmj7@ep-mute-hall-a147mllo.ap-southeast-1.aws.neon.tech/HRMS?sslmode=require"
+DATABASE_URL = "postgresql://HRISDB_owner:2OEg3qIpFfAy@ep-hidden-lab-a5qt4pxr.us-east-2.aws.neon.tech/HRISDB?sslmode=require"
 
 # Parse the DATABASE_URL
 tmpPostgres = urlparse(DATABASE_URL)
