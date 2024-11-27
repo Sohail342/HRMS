@@ -10,7 +10,6 @@ class AdminEmployeeForm(forms.ModelForm):
         model = Employee
         fields = (
             'email', 
-            'password',
             'name', 
             'is_active', 
             'is_admin', 
