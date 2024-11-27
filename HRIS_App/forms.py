@@ -2,10 +2,6 @@ from django import forms
 from .models import Employee,  Branch
 
 class AdminEmployeeForm(forms.ModelForm):
-    password = forms.CharField(
-        widget=forms.PasswordInput(attrs={'placeholder': 'Enter a Password'}),
-        required=False,
-    )
     class Meta:
         model = Employee
         fields = (
