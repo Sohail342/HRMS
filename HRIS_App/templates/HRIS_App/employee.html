@@ -3,7 +3,7 @@
 
 {% block content %}
 
-    <h1 class="text-xl font-bold mb-4">Select columns</h1>
+    <h1 class="text-xl text-center font-bold mb-4">Select columns</h1>
 <form action="{% url 'HRMS:download_employees_csv' %}" method="get">
     <div class="grid grid-cols-8 gap-4 mt-4">
         <!-- Row 1 -->
@@ -153,7 +153,11 @@
                         <tr class="hover:bg-gray-100 transition duration-150 ease-in-out">
                             
                             <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.branch.branch_code }}</td>
+                            {% if  employee.branch %}
                             <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.branch }}</td>
+                            {% else %}
+                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base"> </td>
+                            {% endif %}
                             <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">
                                 <a href="{% url 'HRMS:employee_detail' employee.SAP_ID %}" class="text-blue-600 hover:underline">{{ employee.SAP_ID }}</a>
                             

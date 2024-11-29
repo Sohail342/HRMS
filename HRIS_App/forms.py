@@ -2,10 +2,12 @@ from django import forms
 from .models import Employee,  Branch
 
 class AdminEmployeeForm(forms.ModelForm):
+    password = forms.CharField(widget=forms.PasswordInput, required=False, help_text="Leave blank to keep the current password.")
     class Meta:
         model = Employee
         fields = (
             'email', 
+            'password',
             'name', 
             'is_active', 
             'is_admin', 
@@ -35,15 +37,18 @@ class AdminEmployeeForm(forms.ModelForm):
         )
 
     def clean_password(self):
-        # If no password is provided, return None to avoid overwriting
+        """
+        Return the cleaned password only if it is provided; otherwise, return None.
+        """
+        
         password = self.cleaned_data.get('password')
-        if password == "":
-            return None
-        return password
+        if password:
+            return password
+        return None 
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        
+
         # Condition to handle branch visibility based on region
         if self.instance and self.instance.region and self.instance.region.head_office:
             self.fields['branch'].widget = forms.HiddenInput()  # Hide the branch field if it's a head office
@@ -52,26 +57,6 @@ class AdminEmployeeForm(forms.ModelForm):
             if self.instance and self.instance.region:
                 self.fields['branch'].queryset = Branch.objects.filter(region=self.instance.region)
             self.fields['branch'].required = False
-
-    def save_model(self, request, obj, form, change):
-        """
-        Save the model while ensuring password handling.
-        """
-        # Handle the password logic
-        new_password = form.cleaned_data.get('password')
-        
-        if change:  # Updating an existing employee
-            if new_password:  # If a new password is provided
-                obj.set_password(new_password)  # Hash and set the new password
-        else:  # Creating a new employee
-            if not new_password:  # If no password is provided, set the default password
-                obj.set_password('1234')  # Default password for new employees
-            else:
-                obj.set_password(new_password)  # Hash the provided password
-
-        obj.save()
-
-
 
 
 

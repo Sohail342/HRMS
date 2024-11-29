@@ -20,20 +20,26 @@
 
 <body class="bg-gray-100 min-h-screen">
     <div class="flex h-screen">
-         <!-- Toggle Button -->
-         <button id="toggleSidebar" class="absolute top-7 left-19 z-50 p-1 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition duration-200">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="h-5 w-5">
-                <path d="M3 12h18m-9-9v18" />
+        <!-- Toggle Button -->
+        <button id="toggleSidebar" class="fixed top-3 left-4 z-50 p-2 rounded-full bg-gray-100 shadow-md hover:shadow-lg hover:bg-gray-200 transition">
+            <svg id="iconShow" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="h-6 w-6 hidden">
+                <!-- Hamburger Menu Icon -->
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-7 6h7" />
             </svg>
-          </button>
+            <svg id="iconHide" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="h-6 w-6">
+                <!-- Close (X) Icon -->
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M6 18L18 6" />
+            </svg>
+        </button>
 
         <div id="sidebar" class="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 w-1/4 p-4 shadow-xl shadow-blue-gray-900/5 transition-transform duration-300 ease-in-out">
             <a href="{% url 'HRMS:home' %}">
                 <div class="mb-2 p-4">
-                    <h5 class="block antialiased tracking-normal font-sans text-xl font-semibold leading-snug text-gray-900">
+                    <h5 class="block antialiased tracking-normal text-center font-sans text-xl font-semibold leading-snug text-gray-900">
                         HRIS</h5>
                 </div>
             </a>
+            {% if request.user.is_authenticated %}
             <nav class="flex flex-col gap-1 min-w-[240px] p-2 font-sans text-base font-normal text-gray-700">
                 <a href="{% url 'HRMS:employees_view' %}">
                     <div class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-blue-100">
@@ -80,7 +86,19 @@
                   Admin Panel
                 </div>
               </a>
-                     {% endif %}             
+                {% endif %}
+
+                <a href="{% url 'account:password_change' %}">
+                    <div class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-blue-100">
+                        <div class="grid place-items-center mr-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="h-6 w-6 text-gray-700 hover:text-blue-600">
+                                <path d="M12 12c2.5 0 4.5-2 4.5-4.5S14.5 3 12 3 7.5 5 7.5 7.5 9.5 12 12 12zm0 2c-3.3 0-10 1.7-10 5v2h20v-2c0-3.3-6.7-5-10-5z"/>
+                            </svg>
+                        </div>
+                        Settings
+                    </div>
+                </a>      
+
               <a href="">
                   <div class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-blue-100">
                       <div class="grid place-items-center mr-4">
@@ -100,7 +118,8 @@
                         </div>
                         Region Related Reports
                     </div>
-                </a>  
+                </a> 
+                {% endif %} 
                 {% if not request.user.is_authenticated %}
                 <a href="{% url 'account:login' %}">
                     <div class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-blue-100">
@@ -139,10 +158,37 @@
     <script>
         const toggleButton = document.getElementById('toggleSidebar');
         const sidebar = document.getElementById('sidebar');
+        const iconShow = document.getElementById('iconShow');
+        const iconHide = document.getElementById('iconHide');
+
+        // Check the localStorage value on page load
+        if (localStorage.getItem('sidebarHidden') === 'true') {
+            sidebar.classList.add('hidden');
+            iconShow.classList.remove('hidden');
+            iconHide.classList.add('hidden');
+        } else {
+            sidebar.classList.remove('hidden');
+            iconShow.classList.add('hidden');
+            iconHide.classList.remove('hidden');
+        }
 
         toggleButton.addEventListener('click', () => {
+            // Toggle the visibility of the sidebar
             sidebar.classList.toggle('hidden');
+
+            // Toggle icons
+            iconShow.classList.toggle('hidden');
+            iconHide.classList.toggle('hidden');
+
+            // Update localStorage based on the sidebar's visibility
+            if (sidebar.classList.contains('hidden')) {
+                localStorage.setItem('sidebarHidden', 'true');
+            } else {
+                localStorage.setItem('sidebarHidden', 'false');
+            }
         });
+
+
     </script>
 </body>
 

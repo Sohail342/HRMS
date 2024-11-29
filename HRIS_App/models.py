@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.contrib.auth.hashers import make_password, check_password
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 
@@ -11,8 +12,7 @@ class Group(models.Model):
         return self.name
     
     class Meta:
-        verbose_name = "Group"
-        verbose_name_plural = "  Groups"
+        verbose_name = "  Group"
 
 
 class FunctionalGroup(models.Model):
@@ -149,13 +149,11 @@ class MyUserManager(BaseUserManager):
             is_admin_employee=is_admin_employee,
         )
         
-        # Set the password
-        if is_admin_employee:
-            user.set_password('1234')  # Set default password for admin employees
-        elif password:
-            user.set_password(password)
+        if password:
+            user.set_password(password)  # Set the provided password
         else:
-            user.set_unusable_password()  # If no password is provided, make the password unusable.
+            print("Unsable Password")
+            user.set_unusable_password() 
 
         user.save(using=self._db)
         return user
@@ -180,6 +178,7 @@ class Employee(AbstractBaseUser):
     
     email = models.EmailField(verbose_name="Email", max_length=255, blank=True, null=True, unique=True)
     name = models.CharField(max_length=200)
+    password = models.CharField(max_length=128, blank=True, null=True)  # Allow null and blank
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     is_admin_employee = models.BooleanField(default=False)
@@ -286,7 +285,7 @@ class Employee(AbstractBaseUser):
     REQUIRED_FIELDS = ["name"]
 
     def __str__(self):
-        return self.email if self.email else "No Email Provided"
+        return self.name if self.email else "Unknow"
 
     def has_perm(self, perm, obj=None):
         "Does the user have a specific permission?"
@@ -301,6 +300,14 @@ class Employee(AbstractBaseUser):
         "Is the user a member of staff?"
         return self.is_admin
     
+    def set_password(self, raw_password):
+        self.password = make_password(raw_password)  # Hash the password
+
+    def check_password(self, raw_password):
+        if self.password is None:
+            return False  # Password is not set, cannot authenticate
+        return check_password(raw_password, self.password)
+    
 
     def save(self, *args, **kwargs):
 
@@ -311,12 +318,6 @@ class Employee(AbstractBaseUser):
 
         self.full_clean()  # Ensure all validations are applied
         super().save(*args, **kwargs)
-
-        
-
-    # def set_password(self, raw_password):
-    #     super().set_password(raw_password)
-    #     self._password_set = True  
 
         
     class Meta:

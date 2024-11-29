@@ -1,7 +1,6 @@
-
 from urllib.parse import urlparse
 from pathlib import Path
-
+from django.urls import reverse_lazy
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -14,9 +13,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-y6v#uewfea@x)o(5z&uemx@lrojs^*_in60ri38_pxn1!#@k@u'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*', '.vercel.app/']
+
+
+
+LOGIN_URL = reverse_lazy('account:login')
+LOGIN_REDIRECT_URL = reverse_lazy('HRMS:home')
 
 
 # Application definition
@@ -79,13 +83,6 @@ WSGI_APPLICATION = 'HRMS.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3', 
-#         'NAME': BASE_DIR / 'db.sqlite3',  
-#     }
-# }
-
 
 DATABASE_URL = "postgresql://HRISDB_owner:2OEg3qIpFfAy@ep-hidden-lab-a5qt4pxr.us-east-2.aws.neon.tech/HRISDB?sslmode=require"
 
@@ -103,6 +100,7 @@ DATABASES = {
         'PORT': tmpPostgres.port or 5432,  # Default to 5432 if no port is specified
     }
 }
+
 
 # Custom Employee Model
 AUTH_USER_MODEL = 'HRIS_App.Employee'

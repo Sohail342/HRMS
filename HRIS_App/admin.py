@@ -104,10 +104,10 @@ class QualificationAdmin(ImportExportModelAdmin, ModelAdmin):
 
 
 class EmployeeAdmin(ImportExportModelAdmin, ModelAdmin):
-    resource_class = EmployeeResource
     export_form_class = ExportForm
     import_form_class = ImportForm
-    list_display = ('SAP_ID', 'name', 'branch', 'region', 'designation', 'employee_grade', 'employee_type', 'date_of_joining', 'designation', 'is_admin_employee')
+    form = AdminEmployeeForm
+    list_display = ('SAP_ID', 'name', 'branch', 'region', 'designation', 'employee_grade', 'employee_type', 'date_of_joining', 'is_admin_employee')
     list_filter = ('designation', 'branch__region', 'is_admin_employee', 'is_active', 'branch')
     search_fields = ("SAP_ID", 'name', 'region__name', 'branch__branch_name')
 
@@ -137,19 +137,28 @@ class EmployeeAdmin(ImportExportModelAdmin, ModelAdmin):
         """
         Save the model while ensuring password handling.
         """
-        # Handle the password logic
         new_password = form.cleaned_data.get('password')
-        
-        if change:  # If updating an existing employee
-            if new_password:  # If a new password is provided
-                obj.set_password(new_password)  # Hash the new password
-        else:  # If creating a new employee
-            if not new_password:  # If no password is provided, set the default password
-                obj.set_password('1234')  # Set your desired default password here
+
+        if new_password:  # Check if a new password is provided
+            if obj.pk:  # Check if this is an existing object (not a new one)
+                # Fetch the object from the database to compare passwords
+                original_obj = obj.__class__.objects.get(pk=obj.pk)
+
+                # Check if the new password matches the current password
+                if original_obj.check_password(new_password):
+                    print("The new password matches the current password.")
+                else:
+                    print("Setting a new password.")
+                    obj.set_password(new_password)  # Hash and set the new password
             else:
-                obj.set_password(new_password)  # Hash the new password if provided
+                # For new objects, simply set the password
+                obj.set_password(new_password)
+        else:
+            # If no password is provided and it's an existing user, retain the current password
+            if obj.pk:
+                original_obj = obj.__class__.objects.get(pk=obj.pk)
+                obj.password = original_obj.password
 
+        # Save the object with the potentially updated password
         obj.save()
-
-
 admin.site.register(Employee, EmployeeAdmin)
