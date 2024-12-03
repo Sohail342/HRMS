@@ -59,7 +59,7 @@ class BranchAdmin(ImportExportModelAdmin, ModelAdmin):
     export_form_class = ExportForm
     import_form_class = ImportForm
     list_display = ("branch_code", 'branch_name', 'region__name', 'branch_address', 'branch_Category')
-    search_fields = ('id', 'branch_code', 'branch_name', 'region')
+    search_fields = ('id', 'branch_code', 'branch_name', 'region__name')
     list_filter = ('region', 'branch_Category')
 
 @admin.register(Designation)
@@ -106,6 +106,7 @@ class QualificationAdmin(ImportExportModelAdmin, ModelAdmin):
 class EmployeeAdmin(ImportExportModelAdmin, ModelAdmin):
     export_form_class = ExportForm
     import_form_class = ImportForm
+    resource_class = EmployeeResource
     form = AdminEmployeeForm
     list_display = ('SAP_ID', 'name', 'branch', 'region', 'designation', 'employee_grade', 'employee_type', 'date_of_joining', 'is_admin_employee')
     list_filter = ('designation', 'branch__region', 'is_admin_employee', 'is_active', 'branch')

@@ -19,7 +19,7 @@ class FunctionalGroupResource(resources.ModelResource):
     group = fields.Field(
         column_name='group',
         attribute='group',
-        widget=ForeignKeyWidget(Group, field='name')  # Referencing the Group model's name field
+        widget=ForeignKeyWidget(Group, field='name') 
     )
 
     class Meta:
