@@ -101,7 +101,6 @@ DATABASES = {
     }
 }
 
-
 # Custom Employee Model
 AUTH_USER_MODEL = 'HRIS_App.Employee'
 

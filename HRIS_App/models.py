@@ -240,44 +240,57 @@ class Employee(AbstractBaseUser):
 
     grade_assignment = models.CharField(max_length=100, choices=GRADE_CHOICES, blank=True, null=True)
 
-    def clean(self):
-        # Call the validation method
-        self.validate_grades()
 
 
     def validate_grades(self):
-        # Get the total number of employees
-        total_employees = Employee.objects.count()
+        total_employees = 0
+        try:
+            # Get the total number of employees in the same region
+            total_employees = Employee.objects.filter(region=self.region).count()
+        except:
+            # Get all employees if admin login
+            total_employees = Employee.objects.filter().count()
 
         # If there are no employees, no validation is necessary
         if total_employees == 0:
             return
 
-        # Count the number of employees with each grade
-        grade_counts = Employee.objects.values('grade_assignment').annotate(count=models.Count('id'))
+        # Define the number of employees allowed per grade based on percentage
+        grade_limits = {
+            'A - Excellent': int(total_employees * 0.15),
+            'B - Very Good': int(total_employees * 0.20),
+            'C - Good': int(total_employees * 0.50),
+            'D - Needs Improvement': int(total_employees * 0.10),
+            'E - Unsatisfactory': int(total_employees * 0.05),
+        }
 
-        # Calculate the total percentage assigned
-        total_percentage = 0
-        for grade in grade_counts:
-            if grade['grade_assignment'] == 'A - Excellent':
-                total_percentage += grade['count'] * 0.20
-            elif grade['grade_assignment'] == 'B - Very Good':
-                total_percentage += grade['count'] * 0.25
-            elif grade['grade_assignment'] == 'C - Good':
-                total_percentage += grade['count'] * 0.40
-            elif grade['grade_assignment'] == 'D - Needs Improvement':
-                total_percentage += grade['count'] * 0.10
-            elif grade['grade_assignment'] == 'E - Unsatisfactory':
-                total_percentage += grade['count'] * 0.05
+        # Convert to integers, with rounding to handle fractional employees
+        grade_limits = {grade: int(limit) for grade, limit in grade_limits.items()}
 
-        # Calculate the percentage based on the total number of employees
-        total_percentage = (total_percentage / total_employees) * 100
-    
+        # Calculate the remaining employees after applying the floor values
+        assigned_employees = sum(grade_limits.values())
+        remaining_employees = total_employees - assigned_employees
 
-        # Check if the total percentage exceeds 100%
-        if total_percentage > 100:
-            raise ValidationError("Total grade percentage assigned to employees exceeds 100%.")
-    
+        # Distribute the remaining employees (this could go to the grade with the smallest number)
+        if remaining_employees > 0:
+            # Add remaining employees to the lowest grade
+            grade_limits['E - Unsatisfactory'] += remaining_employees
+
+        # Count how many employees currently have each grade
+        current_grade_counts = Employee.objects.filter(region=self.region).values('grade_assignment').annotate(count=models.Count('id'))
+
+        # Subtract the current counts from the grade limits
+        for entry in current_grade_counts:
+            grade = entry['grade_assignment']
+            count = entry['count']
+            if grade in grade_limits:
+                grade_limits[grade] -= count
+
+
+        # Check if the current instance's grade exceeds the remaining limit
+        if self.grade_assignment in grade_limits and grade_limits[self.grade_assignment] <= 0:
+            raise ValueError(f"The grade '{self.grade_assignment}' has already reached its limit in the region.")
+
 
     objects = MyUserManager()
 
@@ -316,6 +329,8 @@ class Employee(AbstractBaseUser):
             self.remarks = ""
             self.transferred_status = ""
 
+        
+        self.validate_grades()
         self.full_clean()  # Ensure all validations are applied
         super().save(*args, **kwargs)
 

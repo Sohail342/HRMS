@@ -1,5 +1,7 @@
 from django import forms
-from .models import Employee,  Branch
+from django.db.models import Count
+from .models import Employee, Branch
+from django.core.exceptions import ValidationError
 
 class AdminEmployeeForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput, required=False, help_text="Leave blank to keep the current password.")
@@ -79,6 +81,8 @@ class NonAdminEmployeeForm(forms.ModelForm):
             if self.instance and self.instance.region:
                 self.fields['branch'].queryset = Branch.objects.filter(region=self.instance.region)
             self.fields['branch'].required = False  
+
+
 
 
 class AssignGradeForm(forms.ModelForm):

@@ -51,6 +51,7 @@
                         Employees
                     </div>
                 </a>
+                {% if request.user.is_admin %}
                 <a href="{% url 'reporting:lettername' %}">
                   <div role="button" tabindex="0"
                     class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-blue-100 focus:bg-blue-100 active:bg-gray-100 hover:text-blue-900 focus:text-blue-900 active:text-blue-900 outline-none">
@@ -73,7 +74,7 @@
                       <span>Add Employee</span>
                   </div>
               </a> 
-              {% if request.user.is_admin %}
+              
               <a href="{% url 'admin:index' %}">
                 <div role="button" tabindex="0"
                   class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-blue-100 focus:bg-blue-100 active:bg-gray-100 hover:text-blue-900 focus:text-blue-900 active:text-blue-900 outline-none">
@@ -99,7 +100,7 @@
                     </div>
                 </a>      
 
-              <a href="">
+              {% comment %} <a href="">
                   <div class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-blue-100">
                       <div class="grid place-items-center mr-4">
                           <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="h-6 w-6 text-gray-700 hover:text-blue-600">
@@ -108,8 +109,8 @@
                       </div>
                       BOM Related Reports
                   </div>
-              </a>
-                <a href="#">
+              </a> {% endcomment %}
+                {% comment %} <a href="#">
                     <div class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-blue-100">
                         <div class="grid place-items-center mr-4">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="h-6 w-6 text-gray-700 hover:text-blue-600">
@@ -118,7 +119,7 @@
                         </div>
                         Region Related Reports
                     </div>
-                </a> 
+                </a>  {% endcomment %}
                 {% endif %} 
                 {% if not request.user.is_authenticated %}
                 <a href="{% url 'account:login' %}">
