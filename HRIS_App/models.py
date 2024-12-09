@@ -263,44 +263,48 @@ class Employee(AbstractBaseUser):
             return
 
 
-        # Fetch the Region instance
-        region_instance = Region.objects.get(name=self.region)
+        if self.is_admin == False:
+            '''
+            Fetch the Region instance for employees or employees admin ( not admin itself) 
+            and calculate grading eligbility base on Region % ( define in region model for each region) 
+            '''
+            region_instance = Region.objects.get(name=self.region)
 
-        # Define the number of employees allowed per grade based on percentage
-        grade_limits = {
-        'A - Excellent': int(total_employees * region_instance.A_Grade_seats / 100),
-        'B - Very Good': int(total_employees * region_instance.B_Grade_seats / 100),
-        'C - Good': int(total_employees * region_instance.C_Grade_seats / 100),
-        'D - Needs Improvement': int(total_employees * region_instance.D_Grade_seats / 100),
-        'E - Unsatisfactory': int(total_employees * region_instance.E_Grade_seats / 100),
-    }
+            # Define the number of employees allowed per grade based on percentage
+            grade_limits = {
+            'A - Excellent': int(total_employees * region_instance.A_Grade_seats / 100),
+            'B - Very Good': int(total_employees * region_instance.B_Grade_seats / 100),
+            'C - Good': int(total_employees * region_instance.C_Grade_seats / 100),
+            'D - Needs Improvement': int(total_employees * region_instance.D_Grade_seats / 100),
+            'E - Unsatisfactory': int(total_employees * region_instance.E_Grade_seats / 100),
+        }
 
-        # Convert to integers, with rounding to handle fractional employees
-        grade_limits = {grade: int(limit) for grade, limit in grade_limits.items()}
+            # Convert to integers, with rounding to handle fractional employees
+            grade_limits = {grade: int(limit) for grade, limit in grade_limits.items()}
 
-        # Calculate the remaining employees after applying the floor values
-        assigned_employees = sum(grade_limits.values())
-        remaining_employees = total_employees - assigned_employees
+            # Calculate the remaining employees after applying the floor values
+            assigned_employees = sum(grade_limits.values())
+            remaining_employees = total_employees - assigned_employees
 
-        # Distribute the remaining employees (this could go to the grade with the smallest number)
-        if remaining_employees > 0:
-            # Add remaining employees to the lowest grade
-            grade_limits['E - Unsatisfactory'] += remaining_employees
+            # Distribute the remaining employees (this could go to the grade with the smallest number)
+            if remaining_employees > 0:
+                # Add remaining employees to the lowest grade
+                grade_limits['E - Unsatisfactory'] += remaining_employees
 
-        # Count how many employees currently have each grade
-        current_grade_counts = Employee.objects.filter(region=self.region).values('grade_assignment').annotate(count=models.Count('id'))
+            # Count how many employees currently have each grade
+            current_grade_counts = Employee.objects.filter(region=self.region).values('grade_assignment').annotate(count=models.Count('id'))
 
-        # Subtract the current counts from the grade limits
-        for entry in current_grade_counts:
-            grade = entry['grade_assignment']
-            count = entry['count']
-            if grade in grade_limits:
-                grade_limits[grade] -= count
+            # Subtract the current counts from the grade limits
+            for entry in current_grade_counts:
+                grade = entry['grade_assignment']
+                count = entry['count']
+                if grade in grade_limits:
+                    grade_limits[grade] -= count
 
 
-        # Check if the current instance's grade exceeds the remaining limit
-        if self.grade_assignment in grade_limits and grade_limits[self.grade_assignment] <= 0:
-            raise ValueError(f"The grade '{self.grade_assignment}' has already reached its limit in the region.")
+            # Check if the current instance's grade exceeds the remaining limit
+            if self.grade_assignment in grade_limits and grade_limits[self.grade_assignment] <= 0:
+                raise ValueError(f"The grade '{self.grade_assignment}' has already reached its limit in the region.")
 
 
     objects = MyUserManager()
