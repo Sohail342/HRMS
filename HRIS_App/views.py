@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 import csv
-from django.db.models import Count
+from .calculate_remaining_grades import calculate_remaining_grades
 from django.urls import reverse
 from django.views.generic import UpdateView
 from .forms import AssignGradeForm
@@ -50,11 +50,11 @@ def employees_view(request):
     employees = employees.distinct()  
 
     # Calcute grades
-    remaining_grades, total_grade_limits, awarded_grades = calculate_remaining_grades(region=request.user.region)
+    remaining_grades = calculate_remaining_grades(region=request.user.region)
 
 
     # Pagination
-    paginator = Paginator(employees, 100)
+    paginator = Paginator(employees, 50)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
@@ -101,69 +101,6 @@ def employees_view(request):
     }
 
     return render(request, 'HRIS_App/employee.html', context)
-
-
-
-def calculate_remaining_grades(region):
-    # Get the total number of employees in the same region
-    total_employees = Employee.objects.filter(region=region).count()
-    if total_employees == 0:
-        return {}, {}, {}
-
-    # Define the initial grade limits based on percentage
-    grade_limits = {
-        'A - Excellent': total_employees * 0.15,
-        'B - Very Good': total_employees * 0.20,
-        'C - Good': total_employees * 0.50,
-        'D - Needs Improvement': total_employees * 0.10,
-        'E - Unsatisfactory': total_employees * 0.05,
-    }
-
-    # Convert to integers, with rounding to handle fractional employees
-    grade_limits = {grade: int(limit) for grade, limit in grade_limits.items()}
-
-    # Calculate the remaining employees after applying the floor values
-    assigned_employees = sum(grade_limits.values())
-    remaining_employees = total_employees - assigned_employees
-
-    # Distribute the remaining employees (this could go to the grade with the smallest number)
-    if remaining_employees > 0:
-        # Add remaining employees to the lowest grade
-        grade_limits['E - Unsatisfactory'] += remaining_employees
-
-    total_grade_limits = grade_limits.copy()  # To preserve the original limits for later use
-
-    # Count current assignments
-    current_grade_counts = Employee.objects.filter(region=region).values('grade_assignment').annotate(count=Count('id'))
-
-    # Subtract current counts from grade limits
-    for entry in current_grade_counts:
-        grade = entry['grade_assignment']
-        count = entry['count']
-        if grade in grade_limits:
-            grade_limits[grade] -= count
-
-    # Collect awarded grades (assuming these are the grades assigned to employees)
-    awarded_grades = {}
-    for entry in current_grade_counts:
-        grade = entry['grade_assignment']
-        count = entry['count']
-        awarded_grades[grade] = count
-
-    # Prepare final data to return
-    remaining_grades = []
-    for grade, remaining in grade_limits.items():
-        total = total_grade_limits.get(grade, 0)
-        awarded = awarded_grades.get(grade, 0)
-        remaining_grades.append({
-            'grade': grade,
-            'remaining': remaining,
-            'total': total,
-            'awarded': awarded,
-        })
-
-    return remaining_grades, total_grade_limits, awarded_grades
-
 
 
 

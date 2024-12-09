@@ -55,6 +55,13 @@ class Region(models.Model):
     # Flag for head office
     head_office = models.BooleanField(default=False)
 
+    # Region grading %
+    A_Grade_seats = models.FloatField(default=15.0) 
+    B_Grade_seats = models.FloatField(default=20.0)
+    C_Grade_seats = models.FloatField(default=50.0)
+    D_Grade_seats = models.FloatField(default=10.0)
+    E_Grade_seats = models.FloatField(default=5.0)
+
     def __str__(self):
         return self.name
     
@@ -255,14 +262,18 @@ class Employee(AbstractBaseUser):
         if total_employees == 0:
             return
 
+
+        # Fetch the Region instance
+        region_instance = Region.objects.get(name=self.region)
+
         # Define the number of employees allowed per grade based on percentage
         grade_limits = {
-            'A - Excellent': int(total_employees * 0.15),
-            'B - Very Good': int(total_employees * 0.20),
-            'C - Good': int(total_employees * 0.50),
-            'D - Needs Improvement': int(total_employees * 0.10),
-            'E - Unsatisfactory': int(total_employees * 0.05),
-        }
+        'A - Excellent': int(total_employees * region_instance.A_Grade_seats / 100),
+        'B - Very Good': int(total_employees * region_instance.B_Grade_seats / 100),
+        'C - Good': int(total_employees * region_instance.C_Grade_seats / 100),
+        'D - Needs Improvement': int(total_employees * region_instance.D_Grade_seats / 100),
+        'E - Unsatisfactory': int(total_employees * region_instance.E_Grade_seats / 100),
+    }
 
         # Convert to integers, with rounding to handle fractional employees
         grade_limits = {grade: int(limit) for grade, limit in grade_limits.items()}

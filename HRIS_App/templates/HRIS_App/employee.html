@@ -182,9 +182,9 @@
                             
                             </td>
                             <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">
-                                <a href="{% url 'HRMS:employee_detail' employee.SAP_ID %}" class="text-blue-600 hover:underline">{{ employee.name }}</a>
+                               {{ employee.name }}
 
-                                </td>
+                            </td>
                             <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.employee_type }}</td>
                             <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.designation }}</td>
                             <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.employee_grade }}</td>
