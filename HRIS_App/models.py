@@ -185,7 +185,7 @@ class Employee(AbstractBaseUser):
     
     email = models.EmailField(verbose_name="Email", max_length=255, blank=True, null=True, unique=True)
     name = models.CharField(max_length=200)
-    password = models.CharField(max_length=128, blank=True, null=True)  # Allow null and blank
+    password = models.CharField(max_length=128, blank=True, null=True)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     is_admin_employee = models.BooleanField(default=False)

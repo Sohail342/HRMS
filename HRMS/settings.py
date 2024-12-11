@@ -27,7 +27,7 @@ LOGIN_REDIRECT_URL = reverse_lazy('HRMS:home')
 
 INSTALLED_APPS = [
     'unfold',
-    'django.contrib.admin',
+    'hide_admin.apps.HideAdminConfig',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'reporting',
     'account',
     'transfer_employees',
+    'group_head',
 ]
 
 
@@ -97,7 +98,7 @@ DATABASES = {
         'USER': tmpPostgres.username,
         'PASSWORD': tmpPostgres.password,
         'HOST': tmpPostgres.hostname,
-        'PORT': tmpPostgres.port or 5432,  # Default to 5432 if no port is specified
+        'PORT': tmpPostgres.port or 5432,
     }
 }
 
