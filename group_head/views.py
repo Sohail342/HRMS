@@ -1,14 +1,31 @@
 from HRIS_App.models import Employee
 from django.shortcuts import render
-from django.db.models import Count, Q
+from django.views.decorators.csrf import csrf_exempt
+import json
+from .decorators import admin_required
+from django.contrib.auth.decorators import login_required
+from HRIS_App.calculate_remaining_grades import calculate_remaining_grades
+from django.core.paginator import Paginator
+from django.http import JsonResponse
+from HRIS_App.models import (
+    Designation, 
+    Employee, 
+    EmployeeType, 
+    Cadre, 
+    EmployeeGrade, 
+    Branch, 
+    Qualification,
+)
 
+# Assigned grades of all regions
+@admin_required
 def grade_distribution_view(request):
     GRADE_CHOICES = [
-        'A - Excellent',
-        'B - Very Good',
-        'C - Good',
-        'D - Needs Improvement',
-        'E - Unsatisfactory',
+        'Excellent',
+        'Very Good',
+        'Good',
+        'Needs Improvement',
+        'Unsatisfactory',
         'Not Assigned',
     ]
 
@@ -23,7 +40,7 @@ def grade_distribution_view(request):
 
         for grade in GRADE_CHOICES:
             if grade == "Not Assigned":
-                count = Employee.objects.filter(region__name=region, grade_assignment__isnull=True).count()
+                count = Employee.objects.filter(region__name=region, grade_assignment="Not Assigned").count()
             else:
                 count = Employee.objects.filter(region__name=region, grade_assignment=grade).count()
 
@@ -41,5 +58,112 @@ def grade_distribution_view(request):
         'totals': totals,
     }
     return render(request, 'group_head/grade_distribution.html', context)
+
+
+
+# Assigned Grades of each region
+@admin_required
+@login_required(login_url='account:login')
+def grade_distribution_region_view(request, region_name):
+    employees = Employee.objects.filter(region=region_name).order_by('SAP_ID')
+    search_query = request.GET.get('search', '')
+    employee_type = request.GET.get('employee_type', '')
+    designation = request.GET.get('designation', '')
+    employee_grade = request.GET.get('employeeGrade', '')
+    branch = request.GET.get('branch', '')
+
+    # Apply filters
+    if branch:
+        employees = employees.filter(branch__branch_name__icontains=branch)
+    if search_query:
+        employees = employees.filter(SAP_ID__icontains=search_query)
+    if employee_type:
+        employees = employees.filter(employee_type=employee_type)
+    if designation:
+        employees = employees.filter(designation__title=designation)
+    if employee_grade:
+        employees = employees.filter(employee_grade__grade_name=employee_grade)
+
+    # Ensure no duplicates if using M2M relationships
+    employees = employees.distinct()  
+
+    # Calcute grades
+    remaining_grades = calculate_remaining_grades(region=region_name)
+
+
+    # Pagination
+    paginator = Paginator(employees, 50)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+
+    # Check if it's an AJAX request
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        data = {
+            'employees': [
+                {
+                    'SAP_ID': emp.SAP_ID,
+                    'name': emp.name if emp.name else "N/A",
+                    'employee_type': emp.employee_type.name if emp.employee_type else "N/A",
+                    'designation': emp.designation.title if emp.designation else "N/A",
+                    'employee_grade': emp.employee_grade.grade_name if emp.employee_grade else "N/A",
+                    'branch': emp.branch.branch_name if emp.branch else "N/A",
+                    'Branch_code':emp.branch.branch_code if emp.branch else "N/A",
+                    'pending_inquiry': 'Yes' if emp.pending_inquiry else "No",
+                    'remarks':emp.remarks,
+                    'transfer_remarks':emp.transfer_remarks,
+                    'grade_assignment':emp.grade_assignment,
+                }
+                for emp in page_obj.object_list
+            ],
+            'total_count': paginator.count,
+            'has_previous': page_obj.has_previous(),
+            'has_next': page_obj.has_next(),
+            'previous_page_number': page_obj.previous_page_number() if page_obj.has_previous() else None,
+            'next_page_number': page_obj.next_page_number() if page_obj.has_next() else None,
+        }
+        return JsonResponse(data)
+
+    context = {
+        "page_obj": page_obj,
+        'region_name':region_name,
+        "search_query": search_query,
+        "employee_type": employee_type,
+        "designation": designation,
+        "employee_types": EmployeeType.objects.all(),
+        "designations": Designation.objects.all(),
+        'cadre': Cadre.objects.all(),
+        'employeeGrade': EmployeeGrade.objects.all(),
+        'branches': Branch.objects.filter(region=region_name),
+        'qualifications': Qualification.objects.all(),
+        'remaining_grades': remaining_grades,
+    }
+
+    return render(request, 'group_head/grade_distribution_branch.html', context)
+
+
+
+# Ajax for update or assign grades for all regions by Group Head
+@login_required(login_url='account:login')
+def assign_grade(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            employee_id = data.get('employee_id')
+            grade_assignment = data.get('grade_assignment')
+
+            # Fetch the employee
+            employee = Employee.objects.get(SAP_ID=employee_id)
+            employee.grade_assignment = grade_assignment
+            employee.save()
+
+            return JsonResponse({"success": True, "message": "Grade updated successfully."})
+        except Employee.DoesNotExist:
+            return JsonResponse({"success": False, "message": "Employee not found."}, status=404)
+        except Exception as e:
+            return JsonResponse({"success": False, "message": str(e)}, status=400)
+
+    return JsonResponse({"success": False, "message": "Invalid request method."}, status=405)
+
 
 

@@ -2,13 +2,12 @@ from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 import csv
+from group_head.decorators import admin_employee_required
 from .calculate_remaining_grades import calculate_remaining_grades
-from django.urls import reverse
-from django.views.generic import UpdateView
-from .forms import AssignGradeForm
 from django.db.models import CharField
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
+import json
 from django.shortcuts import render, get_object_or_404
 from django.db.models.functions import Length, Cast
 from .models import (
@@ -22,8 +21,33 @@ from .models import (
 )
 
 
+# Ajax for update or assign grades by admin employee ( only for its own region)
+@login_required(login_url='account:login')
+def assign_grade(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            employee_id = data.get('employee_id')
+            grade_assignment = data.get('grade_assignment')
+
+            # Fetch the employee
+            employee = Employee.objects.get(SAP_ID=employee_id, region=request.user.region)
+            employee.grade_assignment = grade_assignment
+            employee.save()
+
+            return JsonResponse({"success": True, "message": "Grade updated successfully."})
+        except Employee.DoesNotExist:
+            return JsonResponse({"success": False, "message": "Employee not found."}, status=404)
+        except Exception as e:
+            return JsonResponse({"success": False, "message": str(e)}, status=400)
+
+    return JsonResponse({"success": False, "message": "Invalid request method."}, status=405)
+
+
+
 
 @login_required(login_url='account:login')
+@admin_employee_required
 def employees_view(request):
     user_region = request.user.region   
     user_group = request.user.user_group
@@ -107,6 +131,7 @@ def employees_view(request):
 
 
 # Download Dynamic Fields or column as a CSV file
+@admin_employee_required
 def download_employees_csv(request):
     # Get all employee data
     employee_region = request.user.region
@@ -198,26 +223,3 @@ def employee_detail_view(request, sap_id):
     employee = get_object_or_404(Employee, SAP_ID=sap_id)
     return render(request, 'HRIS_App/employee_details.html', {'employee': employee})
 
-
-# Assign Grades Pop up form
-class AssignGradeView(UpdateView):
-    model = Employee
-    form_class = AssignGradeForm
-    template_name = 'HRIS_App/assign_grade.html'
-
-    def get_object(self, queryset=None):
-        return get_object_or_404(Employee, SAP_ID=self.kwargs['sap_id'])
-    
-    def get_success_url(self):
-        # Return the URL as a string using reverse
-        return reverse('HRMS:employees_view')
-
-    def form_valid(self, form):
-        try:
-            # Try to save the form
-            response = super().form_valid(form)
-        except ValueError as e:
-            # If ValueError is raised, add it as a non-field error
-            form.add_error(None, str(e))
-            return self.render_to_response({'form': form})
-        return response

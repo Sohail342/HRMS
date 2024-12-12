@@ -1,0 +1,255 @@
+{% extends "sidebar.html" %}
+
+
+{% block content %}
+<div id="invoice" class="py-3">
+    <div class="container mx-auto p-4">
+        <!-- Search Bar -->
+        <form method="get" action=""> 
+            <div class="w-full flex justify-center p-1 mb-4">
+                <div class="relative w-full">
+                    <input type="text" name="search" class="w-full backdrop-blur-sm bg-blue-100 border border-blue-300 py-2 pl-10 pr-4 rounded-lg focus:outline-none focus:border-blue-500 transition-colors duration-300 shadow-md" placeholder="Search by SAP ID...">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="w-4 h-4 text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div class="flex items-center justify-between">
+            <h1 class="text-xl font-bold mb-4">{{region_name}} Region</h1>
+        </div>
+
+        <div class="container text-center mx-auto px-4 py-6">
+            <div class="flex overflow-x-auto space-x-4">
+                {% for grade_data in remaining_grades %}
+                <div class="flex-shrink-0 bg-white border border-gray-200 shadow rounded-lg p-4 w-1/4 md:w-1/5 lg:w-1/6">
+                    <div class="font-medium text-gray-900 text-lg mb-2">{{ grade_data.grade }}</div>
+                    <div class="text-sm text-gray-500">
+                        <div><strong>Total:</strong> {{ grade_data.total }}</div>
+                        <div><strong>Remaining:</strong> {{ grade_data.remaining }}</div>
+                        <div><strong>Awarded:</strong> {{ grade_data.awarded }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Table -->
+        <div class="overflow-x-auto mt-4">
+            <table class="min-w-full border-collapse border border-gray-300">
+                <thead>
+                    <tr class="bg-gray-200 text-gray-700">
+                        <th class="border border-gray-300 px-10 py-8 text-left text-sm md:text-base">Branch Code</th>
+                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Branch
+                            <select id="branchFilter" name="branch" class="w-24 border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out text-gray-700 bg-white hover:bg-gray-50" onchange="filterEmployees()">
+                                <option value="">All</option>
+                                {% for branch in branches %}
+                                    <option value="{{ branch.branch_name }}" {% if branch_filter == branch.branch_name %}selected{% endif %}>
+                                        {{ branch.branch_name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </th>
+                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">SAP ID</th>
+                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Name</th>
+                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">	
+                            Employee type
+                            <select id="employeeTypeFilter" name="employee_type"
+                                class="border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ease-in-out max-h-32 overflow-y-auto"
+                                onchange="filterEmployees()">
+                                <option value="">All</option>
+                                {% for employee_type in employee_types %}
+                                    <option value="{{ employee_type.name }}" {% if employee_type_filter == employee_type.name %}selected{% endif %}>
+                                        {{ employee_type.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </th>
+                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">APA 2024</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if page_obj %}
+                        {% for employee in page_obj %}
+                        <tr class="hover:bg-gray-100 transition duration-150 ease-in-out">
+                            
+                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.branch.branch_code }}</td>
+                            {% if  employee.branch %}
+                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.branch }}</td>
+                            {% else %}
+                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base"> </td>
+                            {% endif %}
+                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">
+                                <a href="{% url 'HRMS:employee_detail' employee.SAP_ID %}" class="text-blue-600 hover:underline">{{ employee.SAP_ID }}</a>
+                            
+                            </td>
+                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">
+                               {{ employee.name }}
+
+                            </td>
+                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.employee_type }}</td>
+                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">
+                                <select 
+                                    name="grade_assignment" 
+                                    class="border px-1 py-2 rounded bg-white focus:ring-blue-300 focus:outline-none transition" 
+                                    data-employee-id="{{ employee.SAP_ID }}" 
+                                    onchange="updateGrade(this)">
+                                    {% for grade, label in employee.GRADE_CHOICES %}
+                                        <option 
+                                            value="{{ grade }}" 
+                                            {% if employee.grade_assignment == grade %} selected {% endif %}>
+                                            {{ label }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </td>                            
+                            
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="18" class="border border-gray-300 px-6 py-6 text-center">No employees found</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="flex justify-between items-center px-4 py-3">
+            <div class="text-sm text-slate-500">
+                Showing <b>{{ page_obj.start_index }}-{{ page_obj.end_index }}</b> of {{ page_obj.paginator.count }}
+            </div>
+            <div class="flex space-x-1">
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}&search={{ search_query }}" class="px-3 py-1 text-sm font-normal text-slate-500 bg-white border border-slate-200 rounded hover:bg-slate-50 hover:border-slate-400 transition duration-200 ease">Prev</a>
+                {% endif %}
+        
+                {% for num in page_obj.paginator.page_range %}
+                    {% if num >= page_obj.number|add:-1 and num <= page_obj.number|add:1 %}
+                        {% if num == page_obj.number %}
+                            <button class="px-3 py-1 text-sm font-normal text-slate-800 bg-slate-800 border border-slate-800 rounded">{{ num }}</button>
+                        {% else %}
+                            <a href="?page={{ num }}&search={{ search_query }}" class="px-3 py-1 text-sm font-normal text-slate-500 bg-white border border-slate-200 rounded hover:bg-slate-50 hover:border-slate-400 transition duration-200 ease">{{ num }}</a>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+        
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}&search={{ search_query }}" class="px-3 py-1 text-sm font-normal text-slate-500 bg-white border border-slate-200 rounded hover:bg-slate-50 hover:border-slate-400 transition duration-200 ease">Next</a>
+                {% endif %}
+            </div>
+        </div>        
+        
+    </div>
+</div>
+<script>
+    function filterEmployees() {
+        // Get values from each select element
+        const employeeType = document.getElementById("employeeTypeFilter").value;
+        const branch = document.getElementById("branchFilter").value;
+        const searchQuery = document.querySelector("input[name='search']").value;
+    
+        // Construct the request URL with filters
+        const requestUrl = `?employee_type=${employeeType}&branch=${branch}&search=${searchQuery}`;
+        console.log("Filter URL: ", requestUrl);
+    
+        // Fetch data from the server
+        fetch(requestUrl, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+            .then(response => response.json())
+            .then(data => {
+                const tableBody = document.querySelector("table tbody");
+                tableBody.innerHTML = ""; // Clear current table content
+    
+                if (data.employees.length) {
+                    data.employees.forEach(employee => {
+                        const row = `<tr class="hover:bg-slate-100">
+                            <td class="border border-slate-300 px-6 py-6 text-sm md:text-base">${employee.Branch_code}</td>
+                            <td class="border border-slate-300 px-6 py-6 text-sm md:text-base">${employee.branch}</td>
+                            <td class="border border-slate-300 px-6 py-6 text-sm md:text-base">
+                                <a href="${employee.SAP_ID}" class="text-blue-600 hover:underline">${employee.SAP_ID}</a>
+                            </td>
+                            <td class="border border-slate-300 px-6 py-6 text-sm md:text-base">${employee.name}</td>
+                            <td class="border border-slate-300 px-6 py-6 text-sm md:text-base">${employee.employee_type}</td>
+                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">
+                                <select 
+                                    name="grade_assignment" 
+                                    class="border px-1 py-2 rounded bg-white focus:ring-blue-300 focus:outline-none transition" 
+                                    data-employee-id="${employee.SAP_ID}" 
+                                    onchange="updateGrade(this)">
+                                    ${generateGradeOptions(employee.grade_assignment)}
+                                </select>
+                            </td>
+                        </tr>`;
+                        tableBody.insertAdjacentHTML("beforeend", row);
+                    });
+                } else {
+                    tableBody.innerHTML = `<tr><td colspan="12" class="border border-slate-300 px-6 py-6 text-center">No employees found</td></tr>`;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+    
+    // Update Employee Grade
+    function updateGrade(selectElement) {
+        const employeeId = selectElement.getAttribute('data-employee-id');
+        const selectedGrade = selectElement.value;
+
+        fetch("{% url 'group_head:assign-grades' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}",
+            },
+            body: JSON.stringify({
+                employee_id: employeeId,
+                grade_assignment: selectedGrade,
+            }),
+        })
+        .then((response) => {
+            if (!response.ok) {
+                alert("Error: Could not update or grade limit exceed.");
+            }
+        })
+        .catch((error) => {
+            console.error("Error updating grade:", error);
+            alert("An error occurred. Please try again.");
+        });
+    }
+    
+    // Generate grade options dynamically
+    function generateGradeOptions(selectedGrade) {
+        const gradeChoices = [
+            'Excellent',
+            'Very Good',
+            'Good',
+            'Needs Improvement',
+            'Unsatisfactory',
+            'Not Assigned'
+        ];
+    
+        return gradeChoices
+            .map(
+                grade =>
+                    `<option value="${grade}" ${
+                        grade === selectedGrade ? 'selected' : ''
+                    }>${grade}</option>`
+            )
+            .join('');
+    }
+    
+    // Helper to get CSRF token
+    function getCsrfToken() {
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        return csrfToken;
+    }
+    
+</script>
+            
+{% endblock content %}

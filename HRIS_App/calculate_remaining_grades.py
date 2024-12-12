@@ -13,11 +13,11 @@ def calculate_remaining_grades(region):
 
     # Define the number of employees allowed per grade based on percentage
     grade_limits = {
-        'A - Excellent': int(total_employees * region_instance.A_Grade_seats / 100),
-        'B - Very Good': int(total_employees * region_instance.B_Grade_seats / 100),
-        'C - Good': int(total_employees * region_instance.C_Grade_seats / 100),
-        'D - Needs Improvement': int(total_employees * region_instance.D_Grade_seats / 100),
-        'E - Unsatisfactory': int(total_employees * region_instance.E_Grade_seats / 100),
+        'Excellent': int(total_employees * region_instance.A_Grade_seats / 100),
+        'Very Good': int(total_employees * region_instance.B_Grade_seats / 100),
+        'Good': int(total_employees * region_instance.C_Grade_seats / 100),
+        'Needs Improvement': int(total_employees * region_instance.D_Grade_seats / 100),
+        'Unsatisfactory': int(total_employees * region_instance.E_Grade_seats / 100),
     }
 
     # Convert to integers, with rounding to handle fractional employees
@@ -30,7 +30,7 @@ def calculate_remaining_grades(region):
     # Distribute the remaining employees (this could go to the grade with the smallest number)
     if remaining_employees > 0:
         # Add remaining employees to the lowest grade
-        grade_limits['E - Unsatisfactory'] += remaining_employees
+        grade_limits['Unsatisfactory'] += remaining_employees
 
     total_grade_limits = grade_limits.copy()  # To preserve the original limits for later use
 

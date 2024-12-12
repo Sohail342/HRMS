@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect
 from django.shortcuts import get_object_or_404
+from django.utils.decorators import method_decorator
 from django.utils import timezone
+from group_head.decorators import admin_required
 from django.http import JsonResponse
 from django.views.generic import DetailView, ListView
 from HRIS_App.models import Employee
@@ -15,11 +17,12 @@ def get_employee_data(request):
 
     
     data = {
-        'full_name': employee.full_name,
+        'full_name': employee.name,
         'designation': str(employee.designation),
     }
     
     return JsonResponse(data)
+
 
 
 class MemorandumMixin:
@@ -37,54 +40,68 @@ class MemorandumMixin:
         context['current_time'] = timezone.now()
         return context
     
-
+@method_decorator(admin_required, name='dispatch')
 class LeaveMemorandum(MemorandumMixin, DetailView):
     template_name = 'reporting/letter_templates/leave_memorandum.html' 
-    
 
+    
+@method_decorator(admin_required, name='dispatch')
 class GrantOfExtensionMemorandum(MemorandumMixin, DetailView):
     template_name = 'reporting/letter_templates/grant_of_extension.html'
 
 
+@method_decorator(admin_required, name='dispatch')
 class JoiningMemorandum(MemorandumMixin, DetailView):
     template_name = 'reporting/letter_templates/joining_memorandun.html'
 
+
+@method_decorator(admin_required, name='dispatch')
 class ApprovalPermissionHospitilization(MemorandumMixin, DetailView):
     template_name = 'reporting/letter_templates/approval_permission_hospitalization.html'
 
 
+@method_decorator(admin_required, name='dispatch')
 class MaternityLeaveMemorandum(MemorandumMixin, DetailView):
   template_name = 'reporting/letter_templates/maternity_Leave.html' 
 
 
+@method_decorator(admin_required, name='dispatch')
 class RequestForIssuanceOfficeMemorandum(MemorandumMixin, DetailView):
   template_name = 'reporting/letter_templates/request_for_issuance.html' 
 
 
+@method_decorator(admin_required, name='dispatch')
 class OrderOfficeMemorandum(MemorandumMixin, DetailView):
   template_name = 'reporting/letter_templates/order_office_memorandum.html'   
 
 
+@method_decorator(admin_required, name='dispatch')
 class PaymentOfBillMemorandum(MemorandumMixin, DetailView): 
   template_name = 'reporting/letter_templates/payment_of_bill.html'  
 
 
+@method_decorator(admin_required, name='dispatch')
 class ReimbursementMemorandum(MemorandumMixin, DetailView): 
   template_name = 'reporting/letter_templates/reimbursement.html' 
 
 
+@method_decorator(admin_required, name='dispatch')
 class PermissionOfHospitalization(MemorandumMixin, DetailView): 
   template_name = 'reporting/letter_templates/permission_of_hospitalization.html'  
 
+
+@method_decorator(admin_required, name='dispatch')
 class ReimbursementAgainstPurchase(MemorandumMixin, DetailView): 
   template_name = 'reporting/letter_templates/reimbursement_against_purchase.html' 
 
 
+@method_decorator(admin_required, name='dispatch')
 class RelievingOrderMemorandum(MemorandumMixin, DetailView): 
   template_name = 'reporting/letter_templates/relieving_order.html'
 
 
 
+@method_decorator(admin_required, name='dispatch')
 class LetterForm(LoginRequiredMixin, ListView):
     
     model = Employee

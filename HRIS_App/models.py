@@ -238,14 +238,15 @@ class Employee(AbstractBaseUser):
 
      # New grading field for APA 2024
     GRADE_CHOICES = [
-        ('A - Excellent', 'A - Excellent'),
-        ('B - Very Good', 'B - Very Good'),
-        ('C - Good', 'C - Good'),
-        ('D - Needs Improvement', 'D - Needs Improvement'),
-        ('E - Unsatisfactory', 'E - Unsatisfactory'),
+        ('Excellent', 'Excellent'),
+        ('Very Good', 'Very Good'),
+        ('Good', 'Good'),
+        ('Needs Improvement', 'Needs Improvement'),
+        ('Unsatisfactory', 'Unsatisfactory'),
+        ('Not Assigned', 'Not Assigned'),
     ]
 
-    grade_assignment = models.CharField(max_length=100, choices=GRADE_CHOICES, blank=True, null=True)
+    grade_assignment = models.CharField(max_length=100, choices=GRADE_CHOICES, blank=True, null=True, default='Not Assigned',)
 
 
 
@@ -272,12 +273,13 @@ class Employee(AbstractBaseUser):
 
             # Define the number of employees allowed per grade based on percentage
             grade_limits = {
-            'A - Excellent': int(total_employees * region_instance.A_Grade_seats / 100),
-            'B - Very Good': int(total_employees * region_instance.B_Grade_seats / 100),
-            'C - Good': int(total_employees * region_instance.C_Grade_seats / 100),
-            'D - Needs Improvement': int(total_employees * region_instance.D_Grade_seats / 100),
-            'E - Unsatisfactory': int(total_employees * region_instance.E_Grade_seats / 100),
-        }
+                'Excellent': int(total_employees * region_instance.A_Grade_seats / 100),
+                'Very Good': int(total_employees * region_instance.B_Grade_seats / 100),
+                'Good': int(total_employees * region_instance.C_Grade_seats / 100),
+                'Needs Improvement': int(total_employees * region_instance.D_Grade_seats / 100),
+                'Unsatisfactory': int(total_employees * region_instance.E_Grade_seats / 100),
+            }
+
 
             # Convert to integers, with rounding to handle fractional employees
             grade_limits = {grade: int(limit) for grade, limit in grade_limits.items()}
@@ -289,7 +291,7 @@ class Employee(AbstractBaseUser):
             # Distribute the remaining employees (this could go to the grade with the smallest number)
             if remaining_employees > 0:
                 # Add remaining employees to the lowest grade
-                grade_limits['E - Unsatisfactory'] += remaining_employees
+                grade_limits['Unsatisfactory'] += remaining_employees
 
             # Count how many employees currently have each grade
             current_grade_counts = Employee.objects.filter(region=self.region).values('grade_assignment').annotate(count=models.Count('id'))

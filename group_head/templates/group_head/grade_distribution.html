@@ -9,7 +9,7 @@
             <table class="min-w-full border border-gray-300">
                 <thead>
                     <tr class="bg-gray-200 text-gray-700 text-sm">
-                        <th class="py-2 px-4 border">Branch</th>
+                        <th class="py-2 px-4 border">Region</th>
                         <th class="py-2 px-4 border">Total Grades</th>
                         {% for grade in grades %}
                             <th class="py-2 px-4 border">{{ grade }}</th>
@@ -20,7 +20,11 @@
                     {% for branch_data in grade_data %}
                         <tr class="text-gray-600 text-sm">
                             {% if not branch_data.branch == None %}
-                            <td class="py-2 px-4 border">{{ branch_data.branch }}</td>
+
+                            <td class="py-2 px-4 border">
+                                <a href="{% url 'group_head:grade_distribution_branch_view' branch_data.branch %}">{{ branch_data.branch }}</a>
+                            </td>
+                            
                             <td class="py-2 px-4 border">{{ branch_data.total_employees }}</td>
                             {% for grade in grades %}
                                 <td class="py-2 px-4 border">{{ branch_data|get_item:grade }}</td>

@@ -1,11 +1,13 @@
 from django.views.generic import UpdateView
+from django.utils.decorators import method_decorator
 from .forms import InquiryPendingForm, TransferForm
 from HRIS_App.models import Employee
+from group_head.decorators import admin_employee_required
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from .models import Inquiry
 
-
+@method_decorator(admin_employee_required, name='dispatch')
 class InquiryPending(UpdateView):
     model = Employee
     form_class = InquiryPendingForm
@@ -24,7 +26,8 @@ class InquiryPending(UpdateView):
 
         return redirect(self.get_success_url())
     
-
+    
+@method_decorator(admin_employee_required, name='dispatch')
 class TransferView(UpdateView):
     model = Employee
     form_class = TransferForm

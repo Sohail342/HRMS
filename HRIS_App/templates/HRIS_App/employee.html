@@ -163,7 +163,6 @@
                         <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Transfer</th>
                         <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Transfer Remarks</th>
                         <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">APA 2024</th>
-                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Update APA 2024</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -206,11 +205,22 @@
                             </td>  
                             <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.transfer_remarks }}</td>
                             
-                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.grade_assignment }}</td>
-                           
                             <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">
-                                <a  href="{% url 'HRMS:assign_grade' employee.SAP_ID %}" class="bg-blue-500 text-white px-4 py-1 rounded-md hover:bg-blue-600 transition duration-150">Update</a>
-                            </td>
+                                <select 
+                                    name="grade_assignment" 
+                                    class="border px-1 py-2 rounded bg-white focus:ring-blue-300 focus:outline-none transition" 
+                                    data-employee-id="{{ employee.SAP_ID }}" 
+                                    onchange="updateGrade(this)">
+                                    {% for grade, label in employee.GRADE_CHOICES %}
+                                        <option 
+                                            value="{{ grade }}" 
+                                            {% if employee.grade_assignment == grade %} selected {% endif %}>
+                                            {{ label }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </td>                            
+                            
                         </tr>
                         {% endfor %}
                     {% else %}
@@ -296,12 +306,16 @@
                     </td>
 
                     <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">${employee.transfer_remarks}</td>
-                    <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">${employee.grade_assignment}</td>
                     <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">
-                                
-                        <a  href="/assign_grade/${employee.SAP_ID}/" class="bg-blue-500 text-white px-4 py-1 rounded-md hover:bg-blue-600 transition duration-150">Update</a>
-                                
+                        <select 
+                            name="grade_assignment" 
+                            class="border px-1 py-2 rounded bg-white focus:ring-blue-300 focus:outline-none transition" 
+                            data-employee-id="${employee.SAP_ID}" 
+                            onchange="updateGrade(this)">
+                            ${generateGradeOptions(employee.grade_assignment)}
+                        </select>
                     </td>
+                    
                 </tr>`;
                 tableBody.insertAdjacentHTML("beforeend", row);
             });
@@ -341,6 +355,33 @@ function downloadCsv(event) {
     window.location.href = requestUrl;
 }
 
+// Update Employee Grade
+function updateGrade(selectElement) {
+    const employeeId = selectElement.getAttribute('data-employee-id');
+    const selectedGrade = selectElement.value;
+
+    fetch("{% url 'HRMS:assign_grade' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}",
+        },
+        body: JSON.stringify({
+            employee_id: employeeId,
+            grade_assignment: selectedGrade,
+        }),
+    })
+    .then((response) => {
+        if (!response.ok) {
+            alert("Error: Could not update or grade limit exceed.");
+        }
+    })
+    .catch((error) => {
+        console.error("Error updating grade:", error);
+        alert("An error occurred. Please try again.");
+    });
+}
+
 
  // Select all checkboxs
  document.getElementById('select-all').addEventListener('change', function () {
@@ -360,7 +401,34 @@ function downloadCsv(event) {
 
 });
 
+    // Generate grade options dynamically
+    function generateGradeOptions(selectedGrade) {
+        const gradeChoices = [
+            'Excellent',
+            'Very Good',
+            'Good',
+            'Needs Improvement',
+            'Unsatisfactory',
+            'Not Assigned'
+        ];
+
+        return gradeChoices
+            .map(
+                grade =>
+                    `<option value="${grade}" ${
+                        grade === selectedGrade ? 'selected' : ''
+                    }>${grade}</option>`
+            )
+            .join('');
+    }
+
+    // Helper to get CSRF token
+    function getCsrfToken() {
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        return csrfToken;
+    }
+
     
-    </script>
+</script>
             
 {% endblock content %}
