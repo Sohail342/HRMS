@@ -90,30 +90,30 @@ WSGI_APPLICATION = 'HRMS.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 
-DATABASE_URL = "postgresql://HRISDB_owner:2OEg3qIpFfAy@ep-hidden-lab-a5qt4pxr.us-east-2.aws.neon.tech/HRISDB?sslmode=require"
+# DATABASE_URL = "postgresql://HRISDB_owner:2OEg3qIpFfAy@ep-hidden-lab-a5qt4pxr.us-east-2.aws.neon.tech/HRISDB?sslmode=require"
 
-# Parse the DATABASE_URL
-tmpPostgres = urlparse(DATABASE_URL)
+# # Parse the DATABASE_URL
+# tmpPostgres = urlparse(DATABASE_URL)
 
 
-# DATABASES configuration
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': tmpPostgres.path.lstrip('/'),
-        'USER': tmpPostgres.username,
-        'PASSWORD': tmpPostgres.password,
-        'HOST': tmpPostgres.hostname,
-        'PORT': tmpPostgres.port or 5432,
-    }
-}
-
+# # DATABASES configuration
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': tmpPostgres.path.lstrip('/'),
+#         'USER': tmpPostgres.username,
+#         'PASSWORD': tmpPostgres.password,
+#         'HOST': tmpPostgres.hostname,
+#         'PORT': tmpPostgres.port or 5432,
 #     }
 # }
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
 
 
 # Custom Employee Model

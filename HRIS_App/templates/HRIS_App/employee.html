@@ -98,8 +98,8 @@
                     <div class="font-medium text-gray-900 text-lg mb-2">{{ grade_data.grade }}</div>
                     <div class="text-sm text-gray-500">
                         <div><strong>Total:</strong> {{ grade_data.total }}</div>
-                        <div><strong>Remaining:</strong> {{ grade_data.remaining }}</div>
-                        <div><strong>Awarded:</strong> {{ grade_data.awarded }}</div>
+                        <div><strong class="text-red-500">Remaining:</strong> <span class="text-red-500 font-semibold">{{ grade_data.remaining }}</span></div>
+                        <div><strong class="text-green-500">Awarded:</strong> <span class="text-green-500 font-semibold">{{ grade_data.awarded }}</span></div>
                     </div>
                 </div>
                 {% endfor %}

@@ -22,11 +22,15 @@
 
                 {% if regions_csv_file.csv_file %}
                 <td class="px-6 py-4 text-sm border-b">
-                    <a href="{{ regions_csv_file.csv_file }}" class="text-blue-500 hover:underline" download="{{ regions_csv_file.csv_file }}">Download</a>
+                    <a href="{{ regions_csv_file.csv_file }}" class="text-blue-500 hover:underline" download="{{ regions_csv_file.csv_file }}">
+                        <i class="fas fa-download mr-2"></i> Download
+                    </a>
                 </td>                
                 {% else %}
                 <td class="px-6 py-4 text-sm border-b">
-                    <a href="{% url 'group_head:upload_Assigned_grades' regions_csv_file.name %}" class="text-blue-500 hover:underline">Upload</a>
+                    <a href="{% url 'group_head:upload_Assigned_grades' regions_csv_file.name %}" class="text-blue-500 hover:underline">
+                        <i class="fas fa-upload mr-2"></i> Upload
+                    </a>
                 </td>
                 {% endif %}
             </tr>

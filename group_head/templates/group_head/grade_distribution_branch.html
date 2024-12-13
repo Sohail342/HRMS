@@ -42,7 +42,7 @@
         <div class="text-center">
             <a href="{% url 'group_head:upload_Assigned_grades' region_name %}">
                 <button class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-400">
-                    Upload CSV
+                    <i class="fas fa-upload mr-2"></i> Upload CSV
                 </button>
             </a>
         </div>
@@ -54,8 +54,9 @@
                     <div class="font-medium text-gray-900 text-lg mb-2">{{ grade_data.grade }}</div>
                     <div class="text-sm text-gray-500">
                         <div><strong>Total:</strong> {{ grade_data.total }}</div>
-                        <div><strong>Remaining:</strong> {{ grade_data.remaining }}</div>
-                        <div><strong>Awarded:</strong> {{ grade_data.awarded }}</div>
+                        <div><strong class="text-red-500">Remaining:</strong> <span class="text-red-500 font-semibold">{{ grade_data.remaining }}</span></div>
+                        <div><strong class="text-green-500">Awarded:</strong> <span class="text-green-500 font-semibold">{{ grade_data.awarded }}</span></div>
+
                     </div>
                 </div>
                 {% endfor %}
