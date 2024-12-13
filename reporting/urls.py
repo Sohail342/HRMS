@@ -21,6 +21,6 @@ urlpatterns = [
 
 
     path('letterform/', views.LetterForm.as_view(), name="lettername"),
-    path('get_employee_data/', views.get_employee_data, name='get_employee_data'),
+    path('get_employee_data/', views.get_employee_data, name='get_employee_data'), 
 ]
 

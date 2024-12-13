@@ -1,0 +1,33 @@
+{% extends "sidebar.html" %}
+
+{% block content %}
+    <div class="flex justify-center items-center min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+        <div class="w-full max-w-md bg-white p-6 rounded-lg shadow-lg">
+            {% if region.csv_file %}
+                <p class="text-green-500 text-center mb-4">Note: One file already uploaded</p>
+            {% endif %}
+            
+            <div class="text-center mt-6">
+                <h1 class="text-3xl font-bold text-gray-800">{{ region.name }}</h1>
+            </div>
+
+            <!-- Form section -->
+            <form action="" method="post" enctype="multipart/form-data" class="space-y-4">
+                {% csrf_token %}
+                
+                <div class="text-center mb-4">
+                    <span class="text-2xl font-semibold text-gray-700">Upload File</span>
+                </div>
+
+                <div class="mb-6">
+                    <label for="file" class="block text-sm font-medium text-gray-700">Choose CSV File</label>
+                    <input type="file" name="file" id="file" class="mt-2 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required>
+                </div>
+
+                <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    Upload
+                </button>
+            </form>
+        </div>
+    </div>
+{% endblock content %}

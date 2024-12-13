@@ -1,7 +1,9 @@
-from HRIS_App.models import Employee
-from django.shortcuts import render
-from django.views.decorators.csrf import csrf_exempt
+from HRIS_App.models import Employee, Region
+from django.shortcuts import render, redirect
 import json
+from django.contrib import messages
+from django.http import HttpResponse
+import cloudinary
 from .decorators import admin_required
 from django.contrib.auth.decorators import login_required
 from HRIS_App.calculate_remaining_grades import calculate_remaining_grades
@@ -90,7 +92,6 @@ def grade_distribution_region_view(request, region_name):
     # Calcute grades
     remaining_grades = calculate_remaining_grades(region=region_name)
 
-
     # Pagination
     paginator = Paginator(employees, 50)
     page_number = request.GET.get('page')
@@ -145,6 +146,7 @@ def grade_distribution_region_view(request, region_name):
 
 # Ajax for update or assign grades for all regions by Group Head
 @login_required(login_url='account:login')
+@admin_required
 def assign_grade(request):
     if request.method == 'POST':
         try:
@@ -167,3 +169,51 @@ def assign_grade(request):
 
 
 
+# Upload Assigned Grades By Branches on Cloudinary
+@admin_required
+def AssignedGradesByBranchesView(request, region_name):
+
+    # Ensure the region exists or create a new region
+    region, created = Region.objects.get_or_create(name=region_name)
+
+    if request.method == 'POST':
+        csv_file = request.FILES.get('file')
+
+        if csv_file:
+            try:
+                # Upload CSV to Cloudinary
+                upload_result = cloudinary.uploader.upload(csv_file,  resource_type = "raw") 
+
+                # Store the URL of the uploaded file in the model
+                region.csv_file = upload_result['secure_url']
+                region.save()
+
+                messages.success(request, "CSV file uploaded successfully!")
+                return redirect("group_head:grade_distribution_branch_view", region_name=region_name)
+
+            except Exception as e:
+                messages.error(request, e)
+                return redirect("group_head:grade_distribution_branch_view", region_name=region_name)
+
+    return render(request, 'group_head/AssignedGradesByBranches.html', {"region":region})
+
+
+# Uploaded CSV files
+@admin_required
+def uploaded_csv_files(request):
+    regions_csv_files = Region.objects.values('name', 'csv_file')
+
+   # Append '.csv' to each CSV file URL if not already present
+    for region in regions_csv_files:
+
+        if region['csv_file']:
+            csv_url = str(region['csv_file'])
+            
+            # Check if the URL ends with '.csv' and append if not
+            if not csv_url.endswith('.csv'):
+                region['csv_file'] = f"{csv_url}.csv"
+        
+    uploaded_data = {
+        'regions_csv_files':regions_csv_files,
+    }
+    return render(request, 'group_head/uploaded_files.html', uploaded_data)

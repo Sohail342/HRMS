@@ -22,6 +22,31 @@
             <h1 class="text-xl font-bold mb-4">{{region_name}} Region</h1>
         </div>
 
+        {% if messages %}
+            <div class="mb-4">
+                {% for message in messages %}
+                <div class="p-4 mb-2 rounded-md shadow-lg 
+                    {% if message.tags == 'success' %}
+                        bg-green-100 border border-green-400 text-green-700
+                    {% elif message.tags == 'error' %}
+                        bg-red-100 border border-red-400 text-red-700
+                    {% else %}
+                        bg-gray-100 border border-gray-300 text-gray-700
+                    {% endif %}">
+                    <p class="font-semibold">{{ message }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="text-center">
+            <a href="{% url 'group_head:upload_Assigned_grades' region_name %}">
+                <button class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                    Upload CSV
+                </button>
+            </a>
+        </div>
+
         <div class="container text-center mx-auto px-4 py-6">
             <div class="flex overflow-x-auto space-x-4">
                 {% for grade_data in remaining_grades %}

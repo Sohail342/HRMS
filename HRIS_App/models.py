@@ -1,5 +1,5 @@
-from django.core.exceptions import ValidationError
 from django.db import models
+from cloudinary.models import CloudinaryField
 from django.contrib.auth.hashers import make_password, check_password
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
@@ -51,6 +51,10 @@ class Region(models.Model):
     name = models.CharField(max_length=100, unique=True)
     region_category = models.CharField(max_length=100, blank=True, null=True)
     functional_group = models.ManyToManyField(FunctionalGroup, related_name='regions')
+    csv_file = CloudinaryField(
+        blank=True, 
+        null=True, 
+    )
 
     # Flag for head office
     head_office = models.BooleanField(default=False)
@@ -246,7 +250,7 @@ class Employee(AbstractBaseUser):
         ('Not Assigned', 'Not Assigned'),
     ]
 
-    grade_assignment = models.CharField(max_length=100, choices=GRADE_CHOICES, blank=True, null=True, default='Not Assigned',)
+    grade_assignment = models.CharField(max_length=100, choices=GRADE_CHOICES, blank=True, null=True, default='Not Assigned')
 
 
 

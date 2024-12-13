@@ -1,0 +1,37 @@
+{% extends "sidebar.html" %}
+
+{% block content %}
+<div class="overflow-x-auto py-6 px-4 sm:px-6 lg:px-8">
+    <table class="min-w-full table-auto border-collapse bg-white shadow-md rounded-lg">
+        <thead>
+            <tr class="bg-gray-100">
+                <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Region</th>
+                <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Uploaded</th>
+                <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Link</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for regions_csv_file in regions_csv_files %}
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 text-sm font-medium text-gray-900 border-b">{{ regions_csv_file.name }}</td>
+                {% if regions_csv_file.csv_file %}
+                <td class="px-6 py-4 text-sm text-green-500 font-medium border-b">Yes</td>
+                {% else %}
+                <td class="px-6 py-4 text-sm text-red-500 font-medium border-b">No</td>
+                {% endif %}
+
+                {% if regions_csv_file.csv_file %}
+                <td class="px-6 py-4 text-sm border-b">
+                    <a href="{{ regions_csv_file.csv_file }}" class="text-blue-500 hover:underline" download="{{ regions_csv_file.csv_file }}">Download</a>
+                </td>                
+                {% else %}
+                <td class="px-6 py-4 text-sm border-b">
+                    <a href="{% url 'group_head:upload_Assigned_grades' regions_csv_file.name %}" class="text-blue-500 hover:underline">Upload</a>
+                </td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock content %}

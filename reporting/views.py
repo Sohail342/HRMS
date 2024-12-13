@@ -143,6 +143,12 @@ class LetterForm(LoginRequiredMixin, ListView):
         # If no valid form type, render the same page with error
         errors = "Invalid form type."
         return render(request, self.template_name, {'errors': errors, 'employees': self.get_queryset()})
+    
+
+
+
+
+
 
 
     

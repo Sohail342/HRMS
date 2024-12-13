@@ -1,5 +1,9 @@
 from urllib.parse import urlparse
 from pathlib import Path
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+
 from django.urls import reverse_lazy
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -13,7 +17,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-y6v#uewfea@x)o(5z&uemx@lrojs^*_in60ri38_pxn1!#@k@u'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*', '.vercel.app/']
 
@@ -39,6 +43,7 @@ INSTALLED_APPS = [
     'django_browser_reload',
     'import_export',
     "widget_tweaks",
+    'cloudinary',
     
     'HRIS_App',
     'reporting',
@@ -85,29 +90,29 @@ WSGI_APPLICATION = 'HRMS.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 
-DATABASE_URL = "postgresql://HRISDB_owner:2OEg3qIpFfAy@ep-hidden-lab-a5qt4pxr.us-east-2.aws.neon.tech/HRISDB?sslmode=require"
+# DATABASE_URL = "postgresql://HRISDB_owner:2OEg3qIpFfAy@ep-hidden-lab-a5qt4pxr.us-east-2.aws.neon.tech/HRISDB?sslmode=require"
 
-# Parse the DATABASE_URL
-tmpPostgres = urlparse(DATABASE_URL)
+# # Parse the DATABASE_URL
+# tmpPostgres = urlparse(DATABASE_URL)
 
-# DATABASES configuration
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': tmpPostgres.path.lstrip('/'),
-        'USER': tmpPostgres.username,
-        'PASSWORD': tmpPostgres.password,
-        'HOST': tmpPostgres.hostname,
-        'PORT': tmpPostgres.port or 5432,
-    }
-}
-
+# # DATABASES configuration
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': tmpPostgres.path.lstrip('/'),
+#         'USER': tmpPostgres.username,
+#         'PASSWORD': tmpPostgres.password,
+#         'HOST': tmpPostgres.hostname,
+#         'PORT': tmpPostgres.port or 5432,
 #     }
 # }
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
 
 
 # Custom Employee Model
@@ -152,6 +157,11 @@ STATIC_URL = 'static/'
 STATIC_DIRS = [BASE_DIR / 'static ']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+# Cloudinary media files settings
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+
 STATICFILES_STORAGES = "whitenoise.storage.CompressedManifestStaticFilesStorage"
   
 # Default primary key field type
@@ -161,3 +171,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Increase the maximum number of fields
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 9000 
+
+
+
+
+# Cloudinary configuration
+cloudinary.config(
+    cloud_name='dqvuzjoji',
+    api_key='795997967248592',
+    api_secret='LdggdzrPdn6__w4I6CBL7cu9sdM',
+    secure=True  
+)

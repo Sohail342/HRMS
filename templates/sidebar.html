@@ -67,27 +67,42 @@
                   </div>
                 </a>                
                 <a href="{% url 'admin:HRIS_App_employee_add' %}">
-                  <div class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-blue-100">
-                      <div class="grid place-items-center mr-4">
-                          <!-- User Plus Icon (Heroicons) -->
-                          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" class="h-6 w-6 text-gray-700 hover:text-blue-600">
-                              <path fill-rule="evenodd" d="M10 3a2 2 0 110 4 2 2 0 010-4zm4 2a4 4 0 00-4-4 4 4 0 00-4 4v6a4 4 0 004 4h4a4 4 0 004-4V5z" clip-rule="evenodd" />
-                          </svg>
-                      </div>
-                      <span>Add Employee</span>
-                  </div>
-              </a> 
-              <a href="{% url 'group_head:grade_distribution_view' %}">
-                <div class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-blue-100">
-                    <div class="grid place-items-center mr-4">
-                        <!-- User Plus Icon (Heroicons) -->
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" class="h-6 w-6 text-gray-700 hover:text-blue-600">
-                            <path fill-rule="evenodd" d="M10 3a2 2 0 110 4 2 2 0 010-4zm4 2a4 4 0 00-4-4 4 4 0 00-4 4v6a4 4 0 004 4h4a4 4 0 004-4V5z" clip-rule="evenodd" />
-                        </svg>
+                    <div class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-blue-100">
+                        <div class="grid place-items-center mr-4">
+                            <!-- Add Employee Icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" class="h-6 w-6 text-gray-700 hover:text-blue-600">
+                                <path fill-rule="evenodd" d="M10 3a2 2 0 110 4 2 2 0 010-4zm4 2a4 4 0 00-4-4 4 4 0 00-4 4v6a4 4 0 004 4h4a4 4 0 004-4V5z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <span>Add Employee</span>
                     </div>
-                    <span>Head Office</span>
-                </div>
-            </a>
+                </a>
+                
+                <a href="{% url 'group_head:uploaded_csv_files' %}">
+                    <div class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-blue-100">
+                        <div class="grid place-items-center mr-4">
+                            <!-- CSV File Upload Icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" class="h-6 w-6 text-gray-700 hover:text-blue-600">
+                                <path fill-rule="evenodd" d="M9 12.5a1 1 0 011 1v4a1 1 0 11-2 0v-4a1 1 0 011-1z" clip-rule="evenodd" />
+                                <path fill-rule="evenodd" d="M4 5a3 3 0 013-3h6a3 3 0 013 3v10a3 3 0 01-3 3H7a3 3 0 01-3-3V5z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <span>Uploaded CSV files</span>
+                    </div>
+                </a>
+                
+                <a href="{% url 'group_head:grade_distribution_view' %}">
+                    <div class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-blue-100">
+                        <div class="grid place-items-center mr-4">
+                            <!-- Office Building Icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" class="h-6 w-6 text-gray-700 hover:text-blue-600">
+                                <path fill-rule="evenodd" d="M5 4a1 1 0 011-1h8a1 1 0 011 1v12a1 1 0 01-1 1H6a1 1 0 01-1-1V4z" clip-rule="evenodd" />
+                                <path fill-rule="evenodd" d="M3 8a1 1 0 011-1h2a1 1 0 011 1v8a1 1 0 01-1 1H4a1 1 0 01-1-1V8z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <span>Head Office</span>
+                    </div>
+                </a>                
               
               <a href="{% url 'admin:index' %}" target="_blank">
                 <div role="button" tabindex="0"
