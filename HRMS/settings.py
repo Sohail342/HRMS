@@ -95,6 +95,7 @@ DATABASE_URL = "postgresql://HRISDB_owner:2OEg3qIpFfAy@ep-hidden-lab-a5qt4pxr.us
 # Parse the DATABASE_URL
 tmpPostgres = urlparse(DATABASE_URL)
 
+
 # DATABASES configuration
 DATABASES = {
     'default': {
