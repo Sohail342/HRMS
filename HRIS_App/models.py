@@ -252,6 +252,10 @@ class Employee(AbstractBaseUser):
 
     grade_assignment = models.CharField(max_length=100, choices=GRADE_CHOICES, blank=True, null=True, default='Not Assigned')
 
+    # tracked employees if they are not an admin (is_admin=False) or an admin employee (is_admin_employee=False
+    employee_user = models.BooleanField(default=True)
+
+
 
 
     def validate_grades(self):
@@ -344,16 +348,26 @@ class Employee(AbstractBaseUser):
     
 
     def save(self, *args, **kwargs):
+        # Ensure that only employees are tracked, excluding admins or admin employees
+        if self.is_admin or self.is_admin_employee:
+            self.employee_user = False 
+        else:
+            self.employee_user = True 
 
         # Clear remarks and transfer status if no pending inquiry
         if not self.pending_inquiry:
             self.remarks = ""
             self.transferred_status = ""
 
-        
+        # Validate grades before saving
         self.validate_grades()
-        self.full_clean()  # Ensure all validations are applied
+
+        # Ensure all validations are applied
+        self.full_clean()
+
+        # Save the instance
         super().save(*args, **kwargs)
+
 
         
     class Meta:

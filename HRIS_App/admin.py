@@ -11,9 +11,9 @@ from .models import (
 )
 
 @admin.register(Group)
-class GroupAdmin(ImportExportModelAdmin, ModelAdmin):
-    export_form_class = ExportForm
+class GroupAdmin(ModelAdmin, ImportExportModelAdmin):
     import_form_class = ImportForm
+    export_form_class = ExportForm
     list_display = ('id', 'name', 'description')
     search_fields = ('id', 'name')
     list_filter = ('name', )
@@ -95,7 +95,7 @@ class EmployeeGradeAdmin(ImportExportModelAdmin, ModelAdmin):
     list_filter = ('grade_name', )
 
 @admin.register(Qualification)
-class QualificationAdmin(ImportExportModelAdmin, ModelAdmin):
+class QualificationAdmin(ModelAdmin, ImportExportModelAdmin):
     export_form_class = ExportForm
     import_form_class = ImportForm
     list_display = ('name', 'qualification_type', 'institution')
@@ -103,9 +103,9 @@ class QualificationAdmin(ImportExportModelAdmin, ModelAdmin):
     list_filter = ('name', 'qualification_type', 'institution')
 
 
-class EmployeeAdmin(ImportExportModelAdmin, ModelAdmin):
-    export_form_class = ExportForm
+class EmployeeAdmin(ModelAdmin, ImportExportModelAdmin):
     import_form_class = ImportForm
+    export_form_class = ExportForm
     resource_class = EmployeeResource
     form = AdminEmployeeForm
     list_display = ('SAP_ID', 'name', 'branch', 'region', 'designation', 'employee_grade', 'employee_type', 'date_of_joining', 'is_admin_employee')
@@ -162,4 +162,5 @@ class EmployeeAdmin(ImportExportModelAdmin, ModelAdmin):
 
         # Save the object with the potentially updated password
         obj.save()
+        
 admin.site.register(Employee, EmployeeAdmin)

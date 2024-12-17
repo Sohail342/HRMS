@@ -2,7 +2,6 @@ from HRIS_App.models import Employee, Region
 from django.shortcuts import render, redirect
 import json
 from django.contrib import messages
-from django.http import HttpResponse
 import cloudinary
 from .decorators import admin_required
 from django.contrib.auth.decorators import login_required

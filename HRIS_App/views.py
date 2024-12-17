@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 import csv
-from group_head.decorators import admin_employee_required
+from group_head.decorators import admin_employee_required, admin_or_admin_employee_required
 from .calculate_remaining_grades import calculate_remaining_grades
 from django.db.models import CharField
 from django.contrib.auth.decorators import login_required
@@ -201,6 +201,7 @@ def download_employees_csv(request):
 
 # Main dashboard 
 @login_required(login_url='account:login')
+@admin_or_admin_employee_required
 def index(request):
     employees_count_region = Employee.objects.filter(region=request.user.region).count()
     employees_count = Employee.objects.count()
