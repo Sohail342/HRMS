@@ -36,12 +36,24 @@
         </button>
 
         <div id="sidebar" class="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 w-1/4 p-4 shadow-xl shadow-blue-gray-900/5 transition-transform duration-300 ease-in-out">
-            <a href="{% url 'HRMS:home' %}">
-                <div class="mb-2 p-4">
-                    <h5 class="block antialiased tracking-normal text-center font-sans text-xl font-semibold leading-snug text-gray-900">
-                        HRIS</h5>
-                </div>
-            </a>
+
+            {% if not request.user.employee_user %}
+                <a href="{% url 'HRMS:home' %}">
+                    <div class="mb-2 p-4">
+                        <h5 class="block antialiased tracking-normal text-center font-sans text-xl font-semibold leading-snug text-gray-900">
+                            HRIS</h5>
+                    </div>
+                </a>
+            {% else %}
+                <a href="{% url 'employee_user:dashboard' %}">
+                    <div class="mb-2 p-4">
+                        <h5 class="block antialiased tracking-normal text-center font-sans text-xl font-semibold leading-snug text-gray-900">
+                            HRIS</h5>
+                    </div>
+                </a>
+            {% endif %}
+
+
             {% if not request.user.employee_user %} <!--Start Admin and Admin Employee Attributes-->
                 {% if request.user.is_authenticated %}
                 
@@ -160,7 +172,9 @@
                     {% endif %}       
                 {% endif  %}      <!--End Admin and Admin Employee Attributes-->
 
+                
 
+                <!--Employee User Attributes-->
                 {% if not request.user.is_authenticated %}
                 <a href="{% url 'employee_user:user_login' %}">
                     <div class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-blue-100">
@@ -184,6 +198,16 @@
                                     </svg>
                                 </div>
                                 Logout
+                            </div>
+                        </a> 
+                        <a href="{% url 'account:password_change' %}">
+                            <div class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-blue-100">
+                                <div class="grid place-items-center mr-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="h-6 w-6 text-gray-700 hover:text-blue-600">
+                                        <path d="M12 12c2.5 0 4.5-2 4.5-4.5S14.5 3 12 3 7.5 5 7.5 7.5 9.5 12 12 12zm0 2c-3.3 0-10 1.7-10 5v2h20v-2c0-3.3-6.7-5-10-5z"/>
+                                    </svg>
+                                </div>
+                                Settings
                             </div>
                         </a>  
                     {% endif %}
