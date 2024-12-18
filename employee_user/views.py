@@ -32,6 +32,22 @@ def user_login_view(request):
     return render(request, "employee_user/login_user.html")
 
 
+# Employees Information
+@employee_user_required
+def information_employee(request):
+    employee = Employee.objects.get(SAP_ID=request.user.SAP_ID)
+
+    # Functional groups
+    group = None
+    groups = employee.region.functional_group.all()
+
+    for group in groups:
+        group = group.group
+        break
+
+    return render(request, 'employee_user/information_employee.html', {"employee_information":employee, "group":group})
+
+
 
 # User Verification
 def verification_user_view(request):

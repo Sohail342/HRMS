@@ -27,8 +27,8 @@
     <form action="{% url 'employee_user:user_login' %}" method="POST">
         {% csrf_token %}
       <div class="mb-6">
-        <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Enter Your email</label>
-        <input type="email" id="email" name="email" class="shadow-sm rounded-md w-full px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200" placeholder="e.g, 2345" required>
+        <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Enter Your Email</label>
+        <input type="email" id="email" name="email" class="shadow-sm rounded-md w-full px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200" placeholder="e.g, example@gmail.com" required>
       </div>
       
       <!-- Password Field -->

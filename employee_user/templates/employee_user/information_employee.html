@@ -1,0 +1,152 @@
+{% extends "sidebar.html" %}
+
+{% block content %}
+<form method="post" class="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md dark:bg-gray-800 space-y-6">
+    {% csrf_token %}
+    <h2 class="text-2xl font-semibold text-gray-800 dark:text-white">EMPLOYEE INFORMATION</h2>
+    
+    <!-- Row 1 -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+            <label for="name" class="block mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">Name</label>
+            <input 
+                type="text"
+                {% if employee_information.name %}disabled 
+                value="{{employee_information.name}}"
+                {% endif %}
+                id="name" 
+                name="name" 
+                class="block w-full p-2.5 border border-gray-300 text-sm rounded-lg dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500"
+                required>
+        </div>
+        <div>
+            <label for="sapid" class="block mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">SAPID</label>
+            <input 
+                type="text"
+                {% if employee_information.SAP_ID %}disabled
+                value="{{employee_information.SAP_ID}}" 
+                {% endif %}
+                id="sapid" 
+                name="sapid" 
+                class="block w-full p-2.5 border border-gray-300 text-sm rounded-lg dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500"
+                required>
+        </div>
+        <div>
+            <label for="review_period" class="block mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">Review Period</label>
+            <input 
+                type="text" 
+                id="review_period" 
+                name="review_period" 
+                class="block w-full p-2.5 border border-gray-300 text-sm rounded-lg dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500" required>
+        </div>
+    </div>
+
+    <!-- Row 2 -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+            <label for="job_title" class="block mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">Job Title</label>
+            <input 
+                type="text"
+                {% if employee_information.designation %}disabled
+                value="{{employee_information.designation}}"
+                {% endif %}
+                id="job_title" 
+                name="job_title" 
+                class="block w-full p-2.5 border border-gray-300 text-sm rounded-lg dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500"
+                required>
+        </div>
+        <div>
+            <label for="grade" class="block mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">Grade</label>
+            <input 
+                type="text" 
+                id="grade" 
+                {% if employee_information.employee_grade %}disabled
+                value="{{employee_information.employee_grade}}"
+                {% endif %} 
+                name="grade" 
+                class="block w-full p-2.5 border border-gray-300 text-sm rounded-lg dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500"
+                required>
+        </div>
+        <div>
+            <label for="joining_date" class="block mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">Date of Joining</label>
+            <input 
+                type="date" 
+                id="joining_date" 
+                name="joining_date" 
+                class="block w-full p-2.5 border border-gray-300 text-sm rounded-lg dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500"
+                {% if employee_information.joining_date %}disabled{% endif %} required>
+        </div>
+    </div>
+
+    <!-- Row 3 -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+            <label for="group" class="block mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">Group</label>
+            <input 
+                type="text"
+                {% if group %}disabled 
+                value="{{group}}"
+                {% endif %}
+                id="group" 
+                name="group" 
+                class="block w-full p-2.5 border border-gray-300 text-sm rounded-lg dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500"
+                required>
+        </div>
+        <div>
+            <label for="wing_dept" class="block mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">Wing/Dept</label>
+            <input 
+                type="text" 
+                id="wing_dept" 
+                name="wing_dept" 
+                class="block w-full p-2.5 border border-gray-300 text-sm rounded-lg dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500" required>
+        </div>
+        <div>
+            <label for="region_branch" class="block mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">Region/Branch</label>
+            <input 
+                type="text"
+                {% if employee_information.region or employee_information.branch %}disabled
+                value="{{employee_information.region}}/{{employee_information.branch}}"
+                {% endif %}  
+                id="region_branch" 
+                name="region_branch" 
+                class="block w-full p-2.5 border border-gray-300 text-sm rounded-lg dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500"
+                required>
+        </div>
+    </div>
+
+    <!-- Row 4 (New Fields) -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+            <label for="division" class="block mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">Division</label>
+            <input 
+                type="text" 
+                id="division" 
+                name="division" 
+                class="block w-full p-2.5 border border-gray-300 text-sm rounded-lg dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500" required>
+        </div>
+        <div>
+            <label for="first_appraiser" class="block mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">1st Appraiser</label>
+            <input 
+                type="text" 
+                id="first_appraiser" 
+                name="first_appraiser" 
+                class="block w-full p-2.5 border border-gray-300 text-sm rounded-lg dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500" required>
+        </div>
+        <div>
+            <label for="second_appraiser" class="block mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">2nd Appraiser</label>
+            <input 
+                type="text" 
+                id="second_appraiser" 
+                name="second_appraiser" 
+                class="block w-full p-2.5 border border-gray-300 text-sm rounded-lg dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500" required>
+        </div>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="text-right">
+        <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+            Submit
+        </button>
+    </div>
+</form>
+{% endblock content %}
