@@ -111,3 +111,8 @@ def create_password_view(request, sap_id):
 def dashboard_view(request):
     return render(request, 'employee_user/dashboard.html')
 
+
+# RICP 
+
+def RICP(request):
+    return render(request, 'employee_user/RICP.html')

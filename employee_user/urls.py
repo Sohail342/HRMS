@@ -8,6 +8,7 @@ urlpatterns = [
     path("user/login/", views.user_login_view, name="user_login"),
     path("user/create_password/<int:sap_id>/", views.create_password_view, name="create_password"),  
     path("user/dashboard/", views.dashboard_view, name="dashboard"),
-    path('user/information/form/', views.information_employee, name="employee_information")
+    path('user/information/form/', views.information_employee, name="employee_information"),
+    path('user/RICP', views.RICP, name="RICP")
 ]
     
