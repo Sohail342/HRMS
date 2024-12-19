@@ -256,13 +256,13 @@ class Employee(AbstractBaseUser):
     employee_user = models.BooleanField(default=True)
 
 
-
+   
 
     def validate_grades(self):
         total_employees = 0
         try:
             # Get the total number of employees in the same region
-            total_employees = Employee.objects.filter(region=self.region).count()
+            total_employees = Employee.objects.filter(is_admin=False).filter(region=self.region).count()
         except:
             # Get all employees if admin login
             total_employees = Employee.objects.filter().count()

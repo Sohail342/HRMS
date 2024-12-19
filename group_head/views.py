@@ -41,9 +41,9 @@ def grade_distribution_view(request):
 
         for grade in GRADE_CHOICES:
             if grade == "Not Assigned":
-                count = Employee.objects.filter(region__name=region, grade_assignment="Not Assigned").count()
+                count = Employee.objects.filter(region__name=region, grade_assignment="Not Assigned", is_admin=False).count()
             else:
-                count = Employee.objects.filter(region__name=region, grade_assignment=grade).count()
+                count = Employee.objects.filter(region__name=region, grade_assignment=grade, is_admin=False).count()
 
             branch_data[grade] = count
             totals[grade] += count  # Add to totals for this grade
