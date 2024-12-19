@@ -115,4 +115,5 @@ def dashboard_view(request):
 # RICP 
 
 def RICP(request):
-    return render(request, 'employee_user/RICP.html')
+
+    return render(request, 'employee_user/RICP.html', {"test":[1, 2, 3, 4, 5]})
