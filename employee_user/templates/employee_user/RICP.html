@@ -2,7 +2,13 @@
 
 {% block content %}
 <div class="bg-gray-100 p-6">
-  <div class="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6">
+  <div class="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6" id="formContent">
+    <!-- Download PDF Button -->
+    <div class="text-right mb-4">
+        <button id="downloadPdfButton" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-green-600 hover:shadow-lg transition-all duration-200">
+          Download PDF
+        </button>
+    </div>
     <h2 class="text-lg font-bold text-gray-800 mb-2">
       Risk, Internal Controls & Processes
     </h2>
@@ -56,10 +62,10 @@
         </tfoot>
       </table>
     </div>
-    
+
     <!-- Button to Add New Row -->
     <div class="mt-4 text-center">
-      <button id="addRowButton" class="bg-blue-500 text-white px-4 py-2 rounded-md">Add Row</button>
+      <button id="addRowButton" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-green-600 hover:shadow-lg transition-all duration-200 ">Add Row</button>
     </div>
   </div>
 </div>
@@ -69,12 +75,9 @@
   let rowCount = 1; // Initialize row count
 
   function addRow() {
-    // Create a new row
     const row = document.createElement('tr');
-    
-    // If this is the first row, include 25% weightage. Otherwise, don't include it.
     const weightage = rowCount === 1 ? '<td class="border border-gray-300 px-4 py-2 text-center">25%</td>' : '<td class="border border-gray-300 px-4 py-2 w-11 text-center"></td>';
-    
+
     row.innerHTML = `
       <td class="border border-gray-300 px-4 py-2 text-center">${rowCount}</td>
       <td class="border border-gray-300 px-4 py-2">
@@ -99,31 +102,21 @@
         </select>
       </td>
     `;
-    
-    // Append the row to the table body
+
     document.getElementById('dynamicRows').appendChild(row);
-    
-    // Increment row count for the next row
     rowCount++;
-    
-    // Add event listeners to the newly added select elements for real-time score calculation
     const newSelect = row.querySelector('.score select');
     newSelect.addEventListener('change', calculateFinalScore);
-    
-    // Recalculate final score after adding a row
     calculateFinalScore();
   }
 
-  // Event listener for the add row button
   document.getElementById('addRowButton').addEventListener('click', addRow);
-  
-  // Function to calculate the final score dynamically
+
   function calculateFinalScore() {
     const scores = document.querySelectorAll(".score select");
     let sum = 0;
     let count = 0;
-  
-    // Loop through all the score select fields and sum their values
+
     scores.forEach((score) => {
       const scoreValue = parseInt(score.value) || 0;
       if (scoreValue > 0) {
@@ -131,23 +124,91 @@
         count++;
       }
     });
-  
-    // Apply the formula: SUM(all values) / COUNT(all values) * 25%
+
     const finalScore = count > 0 ? (sum / count) * 0.25 : 0;
-  
-    // Set the final score in an element with ID finalScore
     const finalScoreElement = document.getElementById("finalScore");
     if (finalScoreElement) {
-      finalScoreElement.textContent = finalScore > 0 ? finalScore.toFixed(2) : ""; 
+      finalScoreElement.textContent = finalScore > 0 ? finalScore.toFixed(2) : "";
     }
   }
-  
-  // Add event listeners to all score fields for recalculating final score
+
   document.querySelectorAll(".score select").forEach((select) => {
     select.addEventListener("change", calculateFinalScore);
   });
 
-  // Initial calculation
   calculateFinalScore();
+
+ // PDF Download Functionality
+document.getElementById('downloadPdfButton').addEventListener('click', async () => {
+  const formContent = document.getElementById('formContent');
+  const clonedForm = formContent.cloneNode(true);
+
+  // Replace input values with text content
+  clonedForm.querySelectorAll('input').forEach(input => {
+      const span = document.createElement('span');
+      span.textContent = input.value || input.placeholder;
+      span.style.cssText = window.getComputedStyle(input).cssText;
+      span.style.background = 'none';
+      span.style.border = 'none';
+      input.replaceWith(span);
+  });
+
+  // Replace dropdown values with their selected option text
+  clonedForm.querySelectorAll('select').forEach(select => {
+      const selectedOption = select.options[select.selectedIndex];
+      const span = document.createElement('span');
+      
+      // Create a text node from the selected option text and append to the span
+      const textNode = document.createTextNode(selectedOption ? selectedOption.textContent : '');
+      span.appendChild(textNode);
+      
+      span.style.cssText = window.getComputedStyle(select).cssText;
+      span.style.background = 'none';
+      span.style.border = 'none';
+      span.style.display = 'inline-block';
+      span.style.padding = '5px 10px'; // Match dropdown padding
+      span.style.borderRadius = '4px';
+
+      // Create a container for the value outside of the select
+      const valueContainer = document.createElement('div');
+      valueContainer.appendChild(span);
+      select.parentNode.replaceChild(valueContainer, select);
+      select.replaceWith(span);
+  });
+
+  // Create a container to temporarily hold the cloned form
+  const container = document.createElement('div');
+  container.style.position = 'absolute';
+  container.style.top = '-9999px';
+  container.appendChild(clonedForm);
+  document.body.appendChild(container);
+
+  try {
+      // Generate canvas from the cloned form
+      const canvas = await html2canvas(clonedForm, {
+          scale: 2, // Higher scale for better image quality
+          useCORS: true // Enable CORS to handle cross-origin resources
+      });
+      const imgData = canvas.toDataURL('image/png');
+
+      // Generate the PDF and add the image
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF();
+      pdf.addImage(imgData, 'PNG', 10, 10, 190, 0);
+      pdf.save('form.pdf');
+  } catch (error) {
+      console.error('Error generating PDF:', error);
+  } finally {
+      // Remove the temporary container
+      document.body.removeChild(container);
+  }
+});
+
+
+
 </script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 {% endblock %}
