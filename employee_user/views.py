@@ -5,6 +5,11 @@ from group_head.decorators import employee_user_required
 from django.contrib.auth.decorators import login_required
 from .forms import CreatePasswordForm
 from django.contrib.auth import login
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
+from django.shortcuts import get_object_or_404
+from .models import RicpData, RicpKPI
+import json
 
 
 # User Login
@@ -113,7 +118,64 @@ def dashboard_view(request):
 
 
 # RICP 
-
+@login_required(login_url="employee_user:user_login")
+@employee_user_required
 def RICP(request):
+    return render(request, 'employee_user/RICP.html')
 
-    return render(request, 'employee_user/RICP.html', {"test":[1, 2, 3, 4, 5]})
+
+
+
+@csrf_protect
+def submit_ricp_data(request):
+    if request.method == "POST":
+        # Extract data
+        employee_id = request.user.SAP_ID
+        kpis = json.loads(request.POST.get("kpis"))
+        half_year_review = request.POST.get("halfYearReview")
+        full_year_review = request.POST.get("fullYearReview")
+        final_score = request.POST.get("finalScore")
+
+        print(full_year_review)
+
+        # Get or create the RICP data for the employee
+        employee = get_object_or_404(Employee, SAP_ID=employee_id)
+        ricp_data, created = RicpData.objects.get_or_create(employee=employee)
+
+        
+        # Save Final score, half_year_review, and full_year_review
+        if final_score:
+            ricp_data.final_score = final_score
+            
+        if half_year_review:
+            ricp_data.half_year_review = half_year_review
+
+        if full_year_review:
+            ricp_data.full_year_review = full_year_review
+
+        ricp_data.save()
+
+
+
+        # Save KPIs
+        for kpi_data in kpis:
+            # Check score is digit or not ( if not set to 0)
+            score = kpi_data.get("score")
+            if not score:
+                score = 0
+
+            RicpKPI.objects.create(
+                ricp_data=ricp_data,
+                kpi=kpi_data["kpi"],
+                achievement=kpi_data["achievement"],
+                weightage=kpi_data.get("weightage"),
+                target_date=kpi_data["targetDate"],
+                
+                score=score,
+            )
+
+
+        # Return a success message
+        return JsonResponse({"message": "RICP data submitted successfully!"})
+
+    return JsonResponse({"error": "Invalid request"}, status=400)

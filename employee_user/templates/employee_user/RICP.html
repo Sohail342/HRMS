@@ -1,91 +1,121 @@
 {% extends "sidebar.html" %}
 
 {% block content %}
-<div class="bg-gray-100 p-6">
-  <div class="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6">
-    <h2 class="text-lg font-bold text-gray-800 mb-2">
-      Risk, Internal Controls & Processes
-    </h2>
-    <p class="text-sm text-gray-600 mb-4">
-      How I will improve productivity, quality, and speed of service while adhering strictly to the Bank’s regulation and processes?
-    </p>
+<form id="ricpForm" method="POST" action="{% url 'employee_user:submit_ricp_data' %}">
+  {% csrf_token %}
+  <!-- Download PDF Button -->
+  <div class="text-right mb-4">
+    <button type="button" id="download" class="btn btn-light bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-green-600 hover:shadow-lg transition-all duration-200">
+      Download PDF
+    </button>
+  </div>
+  <div id="invoice" class="bg-gray-100 p-6">
+    <div class="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6" id="formContent">
+      <h2 class="text-lg font-bold text-gray-800 mb-2">
+        Risk, Internal Controls & Processes
+      </h2>
+      <p class="text-sm text-gray-600 mb-4">
+        How I will improve productivity, quality, and speed of service while adhering strictly to the Bank’s regulation and processes?
+      </p>
 
-    <div class="overflow-x-auto">
-      <table class="w-full border-collapse border border-gray-300 text-sm" id="tableBody">
-        <thead class="bg-gray-100">
-          <tr>
-            <th class="border border-gray-300 px-4 py-1 text-left">S.No.</th>
-            <th class="border border-gray-300 px-4 py-2 text-left">Key Performing Indicator (KPI)</th>
-            <th class="border border-gray-300 px-4 py-2 text-left">Achievement</th>
-            <th class="border border-gray-300 px-4 py-2 text-center ">Weightage</th>
-            <th class="border border-gray-300 px-4 py-2 text-left">Target Date</th>
-            <th class="border border-gray-300 px-4 py-2 text-left">Score</th>
-          </tr>
-        </thead>
-        <tbody id="dynamicRows">
-          <!-- Dynamic rows will be added here -->
-        </tbody>
-        <tfoot class="bg-gray-100">
-          <tr>
-            <td colspan="2" class="border border-gray-300 px-4 py-2 text-left">Half Year Review (Jun 30)</td>
-            <td class="border border-gray-300 px-4 py-2 text-center">
-              <select class="border border-gray-300 rounded px-2 py-1 w-24">
-                <option value=""></option>
-                <option value="0">Outstanding</option>
-                <option value="1">Very Good</option>
-                <option value="2">Good</option>
-                <option value="3">Needs Improvement</option>
-                <option value="4">Unsatisfactory</option>
-              </select>
-            </td>
-            <td colspan="1" class="border border-gray-300 px-4 py-2 text-left">Full Year Review</td>
-            <td class="border border-gray-300 px-4 py-2 text-center">
-              <select class="border border-gray-300 rounded px-2 py-1 w-24">
-                <option value=""></option>
-                <option value="0">Outstanding</option>
-                <option value="1">Very Good</option>
-                <option value="2">Good</option>
-                <option value="3">Needs Improvement</option>
-                <option value="4">Unsatisfactory</option>
-              </select>
-            </td>
-            <td>
-              <p class="mt-4 text-lg font-semibold"><span id="finalScore"></span></p>
-            </td>
-          </tr>
-        </tfoot>
-      </table>
-    </div>
-    
-    <!-- Button to Add New Row -->
-    <div class="mt-4 text-center">
-      <button id="addRowButton" class="bg-blue-500 text-white px-4 py-2 rounded-md">Add Row</button>
+      <div class="overflow-x-auto">
+        <table class="w-full border-collapse border border-gray-300 text-sm" id="tableBody">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="border border-gray-300 px-4 py-1 text-left">S.No.</th>
+              <th class="border border-gray-300 px-4 py-2 text-left">Key Performing Indicator (KPI)</th>
+              <th class="border border-gray-300 px-4 py-2 text-left">Achievement</th>
+              <th class="border border-gray-300 px-4 py-2 text-center">Weightage</th>
+              <th class="border border-gray-300 px-4 py-2 text-left">Target Date</th>
+              <th class="border border-gray-300 px-4 py-2 text-left">Score</th>
+            </tr>
+          </thead>
+          <tbody id="dynamicRows">
+            <!-- Dynamic rows will be added here -->
+          </tbody>
+            <tfoot class="bg-gray-100">
+              <tr>
+                <td colspan="2" class="border border-gray-300 px-4 py-2 text-left">Half Year Review (Jun 30)</td>
+                <td class="border border-gray-300 px-4 py-2 text-center">
+                  <select id="halfYearReview" name="halfYearReview" class="border border-gray-300 rounded px-2 py-1 w-24">
+                    <option value=""></option>
+                    <option value="Outstanding">Outstanding</option>
+                    <option value="Very Good">Very Good</option>
+                    <option value="Good">Good</option>
+                    <option value="Needs Improvement">Needs Improvement</option>
+                    <option value="Unsatisfactory">Unsatisfactory</option>
+                  </select>
+                </td>
+                <td colspan="1" class="border border-gray-300 px-4 py-2 text-left">Full Year Review</td>
+                <td class="border border-gray-300 px-4 py-2 text-center">
+                  <select id="fullYearReview" name="fullYearReview" class="border border-gray-300 rounded px-2 py-1 w-24">
+                    <option value=""></option>
+                    <option value="Outstanding">Outstanding</option>
+                    <option value="Very Good">Very Good</option>
+                    <option value="Good">Good</option>
+                    <option value="Needs Improvement">Needs Improvement</option>
+                    <option value="Unsatisfactory">Unsatisfactory</option>
+                  </select>
+                </td>
+                <td>
+                  <p class="mt-4 text-lg font-semibold"><span name="finalScore" id="finalScore"></span></p>
+                </td>
+              </tr>
+            </tfoot>
+        </table>
+      </div>
     </div>
   </div>
-</div>
+
+  <!-- Buttons -->
+  <div class="mt-4 text-center">
+    <button type="button" id="addRowButton" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-green-600 hover:shadow-lg transition-all duration-200">
+      Add Row
+    </button>
+    <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 hover:shadow-lg transition-all duration-200">
+      Submit
+    </button>
+  </div>
+</form>
 
 <script>
-  // Function to add a new row dynamically
-  let rowCount = 1; // Initialize row count
+  // Function to auto-resize textarea dynamically based on content
+  function autoResizeTextarea(textarea) {
+    textarea.style.height = "auto";
+    textarea.style.height = `${textarea.scrollHeight}px`;
+  }
 
+  // Attach auto-resize functionality to a textarea
+  function attachAutoResizeTextarea(textarea) {
+    textarea.style.height = `${textarea.scrollHeight}px`;
+    textarea.addEventListener("input", () => autoResizeTextarea(textarea));
+  }
+
+  // Function to add a new row dynamically
+  let rowCount = 1;
   function addRow() {
-    // Create a new row
-    const row = document.createElement('tr');
-    
-    // If this is the first row, include 25% weightage. Otherwise, don't include it.
-    const weightage = rowCount === 1 ? '<td class="border border-gray-300 px-4 py-2 text-center">25%</td>' : '<td class="border border-gray-300 px-4 py-2 w-11 text-center"></td>';
-    
+    const row = document.createElement("tr");
+    const weightage = rowCount === 1 
+      ? '<td class="border border-gray-300 px-4 py-2 text-center">25<span>%</span></td>' 
+      : '<td class="border border-gray-300 px-4 py-2 w-11 text-center"></td>';
+
     row.innerHTML = `
       <td class="border border-gray-300 px-4 py-2 text-center">${rowCount}</td>
       <td class="border border-gray-300 px-4 py-2">
-        <input type="text" class="px-2 py-1 w-full bg-transparent focus:outline-none" placeholder="Enter KPI">
+        <textarea 
+          class="px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden dynamic-textarea" 
+          placeholder="Enter KPI"></textarea>
       </td>
       <td class="border border-gray-300 px-4 py-2">
-        <input type="text" class="px-2 py-1 w-full bg-transparent focus:outline-none" placeholder="Enter Achievement">
+        <textarea 
+          class="px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden dynamic-textarea" 
+          placeholder="Enter Achievement"></textarea>
       </td>
       ${weightage}
       <td class="border border-gray-300 px-4 py-2">
-        <input type="text" class="px-2 py-1 w-full bg-transparent focus:outline-none" placeholder="Enter Target Date">
+        <textarea 
+          class="px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden dynamic-textarea" 
+          placeholder="Enter Target Date" required></textarea>
       </td>
       <td class="border border-gray-300 px-4 py-2 score">
         <select class="border border-gray-300 rounded px-2 py-1 w-24">
@@ -99,31 +129,25 @@
         </select>
       </td>
     `;
-    
-    // Append the row to the table body
-    document.getElementById('dynamicRows').appendChild(row);
-    
-    // Increment row count for the next row
+
+    document.getElementById("dynamicRows").appendChild(row);
+
     rowCount++;
-    
-    // Add event listeners to the newly added select elements for real-time score calculation
-    const newSelect = row.querySelector('.score select');
-    newSelect.addEventListener('change', calculateFinalScore);
-    
-    // Recalculate final score after adding a row
+
+    // Attach resize handler to new textareas
+    row.querySelectorAll(".dynamic-textarea").forEach((textarea) => attachAutoResizeTextarea(textarea));
+
+    const newSelect = row.querySelector(".score select");
+    newSelect.addEventListener("change", calculateFinalScore);
     calculateFinalScore();
   }
 
-  // Event listener for the add row button
-  document.getElementById('addRowButton').addEventListener('click', addRow);
-  
-  // Function to calculate the final score dynamically
+  // Function to calculate the final score
   function calculateFinalScore() {
     const scores = document.querySelectorAll(".score select");
     let sum = 0;
     let count = 0;
-  
-    // Loop through all the score select fields and sum their values
+
     scores.forEach((score) => {
       const scoreValue = parseInt(score.value) || 0;
       if (scoreValue > 0) {
@@ -131,23 +155,68 @@
         count++;
       }
     });
-  
-    // Apply the formula: SUM(all values) / COUNT(all values) * 25%
+
     const finalScore = count > 0 ? (sum / count) * 0.25 : 0;
-  
-    // Set the final score in an element with ID finalScore
     const finalScoreElement = document.getElementById("finalScore");
     if (finalScoreElement) {
-      finalScoreElement.textContent = finalScore > 0 ? finalScore.toFixed(2) : ""; 
+      finalScoreElement.textContent = finalScore > 0 ? finalScore.toFixed(2) : "";
     }
   }
-  
-  // Add event listeners to all score fields for recalculating final score
+
+  // Attach auto-resize functionality to existing textareas
+  document.querySelectorAll(".dynamic-textarea").forEach((textarea) => attachAutoResizeTextarea(textarea));
+
+  // Attach event listener for existing score dropdowns
   document.querySelectorAll(".score select").forEach((select) => {
     select.addEventListener("change", calculateFinalScore);
   });
 
-  // Initial calculation
-  calculateFinalScore();
+  // Event listener for "Add Row" button
+  document.getElementById("addRowButton").addEventListener("click", addRow);
+
+  // Handle form submission
+  document.getElementById("ricpForm").addEventListener("submit", function (event) {
+    event.preventDefault(); // Prevent default form submission
+
+    const rows = document.querySelectorAll("#dynamicRows tr");
+    const kpis = [];
+
+    rows.forEach((row) => {
+      const kpi = row.querySelector('textarea[placeholder="Enter KPI"]').value;
+      const achievement = row.querySelector('textarea[placeholder="Enter Achievement"]').value;
+      const weightage = row.querySelector("td:nth-child(4)").textContent.trim();
+      const targetDate = row.querySelector('textarea[placeholder="Enter Target Date"]').value;
+      const score = row.querySelector(".score select").value;
+
+      kpis.push({ kpi, achievement, weightage, targetDate, score });
+    });
+
+    const formData = new FormData(this);
+    const finalScore = document.getElementById("finalScore").textContent;
+    formData.append("kpis", JSON.stringify(kpis));
+    formData.append("finalScore", finalScore); 
+
+    fetch(this.action, {
+      method: "POST",
+      body: formData,
+      headers: {
+        "X-Requested-With": "XMLHttpRequest",
+      },
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error("Failed to submit");
+        }
+      })
+      .then((data) => {
+        alert("Data Submitted Successfully.");
+      })
+      .catch((error) => {
+        console.error(error);
+        alert("There was an error submitting the form.");
+      });
+  });
 </script>
 {% endblock %}
