@@ -1,0 +1,129 @@
+{% extends "sidebar.html" %}
+{% block content %}
+<div class="container mx-auto p-8 bg-gray-100 rounded-lg shadow-md">
+    <h1 class="text-2xl font-bold mb-6 text-center text-gray-800">Performance Review Form</h1>
+    <form method="post" action="" class="space-y-8">
+        {% csrf_token %}
+        
+        <!-- KPIs/Job Objectives Section -->
+        <div>
+            <h2 class="text-xl font-semibold text-gray-700">For KPIs/Job Objectives</h2>
+            <div class="mt-4">
+                <label for="overall_score" class="block text-gray-600 font-medium">Overall Score:</label>
+                <input type="text" id="overall_score" name="overall_score" placeholder="Enter Overall Score" class="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+        </div>
+
+        <!-- Agreed Section -->
+        <div>
+            <select id="agreement_status" name="agreement_status" class="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="" disabled selected>Select an option</option>
+                <option value="agreed">Agreed</option>
+                <option value="disagreed">Disagreed</option>
+            </select>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div>
+                    <label for="employee_signature" class="block text-gray-600 font-medium">Employee Signature:</label>
+                    <input type="text" id="employee_signature" name="employee_signature" class="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="date" class="block text-gray-600 font-medium">Date:</label>
+                    <input type="date" id="date" name="date" class="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="appraiser_signature" class="block text-gray-600 font-medium">1st Appraiser Name & Signature:</label>
+                    <input type="text" id="appraiser_signature" name="appraiser_signature" class="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="second_appraiser_signature" class="block text-gray-600 font-medium">2nd Appraiser Name & Signature:</label>
+                    <input type="text" id="second_appraiser_signature" name="second_appraiser_signature" class="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+            </div>
+        </div>
+
+        <!-- Ratings Section -->
+        <div>
+            <h3 class="text-lg font-medium text-gray-700">Ratings</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div>
+                    <label for="half_year_rating" class="block text-gray-600 font-medium">Half Year Rating:</label>
+                    <input type="text" id="half_year_rating" name="half_year_rating" class="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="full_year_rating" class="block text-gray-600 font-medium">Overall Full Year Rating:</label>
+                    <input type="text" id="full_year_rating" name="full_year_rating" class="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+            </div>
+            <div class="mt-6">
+                <h4 class="text-md font-semibold text-gray-700">Rating Definitions</h4>
+                <ul class="list-disc ml-6 mt-2 text-gray-600">
+                    <li>5 - Outstanding (Significantly above the performance level required)</li>
+                    <li>4 - Very Good (Consistently better than required)</li>
+                    <li>3 - Good (Achieved the required performance level)</li>
+                    <li>2 - Needs Improvement (Not consistent with required performance)</li>
+                    <li>1 - Unsatisfactory (Significantly below the required level)</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Employee Comments Section -->
+        <div>
+            <h3 class="text-lg font-medium text-gray-700">Employee Comments</h3>
+            <textarea name="employee_comments" id="employee_comments" rows="4" placeholder="Enter your comments here" class="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div>
+                    <label for="employee_signature_comments" class="block text-gray-600 font-medium">Employee Signature:</label>
+                    <input type="text" id="employee_signature_comments" name="employee_signature_comments" class="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="appraiser_signature_comments" class="block text-gray-600 font-medium">1st Appraiser Signature:</label>
+                    <input type="text" id="appraiser_signature_comments" name="appraiser_signature_comments" class="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+            </div>
+        </div>
+
+        <!-- Co-appraiser Feedback Section -->
+        <div>
+            <h3 class="text-lg font-medium text-gray-700">Co-appraiser Feedback (if applicable)</h3>
+            <textarea name="co_appraiser_feedback" id="co_appraiser_feedback" rows="4" placeholder="Enter co-appraiser feedback here" class="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+            <label for="co_appraiser_signature" class="block mt-4 text-gray-600 font-medium">Co-appraiser Signature:</label>
+            <input type="text" id="co_appraiser_signature" name="co_appraiser_signature" class="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+
+        <!-- Development Review Section -->
+        <div>
+            <h3 class="text-lg font-medium text-gray-700">Development Review</h3>
+            <li>Summary comments by line manager including 3 strengths and 3 areas for development</li>
+            <textarea name="development_review" id="development_review" rows="6" placeholder="Enter development review here" class="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div>
+                    <label for="development_signature" class="block text-gray-600 font-medium">Employee Signature:</label>
+                    <input type="text" id="development_signature" name="development_signature" class="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="appraiser_signature_development" class="block text-gray-600 font-medium">1st Appraiser Signature:</label>
+                    <input type="text" id="appraiser_signature_development" name="appraiser_signature_development" class="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+            </div>
+        </div>
+
+        <!-- Comments by Countersigning Manager -->
+        <div>
+            <h3 class="text-lg font-medium text-gray-700">Comments by Countersigning Manager (or Group/Division/Wing Head if applicable)</h3>
+            <textarea name="countersigning_comments" id="countersigning_comments" rows="4" placeholder="Enter comments here" class="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div>
+                    <label for="countersigning_appraiser_signature" class="block text-gray-600 font-medium">1st Appraiser Signature:</label>
+                    <input type="text" id="countersigning_appraiser_signature" name="countersigning_appraiser_signature" class="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="countersigning_second_appraiser_signature" class="block text-gray-600 font-medium">2nd Appraiser Signature:</label>
+                    <input type="text" id="countersigning_second_appraiser_signature" name="countersigning_second_appraiser_signature" class="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1">Submit</button>
+    </form>
+</div>
+{% endblock %}

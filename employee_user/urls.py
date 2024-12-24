@@ -10,7 +10,12 @@ urlpatterns = [
     path("user/dashboard/", views.dashboard_view, name="dashboard"),
     path('user/information/form/', views.information_employee, name="employee_information"),
     path('user/ricp/form/', views.RICP, name="ricp_form"),
-
+    path('user/customer_kpi/form/', views.customer_kpi, name="customer_kpi"),
+    path('user/financials_kpi/form/', views.financials_kpi, name="financials_kpi"),
+    path('user/learning_growth_kpi/form/', views.learning_growth_kpi, name="learning_growth_kpi"),
+    path('user/final_evaluation/form/', views.final_evaluation, name="final_evaluation"),
+    
+    
     # Ajax
     path("submit-ricp-data/", views.submit_ricp_data, name="submit_ricp_data"),
 ]
