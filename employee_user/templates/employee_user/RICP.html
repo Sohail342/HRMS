@@ -80,10 +80,23 @@
 
 
 <script>
-  // Function to auto-resize textarea dynamically based on content
+  // Function to auto-resize textarea dynamically and ensure it does not exceed 5 lines
   function autoResizeTextarea(textarea) {
-    textarea.style.height = "auto"; // Reset the height
-    textarea.style.height = `${textarea.scrollHeight}px`; // Set height dynamically
+    textarea.style.height = "auto";
+    textarea.style.height = `${textarea.scrollHeight}px`;
+
+    // Check if content exceeds 5 lines
+    const lineHeight = parseFloat(window.getComputedStyle(textarea).lineHeight);
+    const maxHeight = lineHeight * 5; // Maximum height for 5 lines
+
+    if (textarea.scrollHeight > maxHeight) {
+      textarea.style.height = `${maxHeight}px`; // Limit to 5 lines
+      textarea.style.overflow = "hidden"; // Prevent scrolling
+      textarea.style.fontSize = "12px"; // Reduce font size to fit content
+    } else {
+      textarea.style.fontSize = "inherit"; // Reset to default font size
+      textarea.style.overflow = "auto"; // Allow scrolling for smaller content
+    }
   }
 
   function attachAutoResizeTextarea(textarea) {
