@@ -123,6 +123,30 @@ def dashboard_view(request):
 def RICP(request):
     return render(request, 'employee_user/RICP.html')
 
+#customer_kpi
+@login_required(login_url="employee_user:user_login")
+@employee_user_required
+def customer_kpi(request):
+    return render(request, 'employee_user/customer_kpi.html')
+
+#financials_kpi
+@login_required(login_url="employee_user:user_login")
+@employee_user_required
+def financials_kpi(request):
+    return render(request, 'employee_user/financials_kpi.html')
+
+#financials_kpi
+@login_required(login_url="employee_user:user_login")
+@employee_user_required
+def learning_growth_kpi(request):
+    return render(request, 'employee_user/Learning_Growth_kpi.html')
+
+#final evaluation
+@login_required(login_url="employee_user:user_login")
+@employee_user_required
+def final_evaluation(request):
+    return render(request, 'employee_user/final_evaluation.html')
+
 
 
 
