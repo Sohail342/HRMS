@@ -1,0 +1,330 @@
+{% load static %}
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="icon" href="{% static 'HRIS_App/images/favicon.png' %}" type="image/x-icon">
+
+    <!-- Add Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        .hidden {
+            transform: translateX(-100%);
+            opacity: 0;
+            pointer-events: none; 
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 min-h-screen">
+    <div class="flex h-screen">
+        <!-- Toggle Button -->
+        <button id="toggleSidebar" class="fixed top-3 left-4 z-50 p-2 rounded-full bg-gray-100 shadow-md hover:shadow-lg hover:bg-gray-200 transition">
+            <svg id="iconShow" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="h-6 w-6 hidden">
+                <!-- Hamburger Menu Icon -->
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-7 6h7" />
+            </svg>
+            <svg id="iconHide" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="h-6 w-6">
+                <!-- Close (X) Icon -->
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M6 18L18 6" />
+            </svg>
+        </button>
+
+        <div id="sidebar" class="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 w-1/4 p-4 shadow-xl shadow-blue-gray-900/5 transition-transform duration-300 ease-in-out">
+
+            {% if not request.user.employee_user %}
+                <a href="{% url 'HRMS:home' %}">
+                    <div class="mb-2 p-4">
+                        <h5 class="text-gray-700 group-hover:text-blue-600 block antialiased tracking-normal text-center font-sans text-xl font-semibold leading-snug text-gray-900">
+                            HRIS</h5>
+                    </div>
+                </a>
+            {% else %}
+                <a href="{% url 'employee_user:dashboard' %}">
+                    <div class="mb-2 p-4">
+                        <h5 class="text-gray-700 group-hover:text-blue-600 block antialiased tracking-normal text-center font-sans text-xl font-semibold leading-snug text-gray-900">
+                            HRIS</h5>
+                    </div>
+                </a>
+            {% endif %}
+
+
+            {% if not request.user.employee_user %} <!--Start Admin and Admin Employee Attributes-->
+                {% if request.user.is_authenticated %}
+                
+                <nav class="flex flex-col gap-1 min-w-[240px] p-2 font-sans text-base font-normal text-gray-700">
+                    {% if not request.user.is_admin %}
+                    <a href="{% url 'HRMS:employees_view' %}">
+                        <div class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-blue-100">
+                            <div class="grid place-items-center mr-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="h-6 w-6 text-gray-700 hover:text-blue-600">
+                                    <path d="M12 12c2.5 0 4.5-2 4.5-4.5S14.5 3 12 3 7.5 5 7.5 7.5 9.5 12 12 12zm0 2c-3.3 0-10 1.7-10 5v2h20v-2c0-3.3-6.7-5-10-5z"/>
+                                </svg>
+                            </div>
+                            <span class="text-gray-700 group-hover:text-blue-600">
+                                Employees
+                            </span>
+                        </div>
+                    </a>
+                    {% endif %}
+                    {% if request.user.is_admin %}
+                    <a href="{% url 'reporting:lettername' %}">
+                    <div role="button" tabindex="0"
+                        class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-blue-100 focus:bg-blue-100 active:bg-gray-100 hover:text-blue-900 focus:text-blue-900 active:text-blue-900 outline-none">
+                        <div class="grid place-items-center mr-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="h-6 w-6 text-gray-700 hover:text-blue-600">
+                            <path d="M2 3v18h20V3H2zm18 2v14H4V5h16zm-2 2H6v10h12V7z"/>
+                        </svg>
+                        </div>
+                        <span class="text-gray-700 group-hover:text-blue-600">
+                            Letter Templates
+                        </span>
+                    </div>
+                    </a>                
+                    <a href="{% url 'admin:HRIS_App_employee_add' %}">
+                        <div class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-blue-100">
+                            <div class="grid place-items-center mr-4">
+                                <!-- Add Employee Icon -->
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" class="h-6 w-6 text-gray-700 hover:text-blue-600">
+                                    <path fill-rule="evenodd" d="M10 3a2 2 0 110 4 2 2 0 010-4zm4 2a4 4 0 00-4-4 4 4 0 00-4 4v6a4 4 0 004 4h4a4 4 0 004-4V5z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <span class="text-gray-700 group-hover:text-blue-600">
+                                Add Employee
+                            </span>
+                        </div>
+                    </a>
+                    
+                    <a href="{% url 'group_head:uploaded_csv_files' %}">
+                        <div class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-blue-100">
+                            <div class="grid place-items-center mr-4">
+                                <!-- CSV File Upload Icon -->
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" class="h-6 w-6 text-gray-700 hover:text-blue-600">
+                                    <path fill-rule="evenodd" d="M9 12.5a1 1 0 011 1v4a1 1 0 11-2 0v-4a1 1 0 011-1z" clip-rule="evenodd" />
+                                    <path fill-rule="evenodd" d="M4 5a3 3 0 013-3h6a3 3 0 013 3v10a3 3 0 01-3 3H7a3 3 0 01-3-3V5z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <span class="text-gray-700 group-hover:text-blue-600">
+                               Uploaded CSV files
+                            </span>
+                        </div>
+                    </a>
+                    
+                    <a href="{% url 'group_head:grade_distribution_view' %}">
+                        <div class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-blue-100">
+                            <div class="grid place-items-center mr-4">
+                                <!-- Office Building Icon -->
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" class="h-6 w-6 text-gray-700 hover:text-blue-600">
+                                    <path fill-rule="evenodd" d="M5 4a1 1 0 011-1h8a1 1 0 011 1v12a1 1 0 01-1 1H6a1 1 0 01-1-1V4z" clip-rule="evenodd" />
+                                    <path fill-rule="evenodd" d="M3 8a1 1 0 011-1h2a1 1 0 011 1v8a1 1 0 01-1 1H4a1 1 0 01-1-1V8z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <span class="text-gray-700 group-hover:text-blue-600">
+                                Head Office
+                            </span>
+                        </div>
+                    </a>                
+                
+                <a href="{% url 'admin:index' %}" target="_blank">
+                    <div role="button" tabindex="0"
+                    class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-blue-100 focus:bg-blue-100 active:bg-gray-100 hover:text-blue-900 focus:text-blue-900 active:text-blue-900 outline-none">
+                    <div class="grid place-items-center mr-4">
+                        <!-- Settings Icon (Admin Panel) -->
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="h-6 w-6 text-gray-700 hover:text-blue-600">
+                        <path d="M19.14 12.94c.07-.32.14-.65.14-.98 0-.33-.07-.66-.14-.98l2.07-1.61c.25-.19.31-.54.15-.81l-1.96-2.88c-.16-.26-.51-.34-.78-.2l-2.49 1.01c-.46-.37-.97-.7-1.52-.98L15 2.97c-.02-.29-.25-.51-.54-.51h-3.91c-.29 0-.52.22-.54.51l-.31 2.93c-.55.28-1.06.61-1.52.98l-2.49-1.01c-.27-.14-.62-.06-.78.2l-1.96 2.88c-.16.26-.1.61.15.81l2.07 1.61c-.07.32-.14.65-.14.98 0 .33.07.66.14.98l-2.07 1.61c-.25.19-.31.54-.15.81l1.96 2.88c.16.26.51.34.78.2l2.49-1.01c.46.37.97.7 1.52.98l.31 2.93c.02.29.25.51.54.51h3.91c.29 0 .52-.22.54-.51l.31-2.93c.55-.28 1.06-.61 1.52-.98l2.49 1.01c.27.14.62.06.78-.2l1.96-2.88c.16-.26.1-.61-.15-.81l-2.07-1.61zM12 15.5c-1.96 0-3.5-1.54-3.5-3.5s1.54-3.5 3.5-3.5 3.5 1.54 3.5 3.5-1.54 3.5-3.5 3.5z"/>
+                        </svg>
+                    </div>
+                    <span class="text-gray-700 group-hover:text-blue-600">
+                        Admin Panel
+                    </span>
+                    </div>
+                </a>
+                    {% endif %}
+
+                    <a href="{% url 'account:password_change' %}">
+                        <div class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-blue-100">
+                            <div class="grid place-items-center mr-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="h-6 w-6 text-gray-700 hover:text-blue-600">
+                                    <path d="M12 12c2.5 0 4.5-2 4.5-4.5S14.5 3 12 3 7.5 5 7.5 7.5 9.5 12 12 12zm0 2c-3.3 0-10 1.7-10 5v2h20v-2c0-3.3-6.7-5-10-5z"/>
+                                </svg>
+                            </div>
+                            <span class="text-gray-700 group-hover:text-blue-600">
+                                Settings
+                            </span>
+                        </div>
+                    </a>      
+                    {% endif %} 
+                    {% if not request.user.is_authenticated %}
+                    <a href="{% url 'account:login' %}">
+                        <div class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-blue-100">
+                            <div class="grid place-items-center mr-4">
+                                <!-- Login Icon -->
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="h-6 w-6 text-gray-700 hover:text-blue-600">
+                                    <path d="M15 14h-4v-4h4V6l6 6-6 6v-4zM4 4h10v2H4v12h10v2H4a2 2 0 01-2-2V6a2 2 0 012-2z"/>
+                                </svg>
+                            </div>
+                            <span class="text-gray-700 group-hover:text-blue-600">
+                                Login
+                            </span>
+                        </div>
+                    </a>
+                    {% else %}
+                    <a href="{% url 'account:logout' %}">
+                        <div class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-blue-100">
+                            <div class="grid place-items-center mr-4">
+                                <!-- Logout Icon -->
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="h-6 w-6 text-gray-700 hover:text-blue-600">
+                                    <path d="M10 17l-5-5 5-5v3h9v4H10v3zM20 4h-6V2h6a2 2 0 012 2v16a2 2 0 01-2 2h-6v-2h6V4z"/>
+                                </svg>
+                            </div>
+                            <span class="text-gray-700 group-hover:text-blue-600">
+                                Logout
+                            </spna>
+                        </div>
+                    </a>  
+                    {% endif %}       
+                {% endif  %}      <!--End Admin and Admin Employee Attributes-->
+
+                
+
+                <!--Employee User Attributes-->
+                {% if not request.user.is_authenticated %}
+                <a href="{% url 'employee_user:user_login' %}">
+                    <div class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-blue-100">
+                        <div class="grid place-items-center mr-4">
+                            <!-- Login Icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="h-6 w-6 text-gray-700 hover:text-blue-600">
+                                <path d="M15 14h-4v-4h4V6l6 6-6 6v-4zM4 4h10v2H4v12h10v2H4a2 2 0 01-2-2V6a2 2 0 012-2z"/>
+                            </svg>
+                        </div>
+                        <span class="text-gray-700 group-hover:text-blue-600">
+                            Login for Employees
+                        </span>
+                    </div>
+                </a> 
+                {% else %}
+                    {% if request.user.employee_user %}
+                    <a href="{% url 'account:logout' %}" class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-blue-100 focus:bg-blue-100 focus:outline-none group">
+                        <div class="grid place-items-center mr-4">
+                            <!-- Logout Icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="h-6 w-6 text-gray-700 group-hover:text-blue-600">
+                                <path d="M10 17l-5-5 5-5v3h9v4H10v3zM20 4h-6V2h6a2 2 0 012 2v16a2 2 0 01-2 2h-6v-2h6V4z"/>
+                            </svg>
+                        </div>
+                        <span class="text-gray-700 group-hover:text-blue-600">Logout</span>
+                    </a> 
+                    <a href="{% url 'account:password_change' %}" 
+                        class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all 
+                               hover:bg-blue-100 focus:bg-blue-100 focus:outline-none group"
+                        aria-label="Change your password">
+                         <div class="grid place-items-center mr-4">
+                             <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" 
+                                  viewBox="0 0 24 24" 
+                                  class="h-6 w-6 text-gray-700 group-hover:text-blue-600">
+                                 <path d="M12 3a5 5 0 0 1 5 5v1h1a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2h1V8a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v1h6V8a3 3 0 0 0-3-3zm-5 8v7h10v-7H7zm5 4a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/>
+                             </svg>
+                         </div>
+                         <span class="text-gray-700 group-hover:text-blue-600">
+                             Password Reset
+                         </span>
+                    </a>                     
+                    
+                    <div class="relative inline-block text-left">
+                        <!-- Dropdown Trigger -->
+                        <button id="dropdownButton" class="flex items-center mt-4 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <span>Balance ScoreCard(BSC) Form</span>
+                            <svg class="w-5 h-5 ml-2 -mr-1 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 011.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    
+                        <!-- Dropdown Menu -->
+                        <div id="dropdownMenu" class="absolute right-0 z-50 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-lg hidden">
+                            <a href="{% url 'employee_user:employee_information' %}" class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-100 hover:text-blue-600 transition">
+                                <svg class="w-5 h-5 mr-3 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 12c2.5 0 4.5-2 4.5-4.5S14.5 3 12 3 7.5 5 7.5 7.5 9.5 12 12 12zm0 2c-3.3 0-10 1.7-10 5v2h20v-2c0-3.3-6.7-5-10-5z"/>
+                                </svg>
+                                Employee Information
+                            </a>
+                            <a href="{% url 'employee_user:ricp_form' %}" class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-100 hover:text-blue-600 transition">
+                                <svg class="w-5 h-5 mr-3 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M3 17h2v4H3v-4zm4-8h2v12H7V9zm4 4h2v8h-2v-8zm4-6h2v14h-2V7zm4-4h2v18h-2V3z"/>
+                                </svg>
+                                Risk, Internal Controls & Processes
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endif %}
+            </nav>
+        </div>
+
+        <div class="flex-1 p-4 overflow-y-auto">
+            {% block content %}
+            
+            {% endblock content %}
+        </div>
+    </div>
+
+    <script>
+        
+        const dropdownButton = document.getElementById('dropdownButton');
+        const dropdownMenu = document.getElementById('dropdownMenu');
+        const toggleButton = document.getElementById('toggleSidebar');
+        const sidebar = document.getElementById('sidebar');
+        const iconShow = document.getElementById('iconShow');
+        const iconHide = document.getElementById('iconHide');
+
+        // Check the localStorage value on page load
+        if (localStorage.getItem('sidebarHidden') === 'true') {
+            sidebar.classList.add('hidden');
+            iconShow.classList.remove('hidden');
+            iconHide.classList.add('hidden');
+        } else {
+            sidebar.classList.remove('hidden');
+            iconShow.classList.add('hidden');
+            iconHide.classList.remove('hidden');
+        }
+
+        toggleButton.addEventListener('click', () => {
+            // Toggle the visibility of the sidebar
+            sidebar.classList.toggle('hidden');
+
+            // Toggle icons
+            iconShow.classList.toggle('hidden');
+            iconHide.classList.toggle('hidden');
+
+            // Update localStorage based on the sidebar's visibility
+            if (sidebar.classList.contains('hidden')) {
+                localStorage.setItem('sidebarHidden', 'true');
+            } else {
+                localStorage.setItem('sidebarHidden', 'false');
+            }
+        });
+
+
+    dropdownButton.addEventListener('click', () => {
+        dropdownMenu.classList.toggle('hidden');
+    });
+
+    // Optional: Close the dropdown if clicking outside
+    document.addEventListener('click', (event) => {
+        if (!dropdownButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
+            dropdownMenu.classList.add('hidden');
+        }
+    });
+
+
+    </script>
+    <!--PDF Scrips-->
+    <script src="{% static 'HRIS_App/JS/PDF.js' %}"></script>
+    <script src="{% static 'HRIS_App/JS/html2pdf.js' %}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.js"></script>
+</body>
+
+</html>
