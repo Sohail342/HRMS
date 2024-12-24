@@ -1,0 +1,64 @@
+{% extends "sidebar.html" %}
+
+{% block content %}
+<div class="container mx-auto p-6">
+
+    <!-- Message Alert Box -->
+    {% if messages %}
+        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-lg shadow-sm">
+            <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <!-- Page Title -->
+    <h1 class="text-3xl font-semibold text-gray-800 mb-6">Search Employee</h1>
+
+    <!-- Search Form -->
+    <div class="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-lg">
+        <form action="{% url 'group_head:employee_search' %}" method="get" class="flex items-center space-x-4">
+            <!-- Search Input -->
+            <input 
+                type="text" 
+                name="search" 
+                placeholder="Search for an employee..."
+                class="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-md"
+            >
+            <!-- Search Button -->
+            <button type="submit" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 transition-all">
+                <i class="fa fa-search"></i> Search
+            </button>
+        </form>
+    </div>
+
+    <!-- Search Results -->
+    {% if employees %}
+    <div class="mt-8">
+        <ul class="space-y-4">
+            {% for employee in employees %}
+                <li class="bg-gray-100 p-6 rounded-lg shadow-lg hover:bg-gray-200 transition-all flex justify-between items-center">
+                    <span class="text-lg font-medium text-gray-800">{{ employee.name }}</span>
+                    {% if employee.pdf_file %}
+                        <p class="bg-green-100 border-l-4 border-green-500 text-green-700">Already One File Uploaded</p>
+                        {% else %}
+                        <p class="bg-red-100 border-l-4 border-red-500 text-red-700">Not Upload Yet</p>
+                    {% endif %}
+
+                    <a href="{% url 'HRMS:employee_detail' employee.SAP_ID %}" class="text-blue-600 hover:text-blue-800 transition-all">View Details</a>
+
+                    <a href="{% url 'group_head:upload_pdf' employee.SAP_ID %}" class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 transition-all text-center inline-block">
+                        Upload PDF
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% else %}
+    <p class="text-center text-gray-500 mt-8">No employees found matching your search.</p>
+    {% endif %}
+
+</div>
+{% endblock content %}

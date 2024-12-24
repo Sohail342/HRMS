@@ -1,6 +1,8 @@
 from HRIS_App.models import Employee, Region
 from django.shortcuts import render, redirect
 import json
+from django.core.exceptions import ValidationError
+from django.views import View
 from django.contrib import messages
 import cloudinary
 from .decorators import admin_required
@@ -197,6 +199,7 @@ def AssignedGradesByBranchesView(request, region_name):
     return render(request, 'group_head/AssignedGradesByBranches.html', {"region":region})
 
 
+
 # Uploaded CSV files
 @admin_required
 def uploaded_csv_files(request):
@@ -216,3 +219,53 @@ def uploaded_csv_files(request):
         'regions_csv_files':regions_csv_files,
     }
     return render(request, 'group_head/uploaded_files.html', uploaded_data)
+
+
+
+# Search for employee
+class SearchEmployee(View):
+    def get(self, request):
+        query = request.GET.get('search', '')
+        employee = Employee.objects.filter(SAP_ID__icontains=query) if query else None
+        
+        if not employee or employee is None:
+            messages.error(request, 'No employees found matching your search.')
+        return render(request, 'group_head/search_employee.html', {'employees': employee, 'query': query})
+    
+
+
+
+# Upload PDF (BSC Form for employees on Cloudinary)
+class UploadBSCFrom(View):
+    def get(self, request, *args, **kwargs):
+        # Render the upload form
+        employee = Employee.objects.get(SAP_ID=kwargs['sap_id'])
+        return render(request, 'group_head/upload_employee_pdf.html', {'employee': employee})
+
+    def post(self, request, *args, **kwargs):
+        employee = Employee.objects.get(SAP_ID=kwargs['sap_id'])
+
+        if 'pdf_file' in request.FILES:
+            uploaded_file = request.FILES['pdf_file']
+
+            # Validate the file type (only allow PDF)
+            if not uploaded_file.name.endswith('.pdf'):
+                messages.error(request, "Only PDF files are allowed.")
+                return redirect('group_head:upload_pdf', sap_id=employee.SAP_ID)
+
+            # Save the file to Cloudinary
+            try:
+                employee.pdf_file = uploaded_file  
+                print(uploaded_file)
+                employee.save() 
+
+                messages.success(request, "PDF uploaded successfully.")
+                return redirect('group_head:upload_pdf', sap_id=employee.SAP_ID)
+
+            except ValidationError as e:
+                messages.error(request, f"Error uploading file: {e}")
+                return redirect('group_head:upload_pdf', sap_id=employee.SAP_ID)
+
+        else:
+            messages.error(request, "No PDF file uploaded.")
+            return redirect('group_head:upload_pdf', sap_id=employee.SAP_ID)

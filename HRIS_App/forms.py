@@ -36,6 +36,7 @@ class AdminEmployeeForm(forms.ModelForm):
             'transferred_status',
             'remarks',
             'transfer_remarks',
+            'pdf_file',
         )
 
     def clean_password(self):
@@ -68,7 +69,7 @@ class NonAdminEmployeeForm(forms.ModelForm):
         model = Employee
         fields = ('SAP_ID', 'name', 'region', 'branch', 'designation', 'employee_type', 
                   'employee_grade', 'email', 'date_of_joining', 'is_admin_employee', 'grade_assignment',
-                  'pending_inquiry', 'remarks', 'transfer_remarks')
+                  'pending_inquiry', 'remarks', 'transfer_remarks', 'pdf_file')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

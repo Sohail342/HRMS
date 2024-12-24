@@ -255,6 +255,12 @@ class Employee(AbstractBaseUser):
     # tracked employees if they are not an admin (is_admin=False) or an admin employee (is_admin_employee=False
     employee_user = models.BooleanField(default=True)
 
+    # Upload PDF (BSC Form for employees on Cloudinary)
+    pdf_file = CloudinaryField(
+        blank=True, 
+        null=True, 
+    )
+
 
    
 
@@ -323,7 +329,7 @@ class Employee(AbstractBaseUser):
     REQUIRED_FIELDS = ["name"]
 
     def __str__(self):
-        return self.name if self.email else "Unknow"
+        return self.name
 
     def has_perm(self, perm, obj=None):
         "Does the user have a specific permission?"
