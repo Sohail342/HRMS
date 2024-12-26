@@ -3,6 +3,24 @@
 {% block content %}
 <form method="post" class="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md dark:bg-gray-800 space-y-6">
     {% csrf_token %}
+    <!-- Display all messages -->
+    {% if messages %}
+    <div class="space-y-4 mb-4">
+        {% for message in messages %}
+            <div class="p-4 rounded-lg 
+                {% if message.tags == 'error' %}
+                    bg-red-100 border-l-4 border-red-500 text-red-700
+                {% elif message.tags == 'success' %}
+                    bg-green-100 border-l-4 border-green-500 text-green-700
+                {% else %}
+                    bg-blue-100 border-l-4 border-blue-500 text-blue-700
+                {% endif %}
+            ">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
     <h2 class="text-2xl font-semibold text-gray-800 dark:text-white">EMPLOYEE INFORMATION</h2>
     
     <!-- Row 1 -->
@@ -36,6 +54,7 @@
             <input 
                 type="text" 
                 id="review_period" 
+                value="{{employee_information.review_period}}"
                 name="review_period" 
                 class="block w-full p-2.5 border border-gray-300 text-sm rounded-lg dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500" required>
         </div>
@@ -73,8 +92,9 @@
                 type="date" 
                 id="joining_date" 
                 name="joining_date" 
+                value="{{employee_information.date_of_joining}}"
                 class="block w-full p-2.5 border border-gray-300 text-sm rounded-lg dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500"
-                {% if employee_information.joining_date %}disabled{% endif %} required>
+                required>
         </div>
     </div>
 
@@ -129,6 +149,7 @@
             <input 
                 type="text" 
                 id="first_appraiser" 
+                value="{{employee_information.first_appraiser}}"
                 name="first_appraiser" 
                 class="block w-full p-2.5 border border-gray-300 text-sm rounded-lg dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500" required>
         </div>
@@ -136,6 +157,7 @@
             <label for="second_appraiser" class="block mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">2nd Appraiser</label>
             <input 
                 type="text" 
+                value="{{employee_information.second_appraiser}}"
                 id="second_appraiser" 
                 name="second_appraiser" 
                 class="block w-full p-2.5 border border-gray-300 text-sm rounded-lg dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500" required>

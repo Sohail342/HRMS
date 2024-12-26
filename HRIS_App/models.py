@@ -239,6 +239,10 @@ class Employee(AbstractBaseUser):
     pending_inquiry = models.BooleanField(default=False)
     remarks = models.TextField(blank=True, null=True)
     transfer_remarks = models.TextField(blank=True, null=True)
+    review_period = models.CharField(max_length=100, blank=True, null=True)
+    first_appraiser = models.CharField(max_length=100, blank=True, null=True)
+    second_appraiser = models.CharField(max_length=100, blank=True, null=True)
+
 
      # New grading field for APA 2024
     GRADE_CHOICES = [

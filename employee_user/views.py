@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from .forms import CreatePasswordForm
 from django.contrib.auth import login
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt, csrf_protect
+from django.views.decorators.csrf import csrf_protect
 from django.shortcuts import get_object_or_404
 from .models import RicpData, RicpKPI
 import json
@@ -49,6 +49,28 @@ def information_employee(request):
     for group in groups:
         group = group.group
         break
+
+    if request.method == "POST":
+        review_period = request.POST['review_period']
+        first_appraiser = request.POST['first_appraiser']
+        second_appraiser = request.POST['second_appraiser']
+        wing_dept = request.POST['wing_dept']
+        division = request.POST['division']
+        joining_date = request.POST['joining_date']
+        employee = request.user.SAP_ID
+        
+        # Create or update the Employee object
+        employee_data, created = Employee.objects.get_or_create(SAP_ID=employee)
+
+        # Update the employee's information
+        employee_data.review_period = review_period
+        employee_data.first_appraiser = first_appraiser
+        employee_data.second_appraiser = second_appraiser
+        employee_data.date_of_joining = joining_date
+        employee_data.save()
+
+        messages.success(request, "Data Sucessfully Updated")
+        return redirect("employee_user:employee_information")
 
     return render(request, 'employee_user/information_employee.html', {"employee_information":employee, "group":group})
 
@@ -160,8 +182,6 @@ def submit_ricp_data(request):
         full_year_review = request.POST.get("fullYearReview")
         final_score = request.POST.get("finalScore")
 
-        print(full_year_review)
-
         # Get or create the RICP data for the employee
         employee = get_object_or_404(Employee, SAP_ID=employee_id)
         ricp_data, created = RicpData.objects.get_or_create(employee=employee)
@@ -187,6 +207,7 @@ def submit_ricp_data(request):
             score = kpi_data.get("score")
             if not score:
                 score = 0
+
 
             RicpKPI.objects.create(
                 ricp_data=ricp_data,

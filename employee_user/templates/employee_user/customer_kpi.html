@@ -193,7 +193,7 @@
       const kpi = row.querySelector('textarea[placeholder="Enter KPI"]').value;
       const achievement = row.querySelector('textarea[placeholder="Enter Achievement"]').value;
       const weightage = row.querySelector("td:nth-child(4)").textContent.trim();
-      const targetDate = row.querySelector('textarea[placeholder="Enter Target Date"]').value;
+      const targetDate = row.querySelector('input[placeholder="Enter Target Date"]').value;
       const score = row.querySelector(".score select").value;
 
       kpis.push({ kpi, achievement, weightage, targetDate, score });

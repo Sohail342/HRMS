@@ -1,6 +1,7 @@
 from HRIS_App.models import Employee, Region
 from django.shortcuts import render, redirect
 import json
+from django.utils.decorators import method_decorator
 from django.core.exceptions import ValidationError
 from django.views import View
 from django.contrib import messages
@@ -223,6 +224,7 @@ def uploaded_csv_files(request):
 
 
 # Search for employee
+@method_decorator(admin_required, name='dispatch')
 class SearchEmployee(View):
     def get(self, request):
         query = request.GET.get('search', '')
@@ -236,6 +238,7 @@ class SearchEmployee(View):
 
 
 # Upload PDF (BSC Form for employees on Cloudinary)
+@method_decorator(admin_required, name='dispatch')
 class UploadBSCFrom(View):
     def get(self, request, *args, **kwargs):
         # Render the upload form
