@@ -15,7 +15,7 @@ class RicpData(models.Model):
         return f"RICP Data for {self.employee}"
     
     class Meta:
-        verbose_name = "Risk, Internal Controls & Processes"
+        verbose_name = "Balance ScoreCard Employee"
 
 
 class RicpKPI(models.Model):
@@ -34,4 +34,4 @@ class RicpKPI(models.Model):
         return f"KPI: {self.kpi} for {self.ricp_data.employee}"
     
     class Meta:
-        verbose_name = "RICP KPI"
+        verbose_name = "Balance ScoreCard Form"

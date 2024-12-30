@@ -5,12 +5,17 @@
   {% csrf_token %}
   <div id="invoice" class="bg-gray-100 p-6">
     <div class="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6" id="formContent">
-      <h2 class="text-lg font-bold text-gray-800 mb-2">
-        Customers KPIs
-      </h2>
-      <p class="text-sm text-gray-600 mb-4">
-        How I will contribute in providing the highest levels of Customer Service, both internally and externally?
-      </p>
+
+      {% block kpi_title %}
+        <h2 class="text-lg font-bold text-gray-800 mb-2">
+          Customers KPIs
+        </h2>
+        <p  class="text-sm text-gray-600 mb-4">
+          How I will contribute in providing the highest levels of Customer Service, both internally and externally?
+        </p>
+
+        <input type="hidden" name="bsc_form_type" id="bsc_form_type" value="customer_kpi">
+      {% endblock kpi_title %}
 
       <div class="overflow-x-auto">
         <table class="w-full border-collapse border border-gray-300 text-sm" id="tableBody">
@@ -201,8 +206,10 @@
 
     const formData = new FormData(this);
     const finalScore = document.getElementById("finalScore").textContent;
+    customer_kpi = document.getElementById("bsc_form_type").value;
     formData.append("kpis", JSON.stringify(kpis));
     formData.append("finalScore", finalScore); 
+    formData.append("bsc_form_type", customer_kpi);
 
     fetch(this.action, {
       method: "POST",

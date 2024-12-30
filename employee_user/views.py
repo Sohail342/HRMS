@@ -182,6 +182,8 @@ def submit_ricp_data(request):
         full_year_review = request.POST.get("fullYearReview")
         final_score = request.POST.get("finalScore")
 
+        bsc_form_type = request.POST.get('bsc_form_type')
+
         # Get or create the RICP data for the employee
         employee = get_object_or_404(Employee, SAP_ID=employee_id)
         ricp_data, created = RicpData.objects.get_or_create(employee=employee)
@@ -215,7 +217,7 @@ def submit_ricp_data(request):
                 achievement=kpi_data["achievement"],
                 weightage=kpi_data.get("weightage"),
                 target_date=kpi_data["targetDate"],
-                
+                bsc_form_type=bsc_form_type,
                 score=score,
             )
 
