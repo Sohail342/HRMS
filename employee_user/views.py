@@ -155,7 +155,7 @@ def customer_kpi(request):
 @login_required(login_url="employee_user:user_login")
 @employee_user_required
 def financials_kpi(request):
-    return render(request, 'employee_user/financials_kpi.html')
+    return render(request, 'employee_user/Financials_kpi.html')
 
 #financials_kpi
 @login_required(login_url="employee_user:user_login")
