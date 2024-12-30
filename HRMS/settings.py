@@ -184,8 +184,8 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 9000
 
 # Cloudinary configuration
 cloudinary.config(
-    cloud_name=os.getenv("cloud_name"),
-    api_key=os.getenv("api_key"),
-    api_secret=os.getenv("api_secret"),
+    cloud_name="dqvuzjoji",
+    api_key='795997967248592',
+    api_secret="LdggdzrPdn6__w4I6CBL7cu9sdM",
     secure=True  
 )
