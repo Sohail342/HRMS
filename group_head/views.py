@@ -173,10 +173,10 @@ def assign_grade(request):
 
 # Upload Assigned Grades By Branches on Cloudinary
 @admin_required
-def AssignedGradesByBranchesView(request, region_name):
+def AssignedGradesByBranchesView(request, region_id):
 
     # Ensure the region exists or create a new region
-    region, created = Region.objects.get_or_create(name=region_name)
+    region, created = Region.objects.get_or_create(region_id=region_id)
 
     if request.method == 'POST':
         csv_file = request.FILES.get('file')
@@ -191,11 +191,11 @@ def AssignedGradesByBranchesView(request, region_name):
                 region.save()
 
                 messages.success(request, "CSV file uploaded successfully!")
-                return redirect("group_head:grade_distribution_branch_view", region_name=region_name)
+                return redirect("group_head:upload_Assigned_grades", region_id=region_id)
 
             except Exception as e:
                 messages.error(request, e)
-                return redirect("group_head:grade_distribution_branch_view", region_name=region_name)
+                return redirect("group_head:upload_Assigned_grades", region_id=region_id)
 
     return render(request, 'group_head/AssignedGradesByBranches.html', {"region":region})
 
@@ -204,7 +204,7 @@ def AssignedGradesByBranchesView(request, region_name):
 # Uploaded CSV files
 @admin_required
 def uploaded_csv_files(request):
-    regions_csv_files = Region.objects.values('name', 'csv_file')
+    regions_csv_files = Region.objects.values('region_id', 'name', 'csv_file')
 
    # Append '.csv' to each CSV file URL if not already present
     for region in regions_csv_files:

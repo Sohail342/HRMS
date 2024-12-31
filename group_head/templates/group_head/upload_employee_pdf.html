@@ -1,54 +1,61 @@
 {% extends "sidebar.html" %}
 
 {% block content %}
-    <div class="flex justify-center items-center min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-        <div class="w-full max-w-md bg-white p-6 rounded-lg shadow-lg">
-            
-            <!-- Display all messages -->
-            {% if messages %}
-                <div class="space-y-4 mb-4">
-                    {% for message in messages %}
-                        <div class="p-4 rounded-lg 
-                            {% if message.tags == 'error' %}
-                                bg-red-100 border-l-4 border-red-500 text-red-700
-                            {% elif message.tags == 'success' %}
-                                bg-green-100 border-l-4 border-green-500 text-green-700
-                            {% else %}
-                                bg-blue-100 border-l-4 border-blue-500 text-blue-700
-                            {% endif %}
-                        ">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-            {% if employee.pdf_file %}
-                <p class="bg-red-100 border-l-4 border-red-500 text-red-700">Already one file uploaded</p>
-            {% endif %}
+<div class="flex justify-center items-center min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+    <div class="w-full max-w-md bg-white p-6 rounded-lg shadow-lg">
+        
+        <!-- Display all messages -->
+        {% if messages %}
+            <div class="space-y-4 mb-4">
+                {% for message in messages %}
+                    <div class="p-4 rounded-lg 
+                        {% if message.tags == 'error' %}
+                            bg-red-100 border-l-4 border-red-500 text-red-700
+                        {% elif message.tags == 'success' %}
+                            bg-green-100 border-l-4 border-green-500 text-green-700
+                        {% else %}
+                            bg-blue-100 border-l-4 border-blue-500 text-blue-700
+                        {% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <!-- File upload status -->
+        {% if employee.pdf_file %}
+            <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-lg mb-4">
+                ✅ A file is already uploaded. You can replace it by uploading a new one.
+            </div>
+        {% endif %}
 
-            <div class="text-center mt-6">
-                <h1 class="text-3xl font-bold text-gray-800">{{ employee.name }}</h1>
-                <h5 class="text-2xl font-bold text-gray-800">{{ employee.SAP_ID}} SAP ID<h5>
-                <p class="text-lg text-gray-500 mt-2">Upload PDF for Employee</p>
+        <!-- Employee Details -->
+        <div class="text-center mt-6">
+            <h1 class="text-3xl font-bold text-gray-800">{{ employee.name }}</h1>
+            <h5 class="text-2xl font-bold text-gray-800">{{ employee.SAP_ID }} SAP ID</h5>
+            <p class="text-lg text-gray-500 mt-2">Upload PDF for Employee</p>
+        </div>
+
+        <!-- Form Section -->
+        <form action="" method="post" enctype="multipart/form-data" class="space-y-4 mt-6">
+            {% csrf_token %}
+            
+            <div class="text-center">
+                <span class="text-2xl font-semibold text-gray-700"><i class="fas fa-upload mr-2"></i>Upload PDF File</span>
             </div>
 
-            <!-- Form section -->
-            <form action="" method="post" enctype="multipart/form-data" class="space-y-4">
-                {% csrf_token %}
-                
-                <div class="text-center mb-4">
-                    <span class="text-2xl font-semibold text-gray-700"><i class="fas fa-upload mr-2"></i>Upload PDF File</span>
-                </div>
+            <div class="mb-6">
+                <label for="pdf_file" class="block text-sm font-medium text-gray-700">Choose PDF File</label>
+                <input type="file" name="pdf_file" id="pdf_file" 
+                    class="mt-2 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" 
+                    required>
+            </div>
 
-                <div class="mb-6">
-                    <label for="pdf_file" class="block text-sm font-medium text-gray-700">Choose PDF File</label>
-                    <input type="file" name="pdf_file" id="pdf_file" class="mt-2 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required>
-                </div>
-
-                <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                    Upload PDF
-                </button>
-            </form>
-        </div>
+            <button type="submit" 
+                class="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                Upload PDF
+            </button>
+        </form>
     </div>
+</div>
 {% endblock content %}

@@ -28,7 +28,7 @@
                 </td>                
                 {% else %}
                 <td class="px-6 py-4 text-sm border-b">
-                    <a href="{% url 'group_head:upload_Assigned_grades' regions_csv_file.name %}" class="text-blue-500 hover:underline">
+                    <a href="{% url 'group_head:upload_Assigned_grades' regions_csv_file.region_id %}" class="text-blue-500 hover:underline">
                         <i class="fas fa-upload mr-2"></i> Upload
                     </a>
                 </td>
