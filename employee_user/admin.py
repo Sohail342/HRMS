@@ -16,5 +16,5 @@ class RicpDataAdmnin(ModelAdmin, ImportExportModelAdmin):
 class RicpKPIAdmnin(ModelAdmin, ImportExportModelAdmin):
     import_form_class = ImportForm
     export_form_class = ExportForm
-    list_display = ('ricp_data__employee',  'kpi', 'achievement', 'weightage', 'target_date', 'score')
+    list_display = ('ricp_data__employee',  'bsc_form_type', 'achievement', 'weightage', 'target_date', 'score')
     
