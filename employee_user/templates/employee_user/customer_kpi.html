@@ -72,7 +72,7 @@
       Add Row
     </button>
     <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 hover:shadow-lg transition-all duration-200">
-      Submit
+      Next
     </button>
   </div>
 </form>
@@ -226,7 +226,11 @@
         }
       })
       .then((data) => {
-        alert("Data Submitted Successfully.");
+        if (data.redirect_url) {
+          window.location.href = data.redirect_url;
+        } else {
+          alert("Form submitted successfully.");
+        }
       })
       .catch((error) => {
         console.error(error);

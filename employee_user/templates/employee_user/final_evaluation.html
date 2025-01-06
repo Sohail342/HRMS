@@ -1,82 +1,81 @@
 {% extends "sidebar.html" %}
 {% block content %}
 
-<div class="bg-gray-100 p-6">
-    
-        <form method="post" action="" class="space-y-6">
-            <div class="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6">
-                <h1 class="text-xl font-bold mb-4 text-center text-gray-800">Performance Review Form</h1>
-                {% csrf_token %}
+<div id="invoice" class="bg-gray-50 p-8">
+    <form method="post" action="{% url 'employee_user:submit_ricp_data' %}" class="space-y-8">
+        <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-8">
+            <h1 class="text-2xl font-bold mb-6 text-center text-gray-900">Performance Review Form</h1>
+            {% csrf_token %}
 
-                <!-- KPIs/Job Objectives Section -->
+            <!-- KPIs/Job Objectives Section -->
+            <div class="space-y-4">
+                <h2 class="text-lg font-semibold text-gray-800">KPIs/Job Objectives</h2>
                 <div>
-                    <h2 class="text-lg font-semibold text-gray-700">KPIs/Job Objectives</h2>
-                    <div class="mt-2">
-                        <label for="overall_score" class="block text-sm text-gray-600 font-medium">Overall Score:</label>
-                        <input type="text" id="overall_score" name="overall_score" placeholder="Enter Overall Score" class="w-full mt-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
-                    </div>
+                    <label for="overall_score" class="block text-sm text-gray-700 font-medium">Overall Score:</label>
+                    <span class="block mt-1 text-gray-900 font-semibold">{{ total_score }}</span>
                 </div>
-
-                <!-- Agreed Section -->
-                <div>
-                    <label for="agreement_status" class="block text-sm text-gray-600 font-medium">Agreed</label>
-                    <select id="agreement_status" name="agreement_status" class="w-full mt-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
-                        <option value="" disabled selected>Select an option</option>
-                        <option value="agreed">Agreed</option>
-                        <option value="disagreed">Disagreed</option>
-                    </select>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
-                        <div>
-                            <label for="employee_signature" class="block text-sm text-gray-600 font-medium">Employee Signature:</label>
-                            <input type="text" id="employee_signature" name="employee_signature" class="w-full mt-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
-                        </div>
-                        <div>
-                            <label for="date" class="block text-sm text-gray-600 font-medium">Date:</label>
-                            <input type="date" id="date" name="date" class="w-full mt-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
-                        </div>
-                        <div>
-                            <label for="appraiser_signature" class="block text-sm text-gray-600 font-medium">1st Appraiser Name & Signature:</label>
-                            <input type="text" id="appraiser_signature" name="appraiser_signature" class="w-full mt-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
-                        </div>
-                        <div>
-                            <label for="second_appraiser_signature" class="block text-sm text-gray-600 font-medium">2nd Appraiser Name & Signature:</label>
-                            <input type="text" id="second_appraiser_signature" name="second_appraiser_signature" class="w-full mt-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Ratings Section -->
-                <div>
-                    <h3 class="text-md font-medium text-gray-700">Ratings</h3>
-                    <div class="mt-2">
-                        <label for="full_year_rating" class="block text-sm text-gray-600 font-medium">Overall Full Year Rating:</label>
-                        <input type="text" id="full_year_rating" name="full_year_rating" class="w-full mt-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
-                    </div>
-                    <div class="mt-4">
-                        <h4 class="text-sm font-semibold text-gray-700">Rating Definitions</h4>
-                        <ul class="list-disc ml-5 mt-2 text-sm text-gray-600">
-                            <li>5 - Outstanding</li>
-                            <li>4 - Very Good</li>
-                            <li>3 - Good</li>
-                            <li>2 - Needs Improvement</li>
-                            <li>1 - Unsatisfactory</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Employee Comments Section -->
-                <div>
-                    <h3 class="text-md font-medium text-gray-700">Employee Comments</h3>
-                    <textarea name="employee_comments" id="employee_comments" rows="3" placeholder="Enter your comments here" class="w-full mt-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
-                </div>
-
             </div>
-            <div class="flex justify-center">
-                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 hover:shadow-lg transition-all duration-200">
-                    Submit
-                </button>
+
+            <!-- Agreed Section -->
+            <div class="space-y-4">
+                <label for="agreement_status" class="block text-sm text-gray-700 font-medium">Agreed</label>
+                <select id="agreement_status" name="agreement_status" class="w-full mt-2 px-4 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="" disabled selected>Select an option</option>
+                    <option value="agreed">Agreed</option>
+                    <option value="disagreed">Disagreed</option>
+                </select>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <div>
+                        <label class="block text-sm text-gray-700 font-medium">Employee Signature:</label>
+                        <div class="border-b border-gray-400 mt-2"></div>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-700 font-medium">Date:</label>
+                        <input type="date" id="date" name="date" class="w-full mt-2 px-4 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-700 font-medium">1st Appraiser Name & Signature:</label>
+                        <div class="border-b border-gray-400 mt-2"></div>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-700 font-medium">2nd Appraiser Name & Signature:</label>
+                        <div class="border-b border-gray-400 mt-2"></div>
+                    </div>
+                </div>
             </div>
-        </form>
-    
+
+            <!-- Ratings Section -->
+            <div class="space-y-4">
+                <h3 class="text-lg font-semibold text-gray-800">Ratings</h3>
+                <div>
+                    <label for="full_year_rating" class="block text-sm text-gray-700 font-medium">Overall Full Year Rating:</label>
+                    <span class="block mt-1 text-gray-900 font-semibold">{{ final_evaluation }}</span>
+                </div>
+                <div class="mt-4">
+                    <h4 class="text-sm font-semibold text-gray-700">Rating Definitions</h4>
+                    <ul class="list-disc ml-6 mt-2 text-sm text-gray-600 space-y-1">
+                        <li>5 - Outstanding</li>
+                        <li>4 - Very Good</li>
+                        <li>3 - Good</li>
+                        <li>2 - Needs Improvement</li>
+                        <li>1 - Unsatisfactory</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Employee Comments Section -->
+            <div class="space-y-4">
+                <h3 class="text-lg font-semibold text-gray-800">Employee Comments</h3>
+                <textarea name="employee_comments" id="employee_comments" rows="3" placeholder="Enter your comments here" class="w-full mt-2 px-4 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+            </div>
+        </div>
+    </form>
 </div>
+
+<div class="mt-6 flex justify-center">
+    <button type="button" id="download" class="bg-green-600 text-white px-5 py-2.5 rounded-md hover:bg-green-700 hover:shadow-lg transition-all duration-200">
+        Download
+    </button>
+</div>
+
 {% endblock %}

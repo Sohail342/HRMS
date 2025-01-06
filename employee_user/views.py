@@ -70,7 +70,7 @@ def information_employee(request):
         employee_data.save()
 
         messages.success(request, "Data Sucessfully Updated")
-        return redirect("employee_user:employee_information")
+        return redirect("employee_user:ricp_form")
 
     return render(request, 'employee_user/information_employee.html', {"employee_information":employee, "group":group})
 
@@ -167,39 +167,72 @@ def learning_growth_kpi(request):
 @login_required(login_url="employee_user:user_login")
 @employee_user_required
 def final_evaluation(request):
-    return render(request, 'employee_user/final_evaluation.html')
+    employee = request.user
+
+    # Get Distinct forms for requested user or get data for filled forms
+    ricp_data = RicpKPI.objects.filter(ricp_data__employee=employee).values('bsc_form_type').distinct()
+
+    # Get the form final score for each form
+    form_final_scores = {}
+    for form in ricp_data:
+        form_final_scores[form["bsc_form_type"]] = RicpKPI.objects.filter(ricp_data__employee=employee, bsc_form_type=form["bsc_form_type"]).last().form_final_score
+    
+
+    # Sum the all form final scores
+    total_score = sum(form_final_scores.values())
+
+    # Get the final evaluation
+    final_evaluation = "Unsatisfactory"
+    if total_score == 0:
+        final_evaluation = ""
+    elif total_score <= 1:
+        final_evaluation = "Unsatisfactory"
+    elif total_score <= 2:
+        final_evaluation = "Needs Improvement"
+    elif total_score <= 3:
+        final_evaluation = "Good"
+    elif total_score <= 4:
+        final_evaluation = "Very Good"
+    elif total_score <= 5:
+        final_evaluation = "Outstanding"
+
+
+    content = {
+        "total_score": total_score,
+        "final_evaluation": final_evaluation,
+    }
+
+    return render(request, 'employee_user/final_evaluation.html', content)
 
 
 
 
 @csrf_protect
-def submit_ricp_data(request):
+def submit_form_data(request):
     if request.method == "POST":
         # Extract data
         employee_id = request.user.SAP_ID
         kpis = json.loads(request.POST.get("kpis"))
         half_year_review = request.POST.get("halfYearReview")
         full_year_review = request.POST.get("fullYearReview")
-        final_score = request.POST.get("finalScore")
+        form_final_score = request.POST.get("finalScore")
 
         bsc_form_type = request.POST.get('bsc_form_type')
 
-        # Get or create the RICP data for the employee
+        # Get or create the data for the employee
         employee = get_object_or_404(Employee, SAP_ID=employee_id)
-        ricp_data, created = RicpData.objects.get_or_create(employee=employee)
+        form_data, created = RicpData.objects.get_or_create(employee=employee)
 
         
-        # Save Final score, half_year_review, and full_year_review
-        if final_score:
-            ricp_data.final_score = final_score
+        # Save half_year_review, and full_year_review
             
         if half_year_review:
-            ricp_data.half_year_review = half_year_review
+            form_data.half_year_review = half_year_review
 
         if full_year_review:
-            ricp_data.full_year_review = full_year_review
+            form_data.full_year_review = full_year_review
 
-        ricp_data.save()
+        form_data.save()
 
 
 
@@ -212,17 +245,28 @@ def submit_ricp_data(request):
 
 
             RicpKPI.objects.create(
-                ricp_data=ricp_data,
+                ricp_data=form_data,
                 kpi=kpi_data["kpi"],
                 achievement=kpi_data["achievement"],
                 weightage=kpi_data.get("weightage"),
                 target_date=kpi_data["targetDate"],
                 bsc_form_type=bsc_form_type,
                 score=score,
+                form_final_score=form_final_score,
             )
 
+            # Redirect based on `bsc_form_type`
+        if bsc_form_type == "RICP":
+            return JsonResponse({"redirect_url": "/user/customer_kpi/form/"})
+        elif bsc_form_type == "customer_kpi":
+            return JsonResponse({"redirect_url": "/user/financials_kpi/form/"})
+        elif bsc_form_type == "financials_kpi":
+            return JsonResponse({"redirect_url": "/user/learning_growth_kpi/form/"})
+        elif bsc_form_type == "Learning_Growth_kpi":
+            return JsonResponse({"redirect_url": "/user/final_evaluation/form/"})
 
+        
         # Return a success message
-        return JsonResponse({"message": "RICP data submitted successfully!"})
+        return JsonResponse({"message": "Submitted successfully!"})
 
     return JsonResponse({"error": "Invalid request"}, status=400)

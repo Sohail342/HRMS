@@ -17,6 +17,6 @@ urlpatterns = [
     
     
     # Ajax
-    path("submit-ricp-data/", views.submit_ricp_data, name="submit_ricp_data"),
+    path("submit-ricp-data/", views.submit_form_data, name="submit_ricp_data"),
 ]
     

@@ -8,7 +8,7 @@ class RicpData(models.Model):
     employee = models.OneToOneField(Employee, on_delete=models.CASCADE, related_name="ricp_data")
     half_year_review = models.CharField(max_length=20, blank=True, null=True)
     full_year_review = models.CharField(max_length=20, blank=True, null=True)
-    final_score = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    
     
 
     def __str__(self):
@@ -29,6 +29,7 @@ class RicpKPI(models.Model):
     target_date = models.DateField(blank=True, null=True)
     score = models.PositiveIntegerField(blank=True, null=True)
     bsc_form_type = models.CharField(max_length=100, default=None, blank=True, null=True)
+    form_final_score = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
 
     def __str__(self):
         return f"KPI: {self.kpi} for {self.ricp_data.employee}"
