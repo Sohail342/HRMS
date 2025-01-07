@@ -139,29 +139,72 @@ def dashboard_view(request):
     return render(request, 'employee_user/dashboard.html')
 
 
+
 # RICP 
 @login_required(login_url="employee_user:user_login")
 @employee_user_required
 def RICP(request):
-    return render(request, 'employee_user/RICP.html')
+    employee = request.user
+    
+    # Get data for filled forms
+    form_data = RicpKPI.objects.filter(ricp_data__employee=employee).filter(bsc_form_type="RICP")
+
+    if request.method == "POST":
+        # Delete the form data
+        form_data.delete()
+        return redirect("employee_user:ricp_form")
+    return render(request, 'employee_user/RICP.html', {"form_data": form_data})
+
+
 
 #customer_kpi
 @login_required(login_url="employee_user:user_login")
 @employee_user_required
 def customer_kpi(request):
-    return render(request, 'employee_user/customer_kpi.html')
+    employee = request.user
+
+    # Get data for filled forms
+    form_data = RicpKPI.objects.filter(ricp_data__employee=employee).filter(bsc_form_type="customer_kpi")
+
+    if request.method == "POST":
+        # Delete the form data
+        form_data.delete()
+        return redirect("employee_user:customer_kpi")
+    return render(request, 'employee_user/customer_kpi.html', {"form_data": form_data})
 
 #financials_kpi
 @login_required(login_url="employee_user:user_login")
 @employee_user_required
 def financials_kpi(request):
-    return render(request, 'employee_user/Financials_kpi.html')
+    employee = request.user
 
-#financials_kpi
+    # Get data for filled forms
+    form_data = RicpKPI.objects.filter(ricp_data__employee=employee).filter(bsc_form_type="financials_kpi")
+
+    if request.method == "POST":
+        # Delete the form data
+        form_data.delete()
+        return redirect("employee_user:financials_kpi")
+    return render(request, 'employee_user/Financials_kpi.html', {"form_data": form_data})
+
+
+
+#learning_growth_kpi
 @login_required(login_url="employee_user:user_login")
 @employee_user_required
 def learning_growth_kpi(request):
-    return render(request, 'employee_user/Learning_Growth_kpi.html')
+    employee = request.user
+
+    # Get data for filled forms
+    form_data = RicpKPI.objects.filter(ricp_data__employee=employee).filter(bsc_form_type="learning_Growth_kpi")
+
+    if request.method == "POST":
+        # Delete the form data
+        form_data.delete()
+        return redirect("employee_user:learning_growth_kpi")
+    return render(request, 'employee_user/Learning_Growth_kpi.html', {"form_data": form_data})
+
+
 
 #final evaluation
 @login_required(login_url="employee_user:user_login")

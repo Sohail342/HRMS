@@ -11,3 +11,30 @@
 
   <input type="hidden" name="bsc_form_type" id="bsc_form_type" value="financials_kpi">
 {% endblock kpi_title %}
+
+
+{% block buttons %}
+<!-- Buttons -->
+<div class="mt-4 text-center">
+  {% if not form_data %}
+  <button type="button" id="addRowButton" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-green-600 hover:shadow-lg transition-all duration-200">
+    Add Row
+  </button>
+  <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 hover:shadow-lg transition-all duration-200">
+    Next
+  </button>
+  {% endif %}
+</div>
+</form>
+{% if form_data %}
+  <div class="mt-4 text-center">
+    <form id="deleteForm" method="POST" action="{% url 'employee_user:financials_kpi' %}">
+      {% csrf_token %}
+      <input type="hidden" name="bsc_form_type" value="customer_kpi">
+      <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 hover:shadow-lg transition-all duration-200 mt-4">
+        Delete Response
+      </button>
+    </form>
+  </div>
+{% endif %}
+{% endblock buttons %}

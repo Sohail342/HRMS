@@ -1,6 +1,15 @@
 {% extends "sidebar.html" %}
 
 {% block content %}
+
+{% if form_data %}
+  <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+    <strong class="font-bold">Notice:</strong>
+    <span class="block sm:inline">You have already submitted this form.</span>
+    <span class="block sm:inline">If you'd like to resubmit, please delete the initial response first.</span>
+  </div>
+{% endif %}
+
 <form id="ricpForm" method="POST" action="{% url 'employee_user:submit_ricp_data' %}">
   {% csrf_token %}
   <div id="invoice" class="bg-gray-100 p-6">
@@ -66,18 +75,31 @@
     </div>
   </div>
 
+  {% block buttons %}
   <!-- Buttons -->
   <div class="mt-4 text-center">
+    {% if not form_data %}
     <button type="button" id="addRowButton" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-green-600 hover:shadow-lg transition-all duration-200">
       Add Row
     </button>
     <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 hover:shadow-lg transition-all duration-200">
       Next
     </button>
+    {% endif %}
   </div>
 </form>
-
-
+  {% if form_data %}
+    <div class="mt-4 text-center">
+      <form id="deleteForm" method="POST" action="{% url 'employee_user:customer_kpi' %}">
+        {% csrf_token %}
+        <input type="hidden" name="bsc_form_type" value="customer_kpi">
+        <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 hover:shadow-lg transition-all duration-200 mt-4">
+          Delete Response
+        </button>
+      </form>
+    </div>
+  {% endif %}
+  {% endblock buttons %}
 <script>
   // Function to auto-resize textarea dynamically and ensure it does not exceed 5 lines
   function autoResizeTextarea(textarea) {

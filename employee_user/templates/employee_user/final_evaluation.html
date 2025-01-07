@@ -1,81 +1,82 @@
 {% extends "sidebar.html" %}
 {% block content %}
 
-<div id="invoice" class="bg-gray-50 p-8">
-    <form method="post" action="{% url 'employee_user:submit_ricp_data' %}" class="space-y-8">
-        <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-8">
-            <h1 class="text-2xl font-bold mb-6 text-center text-gray-900">Performance Review Form</h1>
+<div id="invoice" class="bg-gray-50 py-12">
+    <form method="post" action="{% url 'employee_user:submit_ricp_data' %}" class="space-y-12">
+        <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-10">
+            <h1 class="text-3xl font-extrabold mb-8 text-center text-gray-800">Performance Review Form</h1>
             {% csrf_token %}
 
             <!-- KPIs/Job Objectives Section -->
-            <div class="space-y-4">
-                <h2 class="text-lg font-semibold text-gray-800">KPIs/Job Objectives</h2>
-                <div>
-                    <label for="overall_score" class="block text-sm text-gray-700 font-medium">Overall Score:</label>
-                    <span class="block mt-1 text-gray-900 font-semibold">{{ total_score }}</span>
+            <div class="space-y-6">
+                <h2 class="text-xl font-semibold text-gray-800 border-b pb-3">KPIs/Job Objectives</h2>
+                <div class="flex items-center space-x-4">
+                    <label for="overall_score" class="text-sm text-gray-600 font-medium">Overall Score:</label>
+                    <span class="text-lg font-bold text-gray-900">{{ total_score }}</span>
                 </div>
             </div>
 
             <!-- Agreed Section -->
-            <div class="space-y-4">
-                <label for="agreement_status" class="block text-sm text-gray-700 font-medium">Agreed</label>
-                <select id="agreement_status" name="agreement_status" class="w-full mt-2 px-4 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <div class="space-y-8 mt-8">
+                <h2 class="text-xl font-semibold text-gray-800 border-b pb-3">Agreement Details</h2>
+                <label for="agreement_status" class="block text-sm text-gray-600 font-medium">Agreed</label>
+                <select id="agreement_status" name="agreement_status" class="w-full mt-3 px-4 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="" disabled selected>Select an option</option>
                     <option value="agreed">Agreed</option>
                     <option value="disagreed">Disagreed</option>
                 </select>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                     <div>
-                        <label class="block text-sm text-gray-700 font-medium">Employee Signature:</label>
-                        <div class="border-b border-gray-400 mt-2"></div>
+                        <label class="block text-sm text-gray-600 font-medium">Employee Signature:</label>
+                        <div class="border-b border-gray-400 mt-4"></div>
                     </div>
                     <div>
-                        <label class="block text-sm text-gray-700 font-medium">Date:</label>
-                        <input type="date" id="date" name="date" class="w-full mt-2 px-4 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <label class="block text-sm text-gray-600 font-medium">Date:</label>
+                        <input type="date" id="date" name="date" class="w-full mt-4 px-4 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div>
-                        <label class="block text-sm text-gray-700 font-medium">1st Appraiser Name & Signature:</label>
-                        <div class="border-b border-gray-400 mt-2"></div>
+                        <label class="block text-sm text-gray-600 font-medium">1st Appraiser Name & Signature:</label>
+                        <div class="border-b border-gray-400 mt-4"></div>
                     </div>
                     <div>
-                        <label class="block text-sm text-gray-700 font-medium">2nd Appraiser Name & Signature:</label>
-                        <div class="border-b border-gray-400 mt-2"></div>
+                        <label class="block text-sm text-gray-600 font-medium">2nd Appraiser Name & Signature:</label>
+                        <div class="border-b border-gray-400 mt-4"></div>
                     </div>
                 </div>
             </div>
 
             <!-- Ratings Section -->
-            <div class="space-y-4">
-                <h3 class="text-lg font-semibold text-gray-800">Ratings</h3>
-                <div>
-                    <label for="full_year_rating" class="block text-sm text-gray-700 font-medium">Overall Full Year Rating:</label>
-                    <span class="block mt-1 text-gray-900 font-semibold">{{ final_evaluation }}</span>
+            <div class="space-y-6 mt-10">
+                <h3 class="text-xl font-semibold text-gray-800 border-b pb-3">Ratings</h3>
+                <div class="flex items-center space-x-4">
+                    <label for="full_year_rating" class="text-sm text-gray-600 font-medium">Overall Full Year Rating:</label>
+                    <span class="text-lg font-bold text-gray-900">{{ final_evaluation }}</span>
                 </div>
-                <div class="mt-4">
-                    <h4 class="text-sm font-semibold text-gray-700">Rating Definitions</h4>
-                    <ul class="list-disc ml-6 mt-2 text-sm text-gray-600 space-y-1">
-                        <li>5 - Outstanding</li>
-                        <li>4 - Very Good</li>
-                        <li>3 - Good</li>
-                        <li>2 - Needs Improvement</li>
-                        <li>1 - Unsatisfactory</li>
+                <div class="mt-6">
+                    <h4 class="text-sm font-semibold text-gray-600">Rating Definitions</h4>
+                    <ul class="list-disc ml-6 mt-4 text-sm text-gray-700 space-y-2">
+                        <li><strong>5</strong> - Outstanding</li>
+                        <li><strong>4</strong> - Very Good</li>
+                        <li><strong>3</strong> - Good</li>
+                        <li><strong>2</strong> - Needs Improvement</li>
+                        <li><strong>1</strong> - Unsatisfactory</li>
                     </ul>
                 </div>
             </div>
 
             <!-- Employee Comments Section -->
-            <div class="space-y-4">
-                <h3 class="text-lg font-semibold text-gray-800">Employee Comments</h3>
-                <textarea name="employee_comments" id="employee_comments" rows="3" placeholder="Enter your comments here" class="w-full mt-2 px-4 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+            <div class="space-y-6 mt-10">
+                <h3 class="text-xl font-semibold text-gray-800 border-b pb-3">Employee Comments</h3>
+                <textarea name="employee_comments" id="employee_comments" rows="4" placeholder="Enter your comments here" class="w-full mt-3 px-4 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
             </div>
         </div>
-    </form>
-</div>
 
-<div class="mt-6 flex justify-center">
-    <button type="button" id="download" class="bg-green-600 text-white px-5 py-2.5 rounded-md hover:bg-green-700 hover:shadow-lg transition-all duration-200">
-        Download
-    </button>
+        <div class="mt-12 flex justify-center">
+            <button type="button" id="download" class="bg-green-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-700 hover:shadow-lg transition duration-200">
+                Download
+            </button>
+        </div>
+    </form>
 </div>
 
 {% endblock %}
