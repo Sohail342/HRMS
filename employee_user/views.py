@@ -305,7 +305,7 @@ def submit_form_data(request):
             return JsonResponse({"redirect_url": "/user/financials_kpi/form/"})
         elif bsc_form_type == "financials_kpi":
             return JsonResponse({"redirect_url": "/user/learning_growth_kpi/form/"})
-        elif bsc_form_type == "Learning_Growth_kpi":
+        elif bsc_form_type == "learning_Growth_kpi":
             return JsonResponse({"redirect_url": "/user/final_evaluation/form/"})
 
         
