@@ -10,6 +10,7 @@
   </div>
 {% endif %}
 
+
 <form id="ricpForm" method="POST" action="{% url 'employee_user:submit_ricp_data' %}">
   {% csrf_token %}
   <div id="invoice" class="bg-gray-100 p-6">
