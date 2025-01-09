@@ -40,12 +40,40 @@
           </thead>
           <tbody id="dynamicRows">
             <!-- Dynamic rows will be added here -->
+            <td class="border border-gray-300 px-4 py-2 text-center">1</td>
+            <td class="border border-gray-300 px-4 py-2">
+              <textarea 
+                class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" 
+                placeholder="Enter KPI" required></textarea>
+            </td>
+            <td class="border border-gray-300 px-4 py-2">
+              <textarea 
+                class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" 
+                placeholder="Enter Achievement" required></textarea>
+            </td>
+            <td class="border border-gray-300 px-4 py-2 text-center">25<span>%</span></td>
+            <td class="border border-gray-300 px-4 py-2">
+              <input 
+                type="date" class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" 
+                placeholder="Enter Target Date" required></input>
+            </td>
+            <td class="border border-gray-300 px-4 py-2 score">
+              <select class="border border-gray-300 rounded px-2 py-1 w-24" required>
+                <option value=""></option>
+                <option value="5">5</option>
+                <option value="4">4</option>
+                <option value="3">3</option>
+                <option value="2">2</option>
+                <option value="1">1</option>
+                <option value="0">0</option>
+              </select>
+            </td>
           </tbody>
           <tfoot class="bg-gray-100">
             <tr>
               <td colspan="2" class="border border-gray-300 px-4 py-2 text-left">Half Year Review (Jun 30)</td>
               <td class="border border-gray-300 px-4 py-2 text-center">
-                <select id="halfYearReview" name="halfYearReview" class="border border-gray-300 rounded px-2 py-1 w-24">
+                <select id="halfYearReview" required name="halfYearReview" class="border border-gray-300 rounded px-2 py-1 w-24">
                   <option value=""></option>
                   <option value="Outstanding">Outstanding</option>
                   <option value="Very Good">Very Good</option>
@@ -56,7 +84,7 @@
               </td>
               <td colspan="1" class="border border-gray-300 px-4 py-2 text-left">Full Year Review</td>
               <td class="border border-gray-300 px-4 py-2 text-center">
-                <select id="fullYearReview" name="fullYearReview" class="border border-gray-300 rounded px-2 py-1 w-24">
+                <select id="fullYearReview" required name="fullYearReview" class="border border-gray-300 rounded px-2 py-1 w-24">
                   <option value=""></option>
                   <option value="Outstanding">Outstanding</option>
                   <option value="Very Good">Very Good</option>
@@ -127,7 +155,7 @@
   }
 
   // Function to add a new row dynamically
-  let rowCount = 1;
+  let rowCount = 2;
   function addRow() {
     const row = document.createElement("tr");
     const weightage = rowCount === 1 
@@ -139,12 +167,12 @@
       <td class="border border-gray-300 px-4 py-2">
         <textarea 
           class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" 
-          placeholder="Enter KPI"></textarea>
+          placeholder="Enter KPI" required></textarea>
       </td>
       <td class="border border-gray-300 px-4 py-2">
         <textarea 
           class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" 
-          placeholder="Enter Achievement"></textarea>
+          placeholder="Enter Achievement" required></textarea>
       </td>
       ${weightage}
       <td class="border border-gray-300 px-4 py-2">
@@ -152,15 +180,15 @@
           type="date" class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" 
           placeholder="Enter Target Date" required></input>
       </td>
-      <td class="border border-gray-300 px-4 py-2 score">
-        <select class="border border-gray-300 rounded px-2 py-1 w-24">
+      <td class="border border-gray-300 px-4 py-2 score" >
+        <select class="border border-gray-300 rounded px-2 py-1 w-24" required>
           <option value=""></option>
-          <option value="0">0</option>
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
           <option value="5">5</option>
+          <option value="4">4</option>
+          <option value="3">3</option>
+          <option value="2">2</option>
+          <option value="1">1</option>
+          <option value="0">0</option>
         </select>
       </td>
     `;
