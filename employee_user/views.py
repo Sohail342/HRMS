@@ -256,8 +256,6 @@ def submit_form_data(request):
         # Extract data
         employee_id = request.user.SAP_ID
         kpis = json.loads(request.POST.get("kpis"))
-        half_year_review = request.POST.get("halfYearReview")
-        full_year_review = request.POST.get("fullYearReview")
         form_final_score = request.POST.get("finalScore")
 
         bsc_form_type = request.POST.get('bsc_form_type')
@@ -265,18 +263,7 @@ def submit_form_data(request):
         # Get or create the data for the employee
         employee = get_object_or_404(Employee, SAP_ID=employee_id)
         form_data, created = RicpData.objects.get_or_create(employee=employee)
-
-        
-        # Save half_year_review, and full_year_review
-            
-        if half_year_review:
-            form_data.half_year_review = half_year_review
-
-        if full_year_review:
-            form_data.full_year_review = full_year_review
-
         form_data.save()
-
 
 
         # Save KPIs

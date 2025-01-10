@@ -8,7 +8,7 @@ from .models import RicpData, RicpKPI
 class RicpDataAdmnin(ModelAdmin, ImportExportModelAdmin):
     import_form_class = ImportForm
     export_form_class = ExportForm
-    list_display = ('employee', 'half_year_review', 'full_year_review')
+    list_display = ('employee', )
     
     
 
@@ -17,5 +17,5 @@ class RicpDataAdmnin(ModelAdmin, ImportExportModelAdmin):
 class RicpKPIAdmnin(ModelAdmin, ImportExportModelAdmin):
     import_form_class = ImportForm
     export_form_class = ExportForm
-    list_display = ('ricp_data__employee',  'bsc_form_type', 'achievement', 'weightage', 'target_date', 'score', 'form_final_score')
+    list_display = ('ricp_data__employee',  'bsc_form_type', 'weightage', 'target_date', 'score', 'form_final_score')
     readonly_fields = ('weightage', 'bsc_form_type')
