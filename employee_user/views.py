@@ -76,6 +76,8 @@ def information_employee(request):
 
 
 
+
+
 # User Verification
 def verification_user_view(request):
     if request.user.is_authenticated:
@@ -132,11 +134,45 @@ def create_password_view(request, sap_id):
 
 
 
-# Employee Dashboard
+
+# -------------------------------------------------------------------------------------------------------
+
+from employee_attendance.models import  LeaveApplication
+
 @login_required(login_url="employee_user:user_login")
 @employee_user_required
 def dashboard_view(request):
-    return render(request, 'employee_user/dashboard.html')
+    user_type = request.user.employee_type
+    
+    # Get leaves for employee ( requested user )
+    casual_leaves = LeaveApplication.objects.filter(employee=request.user, application_type='Casual').values('availed_leaves')
+    casual_leaves_count = sum(item['availed_leaves'] for item in casual_leaves)
+    remaining_casual_leaves = 20 - casual_leaves_count
+    
+    
+    privilege_leaves = LeaveApplication.objects.filter(employee=request.user, application_type='Privilege').values('availed_leaves')
+    privilege_leaves_count = sum(item['availed_leaves'] for item in privilege_leaves)
+    remaining_privilege_leaves = 30 - privilege_leaves_count
+    
+    sick_leaves = LeaveApplication.objects.filter(employee=request.user, application_type='Sick').values('availed_leaves')
+    sick_leaves_count = sum(item['availed_leaves'] for item in sick_leaves)
+    remaining_sick_leaves = 18 - sick_leaves_count
+    
+    
+    content = {
+        "user_type":str(user_type),
+        'casual_leaves': casual_leaves_count,
+        'remaining_casual_leaves': remaining_casual_leaves,
+        
+        'privilege_leaves': privilege_leaves_count,
+        'remaining_privilege_leaves': remaining_privilege_leaves,
+        
+        'sick_leaves': sick_leaves_count,
+        'remaining_sick_leaves':remaining_sick_leaves,
+        
+    }
+    return render(request, 'employee_attendance/permanent_leave_dashboard.html', content)
+
 
 
 
@@ -248,8 +284,6 @@ def final_evaluation(request):
     return render(request, 'employee_user/final_evaluation.html', content)
 
 
-
-
 @csrf_protect
 def submit_form_data(request):
     if request.method == "POST":
@@ -300,3 +334,4 @@ def submit_form_data(request):
         return JsonResponse({"message": "Submitted successfully!"})
 
     return JsonResponse({"error": "Invalid request"}, status=400)
+

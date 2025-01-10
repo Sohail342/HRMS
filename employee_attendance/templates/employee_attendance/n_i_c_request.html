@@ -1,0 +1,82 @@
+{% extends "sidebar.html" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
+    <h2 class="text-2xl font-semibold mb-6 text-gray-800">Non-Involvement Certificate Application</h2>
+    
+    <!-- Form -->
+    <form action="#" method="POST" class="space-y-6" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <!-- Employee Information -->
+        <div class="flex flex-col">
+            <label for="employee_name" class="mb-2 text-sm font-medium text-gray-600">Employee Name</label>
+            <input 
+                type="text" 
+                id="employee_name" 
+                name="employee_name" 
+                value="{{ employee_name }}" 
+                class="block w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-700"
+                readonly
+            >
+        </div>
+
+        <div class="flex flex-col">
+            <label for="employee_id" class="mb-2 text-sm font-medium text-gray-600">Employee ID</label>
+            <input 
+                type="text" 
+                id="employee_id" 
+                name="employee_id" 
+                value="{{ employee_id }}" 
+                class="block w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-700"
+                readonly
+            >
+        </div>
+
+        <!-- Date of Request -->
+        <div class="flex flex-col">
+            <label for="request_date" class="mb-2 text-sm font-medium text-gray-600">Date of Request</label>
+            <input 
+                type="date" 
+                id="request_date" 
+                name="request_date" 
+                class="block w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                required
+            >
+        </div>
+
+        <!-- Reason for Non-Involvement -->
+        <div class="flex flex-col">
+            <label for="reason" class="mb-2 text-sm font-medium text-gray-600">Reason for Non-Involvement</label>
+            <textarea 
+                id="reason" 
+                name="reason" 
+                rows="4" 
+                class="block w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                required
+            ></textarea>
+        </div>
+
+        <!-- Supporting Documents -->
+        <div class="flex flex-col">
+            <label for="supporting_docs" class="mb-2 text-sm font-medium text-gray-600">Supporting Documents (Optional)</label>
+            <input 
+                type="file" 
+                id="supporting_docs" 
+                name="supporting_docs" 
+                class="block w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+        </div>
+
+        <!-- Submit Button -->
+        <div class="flex justify-end">
+            <button 
+                type="submit" 
+                class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+                Submit Application
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

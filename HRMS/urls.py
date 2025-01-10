@@ -12,4 +12,5 @@ urlpatterns = [
     path('', include("transfer_employees.urls")),
     path('', include("group_head.urls")),
     path('', include("employee_user.urls")),
+    path('', include("employee_attendance.urls")),
 ]

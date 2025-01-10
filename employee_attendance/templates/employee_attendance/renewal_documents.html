@@ -1,0 +1,28 @@
+{% extends "sidebar.html" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
+    <h2 class="text-2xl font-semibold mb-6 text-gray-800">Upload Educational Documents</h2>
+
+    <form action="{% url 'employee_attendance:upload_education_documents' %}" method="POST" enctype="multipart/form-data" class="space-y-6">
+        {% csrf_token %}
+        
+        <!-- Document Type -->
+        <div class="mb-4">
+            <label for="document_type" class="block text-sm font-medium text-gray-600">Document Type</label>
+            <input type="text" name="document_type" id="document_type" class="mt-2 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Enter document type" value="">
+        </div>
+
+        <!-- Document File Upload -->
+        <div class="mb-4">
+            <label for="document" class="block text-sm font-medium text-gray-600">Select Document</label>
+            <input type="file" name="document" id="document" class="mt-2 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+        </div>
+
+        <!-- Submit Button -->
+        <div class="flex justify-end">
+            <button type="submit" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">Upload</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

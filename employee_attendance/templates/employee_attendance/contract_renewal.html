@@ -1,0 +1,96 @@
+{% extends "sidebar.html" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
+    <h2 class="text-2xl font-semibold mb-6 text-gray-800">Contract Renewal Letter Application</h2>
+    
+    <!-- Form -->
+    <form method="post" class="space-y-4" enctype="multipart/form-data">
+        {% csrf_token %}
+        <!-- Employee Name -->
+        <div class="flex flex-col">
+            <label for="employee_name" class="mb-2 text-sm font-medium text-gray-600">Employee Name</label>
+            <input 
+                type="text" 
+                id="employee_name" 
+                name="name" 
+                class="block w-full p-2.5 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                value="{{ employee_name }}" 
+                readonly
+            >
+        </div>
+
+        <!-- Employee ID -->
+        <div class="flex flex-col">
+            <label for="employee_id" class="mb-2 text-sm font-medium text-gray-600">Employee ID</label>
+            <input 
+                type="text" 
+                id="employee_id" 
+                name="employee_id" 
+                value="{{ employee_id }}" 
+                class="block w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-700"
+                readonly
+            >
+        </div>
+
+        <!-- Position -->
+        <div class="flex flex-col">
+            <label for="position" class="mb-2 text-sm font-medium text-gray-600">Position</label>
+            <input 
+                type="text" 
+                id="employee_position" 
+                name="employee_position" 
+                value="{{ employee_position }}" 
+                class="block w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-700"
+                readonly
+            >
+        </div>
+
+        <!-- Contract Expiry Date -->
+        <div class="flex flex-col">
+            <label for="contract_expiry" class="mb-2 text-sm font-medium text-gray-600">Contract Expiry Date</label>
+            <input 
+                type="date" 
+                id="contract_expiry" 
+                name="contract_expiry" 
+                class="block w-full p-2.5 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                value="{{ form.contract_expiry.value }}" 
+                required
+            >
+        </div>
+
+        <!-- Reason for Renewal -->
+        <div class="flex flex-col">
+            <label for="reason" class="mb-2 text-sm font-medium text-gray-600">Reason for Contract Renewal</label>
+            <textarea 
+                id="reason" 
+                name="reason" 
+                rows="4" 
+                class="block w-full p-2.5 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                required
+            >{{ form.reason.value }}</textarea>
+        </div>
+
+        <!-- File Upload -->
+        <div class="flex flex-col">
+            <label for="supporting_docs" class="mb-2 text-sm font-medium text-gray-600">Contract Renewal Documents (Optional)</label>
+            <input 
+                type="file" 
+                id="supporting_docs" 
+                name="supporting_docs" 
+                class="block w-full p-2.5 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+        </div>
+
+        <!-- Submit Button -->
+        <div class="flex justify-end">
+            <button 
+                type="submit" 
+                class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+                Submit Application
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

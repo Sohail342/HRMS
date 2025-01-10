@@ -1,0 +1,58 @@
+{% extends "sidebar.html" %}
+
+{% block content %}
+    <div class="container mx-auto p-4">
+        <h1 class="text-2xl font-bold text-center">Employee Leave Dashboard</h1>
+
+        <!-- Leave Information Table -->
+        <div class="mt-6">
+            <h2 class="text-xl font-semibold">Leave Details</h2>
+            <table class="min-w-full bg-white shadow-md rounded-lg mt-4">
+                <thead>
+                    <tr class="bg-gray-100">
+                        <th class="py-2 px-4 text-left">Leave Type</th>
+                        <th class="py-2 px-4 text-left">Total Leave</th>
+                        <th class="py-2 px-4 text-left">Used Leave</th>
+                        <th class="py-2 px-4 text-left">Remaining Leave</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="py-2 px-4">Casual</td>
+                        <td class="py-2 px-4">20</td>
+                        <td class="py-2 px-4">{{ casual_leaves }}</td>
+                        <td class="py-2 px-4">{{ remaining_casual_leaves }}</td>
+                    </tr>
+                    {% if not user_type == "Contractual" %}
+                    <tr>
+                        <td class="py-2 px-4">Privilege</td>
+                        <td class="py-2 px-4">30</td>
+                        <td class="py-2 px-4">{{ privilege_leaves }}</td>
+                        <td class="py-2 px-4">{{ remaining_privilege_leaves }}</td>
+                    </tr>
+                    <tr>
+                    {% endif %}
+                        <td class="py-2 px-4">Sick</td>
+                        <td class="py-2 px-4">18</td>
+                        <td class="py-2 px-4">{{ sick_leaves}}</td>
+                        <td class="py-2 px-4">{{ remaining_sick_leaves }} </td>
+                    </tr>
+                    <tr>
+                        <td class="py-2 px-4">Frozen</td>
+                        <td class="py-2 px-4">{{ frozen_leaves}}</td>
+                        <td class="py-2 px-4">{{ frozen_leave_used }}</td>
+                        <td class="py-2 px-4">{{ frozen_leave_remaining }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Apply for Leave Section -->
+        <div class="mt-6">
+            <a href="{% url 'employee_attendance:apply_permanent_leave' %}" 
+                class="inline-block bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700">
+                Apply for Leave
+            </a>
+        </div>
+    </div>
+{% endblock %}
