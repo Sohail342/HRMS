@@ -72,7 +72,7 @@ def upload_education_documents(request, sap_id):
             try:
                 # Save the file to the document object
                 upload_result = cloudinary.uploader.upload(uploaded_file,  resource_type = "raw")
-                document_file.document = uploaded_file
+                document_file.document = upload_result['secure_url']
                 document_file.document_type = document_type
                 document_file.save()  # Save the document object to the database
 
