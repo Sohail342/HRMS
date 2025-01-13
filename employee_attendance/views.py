@@ -1,12 +1,15 @@
 from django.shortcuts import render, redirect
 from group_head.decorators import employee_user_required 
-from .models import ContractualLeaveRecord, ContractRenewal, LeaveRecordPremanent
+from .models import ContractualLeaveRecord, ContractRenewal
 from django.contrib import messages
+import cloudinary
+from django.core.exceptions import ValidationError
 from django.http import Http404
 from .forms import EducationalDocumentForm, NonInvolvementCertificateForm, StationaryRequestForm, ContractualLeaveApplicationForm
 from .forms import PermanentLeaveApplicationForm, ContractualLeaveApplicationForm, PermanentLeaveApplicationForm
 from django.shortcuts import get_object_or_404
 from django.db import models
+from .models import EducationalDocument, LeaveApplication
 from datetime import datetime
 
 
@@ -44,20 +47,44 @@ def nicrequests(request):
 
 
 
-
-def upload_education_documents(request):
+#  ------------- Educational Document Upload -------------
+from icecream import ic
+def upload_education_documents(request, sap_id):
     if request.method == "POST":
-        form = EducationalDocumentForm(request.POST, request.FILES)
-        if form.is_valid():
-            # Set the employee (logged-in user)
-            educational_document = form.save(commit=False) 
-            educational_document.employee = request.user  
-            educational_document.save() 
-            from icecream import ic
-            ic(educational_document)
-                       
-            messages.success(request, 'Your educational document has been uploaded successfully.')
-            return redirect('employee_attendance:upload_education_documents') 
+        try:
+            document_file = EducationalDocument.objects.get(employee__SAP_ID=request.user.SAP_ID)
+        except EducationalDocument.DoesNotExist:
+            document_file = None
+
+        if document_file is None:
+            # Handle case where there is no existing document, or create a new one
+            document_file = EducationalDocument(employee=request.user)
+
+        if 'document' in request.FILES:
+            uploaded_file = request.FILES.get('document')
+            document_type = request.POST.get('document_type')
+
+            # Validate the file type (only allow PDF)
+            if not uploaded_file.name.endswith('.pdf'):
+                messages.error(request, "Only PDF files are allowed.")
+                return redirect('employee_attendance:upload_education_documents', sap_id=sap_id)
+
+            try:
+                # Save the file to the document object
+                upload_result = cloudinary.uploader.upload(uploaded_file,  resource_type = "raw")
+                document_file.document = uploaded_file
+                document_file.document_type = document_type
+                document_file.save()  # Save the document object to the database
+
+                messages.success(request, "Your educational document has been uploaded successfully.")
+                return redirect('employee_attendance:upload_education_documents', sap_id=sap_id)
+
+            except ValidationError as e:
+                messages.error(request, f"Error uploading file: {e}")
+                return redirect('group_head:upload_pdf', sap_id=sap_id)
+            
+        else:
+            messages.error(request, "Invalid file type. Only PDF files are allowed.")
             
     else:
         form = EducationalDocumentForm()
@@ -134,73 +161,7 @@ def stationaryrequests(request):
     return render(request, 'employee_attendance/stationary_request.html', {'form': form})
 
 
-
-#---------------------- Leave Application -----------------------
-    
-# def permanent_leave_dashboard(request):
-#     if request.method == 'POST':
-#         form = PermanentLeaveApplicationForm(request.POST)
-#         if form.is_valid():
-#             leave_application = form.save(commit=False)
-#             leave_application.employee = request.user  # Assuming the logged-in user is the employee
-#             leave_application.save()
-#             return redirect('leave_application_success')
-#     else:
-#         form = PermanentLeaveApplicationForm()
-
-#     return render(request, 'employee_attendance/permanent_leave_dashboard.html', {'form': form,})
-    
-# def contractual_leave_dashboard(request):
-#     casual_leave_record = ContractualLeaveRecord.objects.filter(
-#         employee=request.user, leave_type__name="Casual"
-#     ).first()
-#     sick_leave_record = ContractualLeaveRecord.objects.filter(
-#         employee=request.user, leave_type__name="Sick"
-#     ).first()
-#     frozen_leave_record = ContractualLeaveRecord.objects.filter(
-#         employee=request.user, leave_type__name="Frozen"
-#     ).first()
-    
-#     if request.method == 'POST':
-#         form = ContractualLeaveApplicationForm(request.POST)
-#         if form.is_valid():
-#             leave_application = form.save()
-
-#             # Retrieve the leave type and employee
-#             leave_type = leave_application.leave_type
-#             employee = leave_application.employee
-
-#             # Check if a record exists for this leave type and employee
-#             try:
-#                 leave_record = ContractualLeaveRecord.objects.get(
-#                     employee=employee, leave_type=leave_type)
-                
-#                 # Update availed leaves and remaining leaves
-#                 leave_record.availed_leaves += (leave_application.to_date - leave_application.from_date).days + 1  # Include both dates
-#                 leave_record.save()
-
-#                 # Optionally, display the remaining leaves
-#                 remaining_leaves = leave_record.remaining_leaves
-#                 messages.success(request, f"Leave applied successfully! Remaining leaves: {remaining_leaves}")
-
-#             except ContractualLeaveRecord.DoesNotExist:
-#                 messages.error(request, "No leave record found for this employee and leave type.")
-
-#             return redirect('leave_status')  # Redirect to an appropriate page (e.g., leave status page)
-
-#     else:
-#         form = ContractualLeaveApplicationForm()
-
-#     return render(request, 'apply_contractual_leave.html', {'form': form,
-#         "casual_leave_used": casual_leave_record.availed_leaves if casual_leave_record else 0,
-#         "casual_leave_remaining": casual_leave_record.remaining_leaves if casual_leave_record else 20,
-#         "sick_leave_used": sick_leave_record.availed_leaves if sick_leave_record else 0,
-#         "sick_leave_remaining": sick_leave_record.remaining_leaves if sick_leave_record else 18,
-#         "frozen_leave_total": frozen_leave_record.leave_type.total_leaves if frozen_leave_record else 0,
-#         "frozen_leave_used": frozen_leave_record.availed_leaves if frozen_leave_record else 0,
-#         "frozen_leave_remaining": frozen_leave_record.remaining_leaves if frozen_leave_record else 0,})
-
-from .models import LeaveApplication
+#------------- Leave Application -------------
 
 def apply_permanent_leave(request):
     try:

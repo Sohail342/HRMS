@@ -11,7 +11,7 @@ urlpatterns = [
     path('stationaryrequests/', views.stationaryrequests, name='stationaryrequests'),
     path('nicrequests/', views.nicrequests, name='nicrequests'),
     path('contractrenewal/', views.contractrenewal, name='contractrenewal'),
-    path('upload_education_documents/', views.upload_education_documents, name='upload_education_documents'),
+    path('upload_education_documents/<int:sap_id>/', views.upload_education_documents, name='upload_education_documents'),
 ]
 
 

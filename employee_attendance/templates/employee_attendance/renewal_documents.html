@@ -4,7 +4,32 @@
 <div class="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
     <h2 class="text-2xl font-semibold mb-6 text-gray-800">Upload Educational Documents</h2>
 
-    <form action="{% url 'employee_attendance:upload_education_documents' %}" method="POST" enctype="multipart/form-data" class="space-y-6">
+
+    <!-- Note about file type restriction -->
+    <div class="bg-yellow-100 border-l-4 border-yellow-400 p-4 mb-6 text-yellow-800">
+        <p class="font-medium">Note: Only PDF files are allowed for upload.</p>
+    </div>
+    
+    <!-- Notifications -->
+    {% if messages %}
+        <div class="my-4 space-y-2">
+            {% for message in messages %}
+                <div class="p-4 rounded-md shadow-sm 
+                    {% if message.tags == 'success' %}
+                        bg-green-100 border border-green-400 text-green-700
+                    {% elif message.tags == 'error' %}
+                        bg-red-100 border border-red-400 text-red-700
+                    {% else %}
+                        bg-gray-100 border border-gray-300 text-gray-700
+                    {% endif %}">
+                    <p class="font-medium">{{ message }}</p>
+                    </div>
+                {% endfor %}
+        </div>
+    {% endif %}
+
+
+    <form action="{% url 'employee_attendance:upload_education_documents' request.user.SAP_ID %}" method="POST" enctype="multipart/form-data" class="space-y-6">
         {% csrf_token %}
         
         <!-- Document Type -->

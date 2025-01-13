@@ -35,14 +35,15 @@
     </div>
 
     <!-- Search Results -->
-    {% if employees %}
+{% if employee %}
     <div class="mt-8">
         <ul class="space-y-4">
-            {% for employee in employees %}
                 <li class="bg-gray-100 p-6 rounded-lg shadow-lg hover:bg-gray-200 transition-all flex justify-between items-center">
                     <span class="text-lg font-medium text-gray-800">{{ employee.name }}</span>
                     {% if employee.pdf_file %}
-                        <p class="bg-green-100 border-l-4 border-green-500 text-green-700">Already One File Uploaded</p>
+                        <a href="{{ employee_pdf_file }}" class="text-blue-500 hover:underline">
+                            <i class="fas fa-download mr-2"></i> Show file
+                        </a>
                         {% else %}
                         <p class="bg-red-100 border-l-4 border-red-500 text-red-700">Not Upload Yet</p>
                     {% endif %}
@@ -53,12 +54,9 @@
                         Upload PDF
                     </a>
                 </li>
-            {% endfor %}
         </ul>
     </div>
-    {% else %}
-    <p class="text-center text-gray-500 mt-8">No employees found matching your search.</p>
-    {% endif %}
-
+  
+{% endif %}
 </div>
 {% endblock content %}

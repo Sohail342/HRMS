@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from HRIS_App.models import Employee
 from django.conf import settings
 from datetime import date, timedelta
+from cloudinary.models import CloudinaryField
 from django.db.models import Sum
 from icecream import ic
 
@@ -145,8 +146,8 @@ class NonInvolvementCertificate(models.Model):
 class EducationalDocument(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name="educational_documents")
     document_type = models.CharField(max_length=100)
-    document = models.FileField(upload_to="educational_documents/")
-    upload_date = models.DateField(auto_now_add=True)  # Automatically sets the upload date to current date
+    document = CloudinaryField(blank=True, null=True)
+    upload_date = models.DateField(auto_now_add=True) 
     
     def __str__(self):
         return f"{self.employee.name} - {self.document_type}"

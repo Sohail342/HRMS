@@ -228,11 +228,39 @@ def uploaded_csv_files(request):
 class SearchEmployee(View):
     def get(self, request):
         query = request.GET.get('search', '')
-        employee = Employee.objects.filter(SAP_ID__icontains=query) if query else None
-        
-        if not employee or employee is None:
+        employee_pdf_files = []
+        employee = None
+        url = None
+
+        try:
+            employee = Employee.objects.get(SAP_ID__icontains=query) if query else None
+
+            if query:
+                employee_pdf_files = Employee.objects.filter(SAP_ID__icontains=query).values('name', 'pdf_file')
+
+        except Employee.DoesNotExist:
             messages.error(request, 'No employees found matching your search.')
-        return render(request, 'group_head/search_employee.html', {'employees': employee, 'query': query})
+            
+
+    # Append '.pdf' to each pdf file URL if not already present
+        for pdf in employee_pdf_files:
+            if pdf['pdf_file']:
+                pdf_url = str(pdf['pdf_file'])
+                
+                # Check if the URL ends with '.csv' and append if not
+                if not pdf_url.endswith('.pdf'):
+                    pdf['pdf_file'] = f"{pdf_url}.pdf"
+                    url = pdf['pdf_file']
+                    print(url)
+            
+
+        context = {
+        'employee_pdf_file':url,
+        'employee':employee,
+        'query':query,
+         }
+        
+        return render(request, 'group_head/search_employee.html', context)
     
 
 
@@ -243,7 +271,8 @@ class UploadBSCFrom(View):
     def get(self, request, *args, **kwargs):
         # Render the upload form
         employee = Employee.objects.get(SAP_ID=kwargs['sap_id'])
-        return render(request, 'group_head/upload_employee_pdf.html', {'employee': employee})
+
+        return render(request, 'group_head/upload_employee_pdf.html', {"employee":employee})
 
     def post(self, request, *args, **kwargs):
         employee = Employee.objects.get(SAP_ID=kwargs['sap_id'])
@@ -258,8 +287,9 @@ class UploadBSCFrom(View):
 
             # Save the file to Cloudinary
             try:
-                employee.pdf_file = uploaded_file  
-                print(uploaded_file)
+                # Upload PDF to Cloudinary
+                upload_result = cloudinary.uploader.upload(uploaded_file,  resource_type = "raw", format="pdf", folder="BSC Forms") 
+                employee.pdf_file = upload_result['secure_url']
                 employee.save() 
 
                 messages.success(request, "PDF uploaded successfully.")
