@@ -335,67 +335,35 @@
     </div>
 
     <script>
-        
-        const dropdownButton = document.getElementById('dropdownButton');
-        const dropdownMenu = document.getElementById('dropdownMenu');
-        const toggleButton = document.getElementById('toggleSidebar');
-        const sidebar = document.getElementById('sidebar');
-        const iconShow = document.getElementById('iconShow');
-        const iconHide = document.getElementById('iconHide');
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggleButton = document.getElementById('toggleSidebar');
+            const sidebar = document.getElementById('sidebar');
+            const iconShow = document.getElementById('iconShow');
+            const iconHide = document.getElementById('iconHide');
 
-         
-         dropdownButton.addEventListener('click', () => {
-             dropdownMenu2.classList.toggle('hidden');
-         });
-     
-         // Optional: Close the dropdown if clicking outside
-         document.addEventListener('click', (event) => {
-             if (!dropdownButton2.contains(event.target) && !dropdownMenu2.contains(event.target)) {
-                 dropdownMenu2.classList.add('hidden');
-             }
-         });
-
-        // Check the localStorage value on page load
-        if (localStorage.getItem('sidebarHidden') === 'true') {
-            sidebar.classList.add('hidden');
-            iconShow.classList.remove('hidden');
-            iconHide.classList.add('hidden');
-        } else {
-            sidebar.classList.remove('hidden');
-            iconShow.classList.add('hidden');
-            iconHide.classList.remove('hidden');
-        }
-
-        toggleButton.addEventListener('click', () => {
-            // Toggle the visibility of the sidebar
-            sidebar.classList.toggle('hidden');
-
-            // Toggle icons
-            iconShow.classList.toggle('hidden');
-            iconHide.classList.toggle('hidden');
-
-            // Update localStorage based on the sidebar's visibility
-            if (sidebar.classList.contains('hidden')) {
-                localStorage.setItem('sidebarHidden', 'true');
+            // Check localStorage
+            if (localStorage.getItem('sidebarHidden') === 'true') {
+                sidebar.classList.add('hidden');
+                iconShow.classList.remove('hidden');
+                iconHide.classList.add('hidden');
             } else {
-                localStorage.setItem('sidebarHidden', 'false');
+                sidebar.classList.remove('hidden');
+                iconShow.classList.add('hidden');
+                iconHide.classList.remove('hidden');
             }
+
+            toggleButton.addEventListener('click', () => {
+                sidebar.classList.toggle('hidden');
+                iconShow.classList.toggle('hidden');
+                iconHide.classList.toggle('hidden');
+
+                // Update localStorage
+                localStorage.setItem('sidebarHidden', sidebar.classList.contains('hidden').toString());
+            });
         });
-
-
-    dropdownButton.addEventListener('click', () => {
-        dropdownMenu.classList.toggle('hidden');
-    });
-
-    // Optional: Close the dropdown if clicking outside
-    document.addEventListener('click', (event) => {
-        if (!dropdownButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
-            dropdownMenu.classList.add('hidden');
-        }
-    });
-
-
     </script>
+    
+
     <!--PDF Scrips-->
     <script src="{% static 'HRIS_App/JS/PDF.js' %}"></script>
     <script src="{% static 'HRIS_App/JS/html2pdf.js' %}"></script>
