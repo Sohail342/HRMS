@@ -242,48 +242,6 @@ def learning_growth_kpi(request):
 
 
 
-#final evaluation
-@login_required(login_url="employee_user:user_login")
-@employee_user_required
-def final_evaluation(request):
-    employee = request.user
-
-    # Get Distinct forms for requested user or get data for filled forms
-    ricp_data = RicpKPI.objects.filter(ricp_data__employee=employee).values('bsc_form_type').distinct()
-
-    # Get the form final score for each form
-    form_final_scores = {}
-    for form in ricp_data:
-        form_final_scores[form["bsc_form_type"]] = RicpKPI.objects.filter(ricp_data__employee=employee, bsc_form_type=form["bsc_form_type"]).last().form_final_score
-    
-
-    # Sum the all form final scores
-    total_score = sum(form_final_scores.values())
-
-    # Get the final evaluation
-    final_evaluation = "Unsatisfactory"
-    if total_score == 0:
-        final_evaluation = ""
-    elif total_score <= 1:
-        final_evaluation = "Unsatisfactory"
-    elif total_score <= 2:
-        final_evaluation = "Needs Improvement"
-    elif total_score <= 3:
-        final_evaluation = "Good"
-    elif total_score <= 4:
-        final_evaluation = "Very Good"
-    elif total_score <= 5:
-        final_evaluation = "Outstanding"
-
-
-    content = {
-        "total_score": total_score,
-        "final_evaluation": final_evaluation,
-    }
-
-    return render(request, 'employee_user/final_evaluation.html', content)
-
-
 @csrf_protect
 def submit_form_data(request):
     if request.method == "POST":
@@ -327,7 +285,7 @@ def submit_form_data(request):
         elif bsc_form_type == "financials_kpi":
             return JsonResponse({"redirect_url": "/user/learning_growth_kpi/form/"})
         elif bsc_form_type == "learning_Growth_kpi":
-            return JsonResponse({"redirect_url": "/user/final_evaluation/form/"})
+            return JsonResponse({"redirect_url": "/user/kpi/summary/"})
 
         
         # Return a success message
@@ -335,3 +293,65 @@ def submit_form_data(request):
 
     return JsonResponse({"error": "Invalid request"}, status=400)
 
+
+
+# Display Overall KPIS Result
+def overall_kpi_result(request):
+    try:
+        employee = Employee.objects.get(SAP_ID=request.user.SAP_ID)
+        ricp_data = RicpData.objects.get(employee=employee)
+        ricp_kpis = RicpKPI.objects.filter(ricp_data=ricp_data, bsc_form_type="RICP")
+        financials_kpis = RicpKPI.objects.filter(ricp_data=ricp_data, bsc_form_type="financials_kpi")
+        customer_kpis = RicpKPI.objects.filter(ricp_data=ricp_data, bsc_form_type="customer_kpi")
+        learning_growth_kpis = RicpKPI.objects.filter(ricp_data=ricp_data, bsc_form_type="learning_Growth_kpi")
+
+
+
+        '''    
+                    Get the final evaluation for the employee
+        Get Distinct forms for requested user or get data for filled forms
+        
+        '''
+        ricp_data = RicpKPI.objects.filter(ricp_data__employee=employee).values('bsc_form_type').distinct()
+
+        # Get the form final score for each form
+        form_final_scores = {}
+        for form in ricp_data:
+            form_final_scores[form["bsc_form_type"]] = RicpKPI.objects.filter(ricp_data__employee=employee, bsc_form_type=form["bsc_form_type"]).last().form_final_score
+        
+
+        # Sum the all form final scores
+        total_score = sum(form_final_scores.values())
+
+        # Get the final evaluation
+        final_evaluation = "Unsatisfactory"
+        if total_score == 0:
+            final_evaluation = ""
+        elif total_score <= 1:
+            final_evaluation = "Unsatisfactory"
+        elif total_score <= 2:
+            final_evaluation = "Needs Improvement"
+        elif total_score <= 3:
+            final_evaluation = "Good"
+        elif total_score <= 4:
+            final_evaluation = "Very Good"
+        elif total_score <= 5:
+            final_evaluation = "Outstanding"
+
+
+
+    except Employee.DoesNotExist:
+        messages.error(request, "Employee with the given SAP ID does not exist.")
+        return redirect("employee_user:dashboard")
+
+
+    context = {
+        "ricp_kpis": ricp_kpis,
+        "financials_kpis": financials_kpis,
+        "customer_kpis": customer_kpis,
+        "learning_growth_kpis": learning_growth_kpis,
+        "total_score": total_score,
+        "final_evaluation": final_evaluation,
+    }
+    
+    return render(request, 'employee_user/overall_kpi_result.html', context)

@@ -10,13 +10,9 @@
       <div class="mb-4">
         {% for message in messages %}
           <div class="text-sm p-3 rounded-md shadow-sm 
-            {% if message.tags == 'success' %}
-              bg-green-100 text-green-600
-            {% elif message.tags == 'error' %}
-              bg-red-100 text-red-600
-            {% else %}
-              bg-yellow-100 text-yellow-600
-            {% endif %}
+            {% if message.tags == 'success' %} bg-green-100 text-green-600
+            {% elif message.tags == 'error' %} bg-red-100 text-red-600
+            {% else %} bg-yellow-100 text-yellow-600 {% endif %}
           ">
             {{ message }}
           </div>
@@ -41,8 +37,8 @@
         <a href="{% url 'employee_user:user_verification' %}" class="text-xs text-indigo-500 hover:text-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Create or Verify New Account</a>
       </div>
       
-      <button type="submit" class="w-full py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Submit</button>
+      <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg shadow hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-300 transition duration-200">Login</button>
     </form>
   </div>
 </div>
-{% endblock content %}
+{% endblock %}

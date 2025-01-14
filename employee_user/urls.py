@@ -13,7 +13,7 @@ urlpatterns = [
     path('user/customer_kpi/form/', views.customer_kpi, name="customer_kpi"),
     path('user/financials_kpi/form/', views.financials_kpi, name="financials_kpi"),
     path('user/learning_growth_kpi/form/', views.learning_growth_kpi, name="learning_growth_kpi"),
-    path('user/final_evaluation/form/', views.final_evaluation, name="final_evaluation"),
+    path('user/kpi/summary/', views.overall_kpi_result, name="kpi_summary"),
     
     
     # Ajax

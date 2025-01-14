@@ -162,8 +162,8 @@ def stationaryrequests(request):
 
 
 #------------- Leave Application -------------
-
 def apply_permanent_leave(request):
+    user_type = request.user.employee_type
     try:
         form = PermanentLeaveApplicationForm(request.POST)
         if request.method == 'POST':
@@ -195,8 +195,8 @@ def apply_permanent_leave(request):
             
     except Exception as e:
         messages.error(request, "Error: " + str(e))
-
-    return render(request, 'employee_attendance/apply_permanent_leave.html', {'form': form})
+    
+    return render(request, 'employee_attendance/apply_permanent_leave.html', {'form': form, 'user_type': str(user_type)})
 
 
 

@@ -269,7 +269,7 @@
             </svg>
         </div>
         <span class="text-gray-700 group-hover:text-blue-600">
-                contract renewal letter
+                Contract renewal letter
         </span>
     </a>
     {% endif %}
@@ -340,7 +340,10 @@
             const sidebar = document.getElementById('sidebar');
             const iconShow = document.getElementById('iconShow');
             const iconHide = document.getElementById('iconHide');
+            const dropdownButton = document.getElementById("dropdownButton");
+            const dropdownMenu = document.getElementById("dropdownMenu");
 
+           
             // Check localStorage
             if (localStorage.getItem('sidebarHidden') === 'true') {
                 sidebar.classList.add('hidden');
@@ -360,6 +363,20 @@
                 // Update localStorage
                 localStorage.setItem('sidebarHidden', sidebar.classList.contains('hidden').toString());
             });
+
+
+             // Dropdown Menu
+             dropdownButton.addEventListener("click", function () {
+                dropdownMenu.classList.toggle("hidden");
+            });
+
+            // Close dropdown menu when clicking outside
+            document.addEventListener("click", function (event) {
+                if (!dropdownButton.contains(event.target)) {
+                    dropdownMenu.classList.add("hidden");
+                }
+            });
+
         });
     </script>
     

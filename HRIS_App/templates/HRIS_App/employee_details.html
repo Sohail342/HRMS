@@ -1,133 +1,140 @@
 {% extends "sidebar.html" %}
 
 {% block content %}
-<div class="container mx-auto p-4">
-    <h1 class="text-2xl font-semibold mb-4">{{ employee.full_name }}</h1>
+<div class="container mx-auto p-6">
+    <!-- Employee Name -->
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">{{ employee.full_name }}</h1>
 
-    <!-- Basic Info Table -->
-    <h2 class="text-xl font-semibold mt-6">Basic Information</h2>
-    <hr class="border-gray-300 mb-4">
-    <div class="overflow-x-auto">
-        <table class="min-w-full border-collapse border border-gray-400">
-            <thead>
-                <tr class="bg-gray-200">
-                    <th class="border border-gray-300 px-4 py-2 text-left">Attribute</th>
-                    <th class="border border-gray-300 px-4 py-2 text-left">Value</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="hover:bg-gray-100">
-                    <td class="border border-gray-300 px-4 py-2">CNIC</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ employee.cnic_no }}</td>
-                </tr>
-                <tr class="hover:bg-gray-100">
-                    <td class="border border-gray-300 px-4 py-2">SAP ID</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ employee.SAP_ID }}</td>
-                </tr>
-                <tr class="hover:bg-gray-100">
-                    <td class="border border-gray-300 px-4 py-2">Father/Husband Name</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ employee.husband_or_father_name }}</td>
-                </tr>
-                <tr class="hover:bg-gray-100">
-                    <td class="border border-gray-300 px-4 py-2">Date of Last Promotion</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ employee.date_of_last_promotion }}</td>
-                </tr>
-                <tr class="hover:bg-gray-100">
-                    <td class="border border-gray-300 px-4 py-2">Date Current Posting</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ employee.date_current_posting }}</td>
-                </tr>
-                <tr class="hover:bg-gray-100">
-                    <td class="border border-gray-300 px-4 py-2">Date Current Assignment</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ employee.date_current_assignment }}</td>
-                </tr>
-                <tr class="hover:bg-gray-100">
-                    <td class="border border-gray-300 px-4 py-2">Date of Retirement</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ employee.date_of_retirement }}</td>
-                </tr>
-            </tbody>
-        </table>
+    <!-- Section: Basic Info -->
+    <div class="mb-8">
+        <h2 class="text-2xl font-semibold text-gray-700 mb-2">Basic Information</h2>
+        <hr class="border-gray-300 mb-4">
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse bg-white rounded-lg shadow-lg overflow-hidden">
+                <thead>
+                    <tr class="bg-gray-100">
+                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">Attribute</th>
+                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">Value</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white">
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 text-sm text-gray-700">CNIC</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">{{ employee.cnic_no }}</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 text-sm text-gray-700">SAP ID</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">{{ employee.SAP_ID }}</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 text-sm text-gray-700">Father/Husband Name</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">{{ employee.husband_or_father_name }}</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 text-sm text-gray-700">Date of Last Promotion</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">{{ employee.date_of_last_promotion }}</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 text-sm text-gray-700">Date Current Posting</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">{{ employee.date_current_posting }}</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 text-sm text-gray-700">Date Current Assignment</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">{{ employee.date_current_assignment }}</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 text-sm text-gray-700">Date of Retirement</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">{{ employee.date_of_retirement }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    <!-- Contact Info Table -->
-    <h2 class="text-xl font-semibold mt-6">Contact Information</h2>
-    <hr class="border-gray-300 mb-4">
-    <div class="overflow-x-auto">
-        <table class="min-w-full border-collapse border border-gray-400">
-            <thead>
-                <tr class="bg-gray-200">
-                    <th class="border border-gray-300 px-4 py-2 text-left">Attribute</th>
-                    <th class="border border-gray-300 px-4 py-2 text-left">Value</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="hover:bg-gray-100">
-                    <td class="border border-gray-300 px-4 py-2">Mobile No</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ employee.mobile_no }}</td>
-                </tr>
-                <tr class="hover:bg-gray-100">
-                    <td class="border border-gray-300 px-4 py-2">Official Phone No</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ employee.phone_no_official }}</td>
-                </tr>
-                <tr class="hover:bg-gray-100">
-                    <td class="border border-gray-300 px-4 py-2">Emergency Contact No</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ employee.phone_no_emergency_contact }}</td>
-                </tr>
-                <tr class="hover:bg-gray-100">
-                    <td class="border border-gray-300 px-4 py-2">Email</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ employee.employee_email }}</td>
-                </tr>
-            </tbody>
-        </table>
+    <!-- Section: Contact Info -->
+    <div class="mb-8">
+        <h2 class="text-2xl font-semibold text-gray-700 mb-2">Contact Information</h2>
+        <hr class="border-gray-300 mb-4">
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse bg-white rounded-lg shadow-lg overflow-hidden">
+                <thead>
+                    <tr class="bg-gray-100">
+                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">Attribute</th>
+                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">Value</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white">
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 text-sm text-gray-700">Mobile No</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">{{ employee.mobile_no }}</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 text-sm text-gray-700">Official Phone No</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">{{ employee.phone_no_official }}</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 text-sm text-gray-700">Emergency Contact No</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">{{ employee.phone_no_emergency_contact }}</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 text-sm text-gray-700">Email</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">{{ employee.employee_email }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    <!-- Employment Details Table -->
-    <h2 class="text-xl font-semibold mt-6">Employment Details</h2>
-    <hr class="border-gray-300 mb-4">
-    <div class="overflow-x-auto">
-        <table class="min-w-full border-collapse border border-gray-400">
-            <thead>
-                <tr class="bg-gray-200">
-                    <th class="border border-gray-300 px-4 py-2 text-left">Attribute</th>
-                    <th class="border border-gray-300 px-4 py-2 text-left">Value</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="hover:bg-gray-100">
-                    <td class="border border-gray-300 px-4 py-2">Designation</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ employee.designation }}</td>
-                </tr>
-                <tr class="hover:bg-gray-100">
-                    <td class="border border-gray-300 px-4 py-2">Cadre</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ employee.cadre }}</td>
-                </tr>
-                <tr class="hover:bg-gray-100">
-                    <td class="border border-gray-300 px-4 py-2">Employee Type</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ employee.employee_type }}</td>
-                </tr>
-                <tr class="hover:bg-gray-100">
-                    <td class="border border-gray-300 px-4 py-2">Employee Grade</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ employee.employee_grade }}</td>
-                </tr>
-                <tr class="hover:bg-gray-100">
-                    <td class="border border-gray-300 px-4 py-2">Branch</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ employee.branch }}</td>
-                </tr>
-                <tr class="hover:bg-gray-100">
-                    <td class="border border-gray-300 px-4 py-2">Department</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ employee.department }}</td>
-                </tr>
-                <tr class="hover:bg-gray-100">
-                    <td class="border border-gray-300 px-4 py-2">Qualifications</td>
-                    <td class="border border-gray-300 px-4 py-2">
-                        {% for qualification in employee.qualifications.all %}
-                            {{ qualification }}{% if not forloop.last %}, {% endif %}
-                        {% endfor %}
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+    <!-- Section: Employment Details -->
+    <div class="mb-8">
+        <h2 class="text-2xl font-semibold text-gray-700 mb-2">Employment Details</h2>
+        <hr class="border-gray-300 mb-4">
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse bg-white rounded-lg shadow-lg overflow-hidden">
+                <thead>
+                    <tr class="bg-gray-100">
+                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">Attribute</th>
+                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">Value</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white">
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 text-sm text-gray-700">Designation</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">{{ employee.designation }}</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 text-sm text-gray-700">Cadre</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">{{ employee.cadre }}</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 text-sm text-gray-700">Employee Type</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">{{ employee.employee_type }}</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 text-sm text-gray-700">Employee Grade</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">{{ employee.employee_grade }}</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 text-sm text-gray-700">Branch</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">{{ employee.branch }}</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 text-sm text-gray-700">Department</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">{{ employee.department }}</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 text-sm text-gray-700">Qualifications</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">
+                            {% for qualification in employee.qualifications.all %}
+                                {{ qualification }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    <a href="{% url 'HRMS:employees_view' %}" class="mt-4 inline-block text-blue-600">Back to Employees List</a>
+    <a href="{% url 'HRMS:employees_view' %}" class="inline-block text-indigo-600 hover:underline mt-4">Back to Employees List</a>
 </div>
-{% endblock content %}
+{% endblock %}

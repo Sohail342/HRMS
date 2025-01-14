@@ -1,70 +1,77 @@
 {% extends "sidebar.html" %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
-    <h2 class="text-2xl font-semibold mb-6 text-gray-800">Non-Involvement Certificate Application</h2>
+<div class="max-w-3xl mx-auto p-8 bg-white rounded-2xl shadow-lg mt-10 border border-gray-200">
+    <h2 class="text-3xl font-bold text-center text-blue-600 mb-8">Non-Involvement Certificate Application</h2>
     
     <!-- Form -->
-    <form action="#" method="POST" class="space-y-6" enctype="multipart/form-data">
+    <form action="#" method="POST" enctype="multipart/form-data" class="space-y-6">
         {% csrf_token %}
         
-        <!-- Employee Information -->
-        <div class="flex flex-col">
-            <label for="employee_name" class="mb-2 text-sm font-medium text-gray-600">Employee Name</label>
-            <input 
-                type="text" 
-                id="employee_name" 
-                name="employee_name" 
-                value="{{ employee_name }}" 
-                class="block w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-700"
-                readonly
-            >
-        </div>
+        <!-- Employee Information Section -->
+        <div>
+            <h3 class="text-lg font-semibold text-gray-700 mb-4">Employee Information</h3>
+            
+            <!-- Employee Name -->
+            <div class="flex flex-col mb-4">
+                <label for="employee_name" class="mb-2 text-sm font-medium text-gray-600">Employee Name</label>
+                <input 
+                    type="text" 
+                    id="employee_name" 
+                    name="employee_name" 
+                    value="{{ employee_name }}" 
+                    class="block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400" 
+                    readonly
+                >
+            </div>
 
-        <div class="flex flex-col">
-            <label for="employee_id" class="mb-2 text-sm font-medium text-gray-600">Employee ID</label>
-            <input 
-                type="text" 
-                id="employee_id" 
-                name="employee_id" 
-                value="{{ employee_id }}" 
-                class="block w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-700"
-                readonly
-            >
+            <!-- Employee ID -->
+            <div class="flex flex-col">
+                <label for="employee_id" class="mb-2 text-sm font-medium text-gray-600">Employee ID</label>
+                <input 
+                    type="text" 
+                    id="employee_id" 
+                    name="employee_id" 
+                    value="{{ employee_id }}" 
+                    class="block w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400" 
+                    readonly
+                >
+            </div>
         </div>
 
         <!-- Date of Request -->
-        <div class="flex flex-col">
-            <label for="request_date" class="mb-2 text-sm font-medium text-gray-600">Date of Request</label>
+        <div>
+            <label for="request_date" class="block mb-2 text-sm font-medium text-gray-600">Date of Request</label>
             <input 
                 type="date" 
                 id="request_date" 
                 name="request_date" 
-                class="block w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                class="block w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400" 
                 required
             >
         </div>
 
         <!-- Reason for Non-Involvement -->
-        <div class="flex flex-col">
-            <label for="reason" class="mb-2 text-sm font-medium text-gray-600">Reason for Non-Involvement</label>
+        <div>
+            <label for="reason" class="block mb-2 text-sm font-medium text-gray-600">Reason for Non-Involvement</label>
             <textarea 
                 id="reason" 
                 name="reason" 
                 rows="4" 
-                class="block w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                required
+                class="block w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400" 
+                required 
+                placeholder="Provide a detailed reason..."
             ></textarea>
         </div>
 
         <!-- Supporting Documents -->
-        <div class="flex flex-col">
-            <label for="supporting_docs" class="mb-2 text-sm font-medium text-gray-600">Supporting Documents (Optional)</label>
+        <div>
+            <label for="supporting_docs" class="block mb-2 text-sm font-medium text-gray-600">Supporting Documents (Optional)</label>
             <input 
                 type="file" 
                 id="supporting_docs" 
                 name="supporting_docs" 
-                class="block w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                class="block w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
             >
         </div>
 
@@ -72,7 +79,7 @@
         <div class="flex justify-end">
             <button 
                 type="submit" 
-                class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                class="px-8 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold rounded-lg hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
             >
                 Submit Application
             </button>

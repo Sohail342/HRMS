@@ -1,18 +1,17 @@
 {% extends "sidebar.html" %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
-    <h2 class="text-2xl font-semibold mb-6 text-gray-800">Upload Educational Documents</h2>
-
+<div class="max-w-4xl mx-auto p-8 bg-white rounded-lg shadow-lg mt-10 border border-gray-200">
+    <h2 class="text-3xl font-bold text-blue-600 mb-8 text-center">Upload Educational Documents</h2>
 
     <!-- Note about file type restriction -->
-    <div class="bg-yellow-100 border-l-4 border-yellow-400 p-4 mb-6 text-yellow-800">
-        <p class="font-medium">Note: Only PDF files are allowed for upload.</p>
+    <div class="bg-yellow-100 border-l-4 border-yellow-400 p-4 mb-6 text-yellow-800 rounded-md">
+        <p class="font-medium"><strong>Note:</strong> Only PDF files are allowed for upload. Ensure the file size does not exceed 5MB.</p>
     </div>
-    
+
     <!-- Notifications -->
     {% if messages %}
-        <div class="my-4 space-y-2">
+        <div class="space-y-4 mb-6">
             {% for message in messages %}
                 <div class="p-4 rounded-md shadow-sm 
                     {% if message.tags == 'success' %}
@@ -22,31 +21,55 @@
                     {% else %}
                         bg-gray-100 border border-gray-300 text-gray-700
                     {% endif %}">
-                    <p class="font-medium">{{ message }}</p>
-                    </div>
-                {% endfor %}
+                    <p class="font-semibold">{{ message }}</p>
+                </div>
+            {% endfor %}
         </div>
     {% endif %}
 
-
-    <form action="{% url 'employee_attendance:upload_education_documents' request.user.SAP_ID %}" method="POST" enctype="multipart/form-data" class="space-y-6">
+    <!-- Form -->
+    <form 
+        action="{% url 'employee_attendance:upload_education_documents' request.user.SAP_ID %}" 
+        method="POST" 
+        enctype="multipart/form-data" 
+        class="space-y-6"
+    >
         {% csrf_token %}
         
         <!-- Document Type -->
-        <div class="mb-4">
+        <div>
             <label for="document_type" class="block text-sm font-medium text-gray-600">Document Type</label>
-            <input type="text" name="document_type" id="document_type" class="mt-2 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Enter document type" value="">
+            <input 
+                type="text" 
+                id="document_type" 
+                name="document_type" 
+                class="mt-2 block w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400" 
+                placeholder="Enter document type (e.g., Transcript, Certificate)" 
+                required
+            >
         </div>
 
         <!-- Document File Upload -->
-        <div class="mb-4">
+        <div>
             <label for="document" class="block text-sm font-medium text-gray-600">Select Document</label>
-            <input type="file" name="document" id="document" class="mt-2 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            <input 
+                type="file" 
+                id="document" 
+                name="document" 
+                class="mt-2 block w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400" 
+                accept=".pdf" 
+                required
+            >
         </div>
 
         <!-- Submit Button -->
         <div class="flex justify-end">
-            <button type="submit" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">Upload</button>
+            <button 
+                type="submit" 
+                class="px-8 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold rounded-lg hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            >
+                Upload
+            </button>
         </div>
     </form>
 </div>
