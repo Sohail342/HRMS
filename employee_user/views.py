@@ -297,6 +297,13 @@ def submit_form_data(request):
 
 # Display Overall KPIS Result
 def overall_kpi_result(request):
+    
+    # Final form scores
+    ricp_form_final_score = 0
+    customer_form_final_score = 0
+    financials_form_final_score = 0
+    learning_growth_form_final_score = 0
+    
     try:
         employee = Employee.objects.get(SAP_ID=request.user.SAP_ID)
         ricp_data = RicpData.objects.get(employee=employee)
@@ -319,7 +326,21 @@ def overall_kpi_result(request):
         for form in ricp_data:
             form_final_scores[form["bsc_form_type"]] = RicpKPI.objects.filter(ricp_data__employee=employee, bsc_form_type=form["bsc_form_type"]).last().form_final_score
         
-
+    
+        for value in ricp_kpis:
+            ricp_form_final_score = value.form_final_score 
+            
+        for value in financials_kpis:
+            financials_form_final_score = value.form_final_score
+            
+        for value in customer_kpis:
+            customer_form_final_score = value.form_final_score
+            
+        for value in learning_growth_kpis:
+            learning_growth_form_final_score = value.form_final_score
+            
+            
+            
         # Sum the all form final scores
         total_score = sum(form_final_scores.values())
 
@@ -346,6 +367,10 @@ def overall_kpi_result(request):
 
 
     context = {
+        "ricp_form_final_score": ricp_form_final_score,
+        "customer_form_final_score": customer_form_final_score,
+        "financials_form_final_score": financials_form_final_score,
+        "learning_growth_form_final_score": learning_growth_form_final_score,
         "ricp_kpis": ricp_kpis,
         "financials_kpis": financials_kpis,
         "customer_kpis": customer_kpis,
@@ -355,3 +380,43 @@ def overall_kpi_result(request):
     }
     
     return render(request, 'employee_user/overall_kpi_result.html', context)
+
+
+def update_kpis(request, form_type):
+    kpis = []
+    employee = request.user
+    ricp_data = RicpData.objects.get(employee=employee)
+    
+    if form_type == "ricp":
+        kpis = RicpKPI.objects.filter(ricp_data=ricp_data, bsc_form_type="RICP")
+    if form_type == "customer_kpi":
+        kpis = RicpKPI.objects.filter(ricp_data=ricp_data, bsc_form_type="customer_kpi")
+    elif form_type == "financials_kpi":
+        kpis = RicpKPI.objects.filter(ricp_data=ricp_data, bsc_form_type="financials_kpi")
+    elif form_type == "learning_growth_kpi":
+        kpis = RicpKPI.objects.filter(ricp_data=ricp_data, bsc_form_type="learning_Growth_kpi")
+        
+    from icecream import ic
+    for i in kpis:
+        ic(i.id)
+    
+    if request.method == "POST":
+        for kpi in kpis:
+            kpi.kpi = request.POST.get(f'kpi_{kpi.id}', kpi.kpi)
+            kpi.achievement = request.POST.get(f'achievement_{kpi.id}', kpi.achievement)
+            kpi.target_date = request.POST.get(f'target_date_{kpi.id}', kpi.target_date)
+            kpi.score = request.POST.get(f'score_{kpi.id}', kpi.score)
+            kpi.save()
+        messages.success(request, "KPIs updated successfully!")
+        return redirect('employee_user:update_kpis', form_type=form_type)
+
+    return render(request, 'employee_user/update_kpis.html', {"ricp_kpis": kpis, "form_type": form_type})
+
+
+def delete_kpi(request, kpi_id, form_type):
+    
+    kpi = RicpKPI.objects.get(id=kpi_id)
+    kpi.delete()
+    messages.success(request, "KPI deleted successfully!")
+    return redirect('employee_user:update_kpis', form_type=form_type)
+

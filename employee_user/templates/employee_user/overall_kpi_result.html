@@ -2,11 +2,14 @@
 
 {% block content %}
 <div id="invoice">
+    <div class="bg-white shadow-md rounded-lg p-6 text-center text-lg font-bold text-gray-800 mb-2">
+      Review your submitted KPIs
+    </div>
     <div class="bg-gray-100">
       <div class="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6" id="formContent">
 
         <h2 class="text-lg font-bold text-gray-800 mb-2">
-          Risk, Internal Controls & Processes
+          Risk, Internal Controls & Processes <a href="{% url 'employee_user:update_kpis' 'ricp' %}" class="text-blue-500 text-sm">Edit</a>
         </h2>
         <p class="text-sm text-gray-600 mb-4">
           How I will improve productivity, quality, and speed of service while adhering strictly to the Bank’s regulation and processes?
@@ -31,10 +34,10 @@
               <tr>
                 <td class="border border-gray-300 px-4 py-2 text-center">{{ forloop.counter }}</td>
                 <td class="border border-gray-300 px-4 py-2">
-                  <textarea class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" value="{{ kpi.kpi }}" placeholder="Enter KPI" required>{{ kpi.kpi }}</textarea>
+                  <textarea readonly class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" value="{{ kpi.kpi }}" placeholder="Enter KPI" required>{{ kpi.kpi }}</textarea>
                 </td>
                 <td class="border border-gray-300 px-4 py-2">
-                  <textarea class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" placeholder="Enter Achievement" required>{{ kpi.achievement }}</textarea>
+                  <textarea readonly class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" placeholder="Enter Achievement" required>{{ kpi.achievement }}</textarea>
                 </td>
                 {% if kpi.weightage %}
                   <td class="border border-gray-300 px-4 py-2 text-center">{{ kpi.weightage }}<span></span></td>
@@ -42,28 +45,20 @@
                   <td class="border border-gray-300 px-4 py-2 text-center"></td>
                 {% endif %}
                 <td class="border border-gray-300 px-4 py-2">
-                  <input type="date" class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" value="{{ kpi.target_date|date:'Y-m-d' }}" required>
+                  <input readonly type="date" class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" value="{{ kpi.target_date|date:'Y-m-d' }}" required>
                 </td>
-                <td class="border border-gray-300 px-4 py-2 score">
-                  <select class="border border-gray-300 rounded px-2 py-1 w-24" required>
-                    <option value=""></option>
-                    <option value="5" {% if kpi.score == 5 %}selected{% endif %}>5</option>
-                    <option value="4" {% if kpi.score == 4 %}selected{% endif %}>4</option>
-                    <option value="3" {% if kpi.score == 3 %}selected{% endif %}>3</option>
-                    <option value="2" {% if kpi.score == 2 %}selected{% endif %}>2</option>
-                    <option value="1" {% if kpi.score == 1 %}selected{% endif %}>1</option>
-                    <option value="0" {% if kpi.score == 0 %}selected{% endif %}>0</option>
-                  </select>
+                <td class="border border-gray-300 px-4 py-2">
+                  <input readonly type="text" class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" value="{{ kpi.score }}" required>
                 </td>
               </tr>
               {% endfor %}
             </tbody>
             <tfoot class="bg-gray-100">
               <tr>
-                <td colspan="5"></td>
+                <td colspan="5" class="border border-gray-300 px-4 py-2 text-left w-2/5"><b>Total score for Risk, Internal Controls & Processes</b></td>
                 <td class="border border-gray-300 px-4 py-2 text-center">
                   <p class="mt-4 text-lg font-semibold">
-                    <span id="finalScore"></span>
+                    <span id="finalScore">{{ricp_form_final_score}}</span>
                   </p>
                 </td>
               </tr>
@@ -78,7 +73,7 @@
         <div class="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6" id="formContent">
 
             <h2 class="text-lg font-bold text-gray-800 mb-2">
-              Customers KPIs
+              Customers KPIs <a href="{% url 'employee_user:update_kpis' 'customer_kpi' %}" class="text-blue-500 text-sm">Edit</a>
             </h2>
             <p  class="text-sm text-gray-600 mb-4">
               How I will contribute in providing the highest levels of Customer Service, both internally and externally?
@@ -103,10 +98,10 @@
                 <tr>
                   <td class="border border-gray-300 px-4 py-2 text-center">{{ forloop.counter }}</td>
                   <td class="border border-gray-300 px-4 py-2">
-                    <textarea class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" value="{{ kpi.kpi }}" placeholder="Enter KPI" required>{{ kpi.kpi }}</textarea>
+                    <textarea readonly class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" value="{{ kpi.kpi }}" placeholder="Enter KPI" required>{{ kpi.kpi }}</textarea>
                   </td>
                   <td class="border border-gray-300 px-4 py-2">
-                    <textarea class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" placeholder="Enter Achievement" required>{{ kpi.achievement }}</textarea>
+                    <textarea readonly class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" placeholder="Enter Achievement" required>{{ kpi.achievement }}</textarea>
                   </td>
                   {% if kpi.weightage %}
                     <td class="border border-gray-300 px-4 py-2 text-center">{{ kpi.weightage }}<span></span></td>
@@ -114,28 +109,20 @@
                     <td class="border border-gray-300 px-4 py-2 text-center"></td>
                   {% endif %}
                   <td class="border border-gray-300 px-4 py-2">
-                    <input type="date" class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" value="{{ kpi.target_date|date:'Y-m-d' }}" required>
+                    <input readonly type="date" class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" value="{{ kpi.target_date|date:'Y-m-d' }}" required>
                   </td>
-                  <td class="border border-gray-300 px-4 py-2 score">
-                    <select class="border border-gray-300 rounded px-2 py-1 w-24" required>
-                      <option value=""></option>
-                      <option value="5" {% if kpi.score == 5 %}selected{% endif %}>5</option>
-                      <option value="4" {% if kpi.score == 4 %}selected{% endif %}>4</option>
-                      <option value="3" {% if kpi.score == 3 %}selected{% endif %}>3</option>
-                      <option value="2" {% if kpi.score == 2 %}selected{% endif %}>2</option>
-                      <option value="1" {% if kpi.score == 1 %}selected{% endif %}>1</option>
-                      <option value="0" {% if kpi.score == 0 %}selected{% endif %}>0</option>
-                    </select>
-                  </td>
+                  <td class="border border-gray-300 px-4 py-2">
+                  <input readonly type="text" class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" value="{{ kpi.score }}" required>
+                </td>
                 </tr>
                 {% endfor %}
               </tbody>
               <tfoot class="bg-gray-100">
                 <tr>
-                  <td colspan="5"></td>
+                  <td colspan="5" class="border border-gray-300 px-4 py-2 text-left w-2/5"><b>Total score for Customers KPIs</b></td>
                   <td class="border border-gray-300 px-4 py-2 text-center">
                     <p class="mt-4 text-lg font-semibold">
-                      <span id="finalScore"></span>
+                      <span id="finalScore">{{customer_form_final_score}}</span>
                     </p>
                   </td>
                 </tr>
@@ -150,7 +137,7 @@
         <div class="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6" id="formContent">
 
           <h2 class="text-lg font-bold text-gray-800 mb-2">
-            Financials KPIs
+            Financials KPIs <a href="{% url 'employee_user:update_kpis' 'financials_kpi' %}" class="text-blue-500 text-sm">Edit</a>
           </h2>
           <p class="text-sm text-gray-600 mb-4">
             How will I achieve the financial results to meet the overall objectives of the Bank?     
@@ -175,10 +162,10 @@
                 <tr>
                   <td class="border border-gray-300 px-4 py-2 text-center">{{ forloop.counter }}</td>
                   <td class="border border-gray-300 px-4 py-2">
-                    <textarea class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" value="{{ kpi.kpi }}" placeholder="Enter KPI" required>{{ kpi.kpi }}</textarea>
+                    <textarea readonly class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" value="{{ kpi.kpi }}" placeholder="Enter KPI" required>{{ kpi.kpi }}</textarea>
                   </td>
                   <td class="border border-gray-300 px-4 py-2">
-                    <textarea class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" placeholder="Enter Achievement" required>{{ kpi.achievement }}</textarea>
+                    <textarea readonly class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" placeholder="Enter Achievement" required>{{ kpi.achievement }}</textarea>
                   </td>
                   {% if kpi.weightage %}
                     <td class="border border-gray-300 px-4 py-2 text-center">{{ kpi.weightage }}<span></span></td>
@@ -186,28 +173,20 @@
                     <td class="border border-gray-300 px-4 py-2 text-center"></td>
                   {% endif %}
                   <td class="border border-gray-300 px-4 py-2">
-                    <input type="date" class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" value="{{ kpi.target_date|date:'Y-m-d' }}" required>
+                    <input readonly type="date" class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" value="{{ kpi.target_date|date:'Y-m-d' }}" required>
                   </td>
-                  <td class="border border-gray-300 px-4 py-2 score">
-                    <select class="border border-gray-300 rounded px-2 py-1 w-24" required>
-                      <option value=""></option>
-                      <option value="5" {% if kpi.score == 5 %}selected{% endif %}>5</option>
-                      <option value="4" {% if kpi.score == 4 %}selected{% endif %}>4</option>
-                      <option value="3" {% if kpi.score == 3 %}selected{% endif %}>3</option>
-                      <option value="2" {% if kpi.score == 2 %}selected{% endif %}>2</option>
-                      <option value="1" {% if kpi.score == 1 %}selected{% endif %}>1</option>
-                      <option value="0" {% if kpi.score == 0 %}selected{% endif %}>0</option>
-                    </select>
-                  </td>
+                  <td class="border border-gray-300 px-4 py-2">
+                  <input readonly type="text" class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" value="{{ kpi.score }}" required>
+                </td>
                 </tr>
                 {% endfor %}
               </tbody>
               <tfoot class="bg-gray-100">
                 <tr>
-                  <td colspan="5"></td>
+                  <td colspan="5" class="border border-gray-300 px-4 py-2 text-left w-2/5"><b>Total score for Financials KPIs</b></td>
                   <td class="border border-gray-300 px-4 py-2 text-center">
                     <p class="mt-4 text-lg font-semibold">
-                      <span id="finalScore"></span>
+                      <span id="finalScore">{{financials_form_final_score}}</span>
                     </p>
                   </td>
                 </tr>
@@ -222,7 +201,7 @@
         <div class="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6" id="formContent">
       
           <h2 class="text-lg font-bold text-gray-800 mb-2">
-            Learning & Growth KPIs
+            Learning & Growth KPIs <a href="{% url 'employee_user:update_kpis' 'learning_growth_kpi' %}" class="text-blue-500 text-sm">Edit</a>
           </h2>
           <p class="text-sm text-gray-600 mb-4">
             How I will sustain future performance, creating an environment of continuous improvement and contributing towards personal and team’s development?
@@ -247,10 +226,10 @@
                 <tr>
                   <td class="border border-gray-300 px-4 py-2 text-center">{{ forloop.counter }}</td>
                   <td class="border border-gray-300 px-4 py-2">
-                    <textarea class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" value="{{ kpi.kpi }}" placeholder="Enter KPI" required>{{ kpi.kpi }}</textarea>
+                    <textarea readonly class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" value="{{ kpi.kpi }}" placeholder="Enter KPI" required>{{ kpi.kpi }}</textarea>
                   </td>
                   <td class="border border-gray-300 px-4 py-2">
-                    <textarea class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" placeholder="Enter Achievement" required>{{ kpi.achievement }}</textarea>
+                    <textarea readonly class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" placeholder="Enter Achievement" required>{{ kpi.achievement }}</textarea>
                   </td>
                   {% if kpi.weightage %}
                     <td class="border border-gray-300 px-4 py-2 text-center">{{ kpi.weightage }}<span></span></td>
@@ -258,28 +237,20 @@
                     <td class="border border-gray-300 px-4 py-2 text-center"></td>
                   {% endif %}
                   <td class="border border-gray-300 px-4 py-2">
-                    <input type="date" class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" value="{{ kpi.target_date|date:'Y-m-d' }}" required>
+                    <input readonly type="date" class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" value="{{ kpi.target_date|date:'Y-m-d' }}" required>
                   </td>
-                  <td class="border border-gray-300 px-4 py-2 score">
-                    <select class="border border-gray-300 rounded px-2 py-1 w-24" required>
-                      <option value=""></option>
-                      <option value="5" {% if kpi.score == 5 %}selected{% endif %}>5</option>
-                      <option value="4" {% if kpi.score == 4 %}selected{% endif %}>4</option>
-                      <option value="3" {% if kpi.score == 3 %}selected{% endif %}>3</option>
-                      <option value="2" {% if kpi.score == 2 %}selected{% endif %}>2</option>
-                      <option value="1" {% if kpi.score == 1 %}selected{% endif %}>1</option>
-                      <option value="0" {% if kpi.score == 0 %}selected{% endif %}>0</option>
-                    </select>
-                  </td>
+                  <td class="border border-gray-300 px-4 py-2">
+                  <input readonly type="text" class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" value="{{ kpi.score }}" required>
+                </td>
                 </tr>
                 {% endfor %}
               </tbody>
               <tfoot class="bg-gray-100">
                 <tr>
-                  <td colspan="5"></td>
+                  <td colspan="5" class="border border-gray-300 px-4 py-2 text-left w-2/5"><b>Total score for Learning & Growth KPIs</b></td>
                   <td class="border border-gray-300 px-4 py-2 text-center">
                     <p class="mt-4 text-lg font-semibold">
-                      <span id="finalScore"></span>
+                      <span id="finalScore">{{learning_growth_form_final_score}}</span>
                     </p>
                   </td>
                 </tr>
@@ -306,25 +277,25 @@
                 </div>
 
                 <div class="space-y-8 mt-8">
-                    <h2 class="text-xl font-semibold text-gray-800 border-b pb-3">Agreement Details</h2>
+                    {% comment %} <h2 class="text-xl font-semibold text-gray-800 border-b pb-3">Agreement Details</h2> {% endcomment %}
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                         
-                            <h4 class="text-xl font-semibold text-gray-800 border-b mt-4 pb-1">Agreed</h4>
+                            <h4 class="text-xl font-semibold text-gray-800 border-b mt-4 pb-1">Agreed for APA?</h4>
                             <select id="agreement_status" name="agreement_status" class="w-full mt-3 px-4 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="" disabled selected>Select an option</option>
                                 <option value="agreed">Agreed</option>
                                 <option value="disagreed">Disagreed</option>
                             </select>
                         
-                        <div>
+                        {% comment %} <div>
                             <label class="block text-sm text-gray-600 font-medium">1st Appraiser Name & Signature:</label>
                             <div class="border-b border-gray-400 mt-4"></div>
                         </div>
                         <div>
                             <label class="block text-sm text-gray-600 font-medium">2nd Appraiser Name & Signature:</label>
                             <div class="border-b border-gray-400 mt-4"></div>
-                        </div>
+                        </div> {% endcomment %}
                     </div>
                 </div>
 

@@ -137,55 +137,78 @@
   }
 
   // Function to add a new row dynamically
-  let rowCount = 2;
-  function addRow() {
-    const row = document.createElement("tr");
-    const weightage = rowCount === 1 
-      ? '<td class="border border-gray-300 px-4 py-2 text-center">25<span>%</span></td>' 
-      : '<td class="border border-gray-300 px-4 py-2 w-11 text-center"></td>';
+let rowCount = 2;
+function addRow() {
+  const row = document.createElement("tr");
+  const weightage = rowCount === 1 
+    ? '<td class="border border-gray-300 px-4 py-2 text-center">25<span>%</span></td>' 
+    : '<td class="border border-gray-300 px-4 py-2 w-11 text-center"></td>';
 
-    row.innerHTML = `
-      <td class="border border-gray-300 px-4 py-2 text-center">${rowCount}</td>
-      <td class="border border-gray-300 px-4 py-2">
-        <textarea 
-          class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" 
-          placeholder="Enter KPI" required></textarea>
-      </td>
-      <td class="border border-gray-300 px-4 py-2">
-        <textarea 
-          class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" 
-          placeholder="Enter Achievement" required></textarea>
-      </td>
-      ${weightage}
-      <td class="border border-gray-300 px-4 py-2">
-        <input 
-          type="date" class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" 
-          placeholder="Enter Target Date" required></input>
-      </td>
-      <td class="border border-gray-300 px-4 py-2 score" >
-        <select class="border border-gray-300 rounded px-2 py-1 w-24" required>
-          <option value=""></option>
-          <option value="5">5</option>
-          <option value="4">4</option>
-          <option value="3">3</option>
-          <option value="2">2</option>
-          <option value="1">1</option>
-          <option value="0">0</option>
-        </select>
-      </td>
-    `;
+  row.innerHTML = `
+    <td class="border border-gray-300 px-4 py-2 text-center">${rowCount}</td>
+    <td class="border border-gray-300 px-4 py-2">
+      <textarea 
+        class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" 
+        placeholder="Enter KPI" required></textarea>
+    </td>
+    <td class="border border-gray-300 px-4 py-2">
+      <textarea 
+        class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" 
+        placeholder="Enter Achievement" required></textarea>
+    </td>
+    ${weightage}
+    <td class="border border-gray-300 px-4 py-2">
+      <input 
+        type="date" class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" 
+        placeholder="Enter Target Date" required></input>
+    </td>
+    <td class="border border-gray-300 px-4 py-2 score" >
+      <select class="border border-gray-300 rounded px-2 py-1 w-24" required>
+        <option value=""></option>
+        <option value="5">5</option>
+        <option value="4">4</option>
+        <option value="3">3</option>
+        <option value="2">2</option>
+        <option value="1">1</option>
+        <option value="0">0</option>
+      </select>
+    </td>
+    <td class="border border-gray-300 px-4 py-2 text-center">
+      <button type="button" class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 delete-btn">
+        Delete
+      </button>
+    </td>
+  `;
 
-    document.getElementById("dynamicRows").appendChild(row);
+  const tbody = document.getElementById("dynamicRows");
+  tbody.appendChild(row);
 
-    rowCount++;
+  rowCount++;
 
-    // Attach resize handler to new textareas
-    row.querySelectorAll(".dynamic-textarea").forEach((textarea) => attachAutoResizeTextarea(textarea));
+  // Attach resize handler to new textareas
+  row.querySelectorAll(".dynamic-textarea").forEach((textarea) => attachAutoResizeTextarea(textarea));
 
-    const newSelect = row.querySelector(".score select");
-    newSelect.addEventListener("change", calculateFinalScore);
-    calculateFinalScore();
-  }
+  // Attach change event listener to the select element
+  const newSelect = row.querySelector(".score select");
+  newSelect.addEventListener("change", calculateFinalScore);
+  calculateFinalScore();
+
+  // Attach click event listener to the delete button
+  const deleteBtn = row.querySelector(".delete-btn");
+  deleteBtn.addEventListener("click", () => {
+    tbody.removeChild(row);
+    recalculateRowNumbers();
+  });
+}
+
+// Function to recalculate row numbers
+function recalculateRowNumbers() {
+  const rows = document.querySelectorAll("#dynamicRows tr");
+  rowCount = 1; // Reset row count
+  rows.forEach((row, index) => {
+    row.children[0].textContent = index + 1; // Update row number
+  });
+}
 
   // Function to calculate the final score
   function calculateFinalScore() {
