@@ -158,12 +158,19 @@ def dashboard_view(request):
     sick_leaves = LeaveApplication.objects.filter(employee=request.user, application_type='Sick').values('availed_leaves')
     sick_leaves_count = sum(item['availed_leaves'] for item in sick_leaves)
     remaining_sick_leaves = 18 - sick_leaves_count
-
-    pending_count = LeaveApplication.objects.filter(employee=request.user, status='Pending').count()
+    
+    pending_count = LeaveApplication.objects.filter(employee=request.user, status='pending').count()
     approved_count = LeaveApplication.objects.filter(employee=request.user, status='approved').count()
     declined_count = LeaveApplication.objects.filter(employee=request.user, status='declined').count()
-
-
+    
+    pending_requests = LeaveApplication.objects.filter(employee=request.user, status='pending')
+    approved_requests = LeaveApplication.objects.filter(employee=request.user, status='approved')
+    declined_requests = LeaveApplication.objects.filter(employee=request.user, status='declined')
+    
+    approved_requests_list = list(approved_requests.values('application_type', 'from_date', 'to_date', 'reason'))
+    pending_requests_list = list(pending_requests.values('application_type', 'from_date', 'to_date','reason'))
+    declined_requests_list = list(declined_requests.values('application_type', 'from_date', 'to_date','reason'))
+    
     
     content = {
         "user_type":str(user_type),
@@ -175,11 +182,15 @@ def dashboard_view(request):
         
         'sick_leaves': sick_leaves_count,
         'remaining_sick_leaves':remaining_sick_leaves,
-
+        
         'pending_count': pending_count,
         'approved_count': approved_count,
         'declined_count': declined_count,
-
+        
+        'pending_requests': pending_requests_list,
+        'approved_requests': approved_requests_list,
+        'declined_requests': declined_requests_list,
+        
     }
     return render(request, 'employee_attendance/permanent_leave_dashboard.html', content)
 
