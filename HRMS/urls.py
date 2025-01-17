@@ -1,6 +1,5 @@
 from django.contrib import admin
-from django.urls import path, include, re_path
-from employee_attendance.consumers import LeaveNotificationConsumer
+from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -14,8 +13,4 @@ urlpatterns = [
     path('', include("group_head.urls")),
     path('', include("employee_user.urls")),
     path('', include("employee_attendance.urls")),
-]
-
-websocket_urlpatterns = [
-    re_path(r'ws/notifications/$', LeaveNotificationConsumer.as_asgi()),
 ]

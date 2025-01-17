@@ -407,13 +407,6 @@
             dropdownMenu.classList.add('hidden');
         }
     });
-
-    const socket = new WebSocket('ws://' + window.location.host + '/ws/notifications/');
-
-    socket.onmessage = function(event) {
-        const data = JSON.parse(event.data);
-        alert(`${data.title}\n${data.content}`);
-    };
     
     </script>
     <!--PDF Scrips-->

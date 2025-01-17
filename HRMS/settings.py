@@ -50,7 +50,6 @@ INSTALLED_APPS = [
     'import_export',
     "widget_tweaks",
     'cloudinary',
-    'channels',
     
     # project apps
     'HRIS_App',
@@ -94,12 +93,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'HRMS.wsgi.application'
-
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',
-    },
-}
 
 
 # Database
