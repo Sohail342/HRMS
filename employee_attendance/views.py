@@ -1,14 +1,80 @@
 from django.shortcuts import render, redirect
 from group_head.decorators import employee_user_required 
-from .models import ContractualLeaveRecord, ContractRenewal, LeaveRecordPremanent
+from .models import ContractualLeaveRecord, ContractRenewal, LeaveRecordPremanent, LeaveApplication
 from django.contrib import messages
 from django.http import Http404
 from .forms import EducationalDocumentForm, NonInvolvementCertificateForm, StationaryRequestForm, ContractualLeaveApplicationForm
 from .forms import PermanentLeaveApplicationForm, ContractualLeaveApplicationForm, PermanentLeaveApplicationForm
 from django.shortcuts import get_object_or_404
-from django.db import models
 from datetime import datetime
+from HRIS_App.models import Employee
 
+
+def leave_management_dashboard(request):
+    # Summary Statistics
+    total_employees = Employee.objects.count()
+    total_leave_requests = LeaveApplication.objects.count()
+    pending_approvals = LeaveApplication.objects.filter(status="pending").count()
+    
+
+    # Leave Requests
+    
+    leave_requests = LeaveApplication.objects.all()
+
+    # Adding CSS classes for status
+    for leave in leave_requests:
+        if leave.status == "Pending":
+            leave.status_class = "bg-yellow-100 text-yellow-700"
+        elif leave.status == "Approved":
+            leave.status_class = "bg-green-100 text-green-700"
+        elif leave.status == "Declined":
+            leave.status_class = "bg-red-100 text-red-700"
+        else:
+            leave.status_class = "bg-gray-100 text-gray-700"
+
+    # Employee Leave Balances
+    employees = Employee.objects.all()
+
+    context = {
+        'total_employees': total_employees,
+        'total_leave_requests': total_leave_requests,
+        'pending_approvals': pending_approvals,
+        'leave_requests': leave_requests,
+        'employees': employees,
+    }
+    return render(request, "employee_attendance/leave_management_dashboard.html", context)
+
+def approve_leave(request, pk):
+    leave_application = get_object_or_404(LeaveApplication, pk=pk)
+    if leave_application.status == "Pending":
+        leave_application.status = "Approved"
+        leave_application.save()
+        messages.success(request, f"Leave for {leave_application.employee.name} approved.")
+    else:
+        messages.error(request, "This leave application cannot be approved.")
+    return redirect('leave_management_dashboard')
+
+
+
+def decline_leave(request, pk):
+    leave_application = get_object_or_404(LeaveApplication, pk=pk)
+    if leave_application.status == "Pending":
+        leave_application.status = "Declined"
+        leave_application.save()
+        messages.success(request, f"Leave for {leave_application.employee.name} declined.")
+    else:
+        messages.error(request, "This leave application cannot be declined.")
+    return redirect('employee_attendance:leave_management_dashboard')
+
+
+
+def status_approval(request, request_id, status):
+    user = LeaveApplication.objects.get(id=request_id)
+    if status:
+        user.status = status
+        user.save()
+        messages.success(request, "Status updated")
+    return redirect("employee_attendance:leave_management_dashboard")
 
 #------------- Non-Involvement Certificate Request -------------
 
@@ -134,71 +200,6 @@ def stationaryrequests(request):
     return render(request, 'employee_attendance/stationary_request.html', {'form': form})
 
 
-
-#---------------------- Leave Application -----------------------
-    
-# def permanent_leave_dashboard(request):
-#     if request.method == 'POST':
-#         form = PermanentLeaveApplicationForm(request.POST)
-#         if form.is_valid():
-#             leave_application = form.save(commit=False)
-#             leave_application.employee = request.user  # Assuming the logged-in user is the employee
-#             leave_application.save()
-#             return redirect('leave_application_success')
-#     else:
-#         form = PermanentLeaveApplicationForm()
-
-#     return render(request, 'employee_attendance/permanent_leave_dashboard.html', {'form': form,})
-    
-# def contractual_leave_dashboard(request):
-#     casual_leave_record = ContractualLeaveRecord.objects.filter(
-#         employee=request.user, leave_type__name="Casual"
-#     ).first()
-#     sick_leave_record = ContractualLeaveRecord.objects.filter(
-#         employee=request.user, leave_type__name="Sick"
-#     ).first()
-#     frozen_leave_record = ContractualLeaveRecord.objects.filter(
-#         employee=request.user, leave_type__name="Frozen"
-#     ).first()
-    
-#     if request.method == 'POST':
-#         form = ContractualLeaveApplicationForm(request.POST)
-#         if form.is_valid():
-#             leave_application = form.save()
-
-#             # Retrieve the leave type and employee
-#             leave_type = leave_application.leave_type
-#             employee = leave_application.employee
-
-#             # Check if a record exists for this leave type and employee
-#             try:
-#                 leave_record = ContractualLeaveRecord.objects.get(
-#                     employee=employee, leave_type=leave_type)
-                
-#                 # Update availed leaves and remaining leaves
-#                 leave_record.availed_leaves += (leave_application.to_date - leave_application.from_date).days + 1  # Include both dates
-#                 leave_record.save()
-
-#                 # Optionally, display the remaining leaves
-#                 remaining_leaves = leave_record.remaining_leaves
-#                 messages.success(request, f"Leave applied successfully! Remaining leaves: {remaining_leaves}")
-
-#             except ContractualLeaveRecord.DoesNotExist:
-#                 messages.error(request, "No leave record found for this employee and leave type.")
-
-#             return redirect('leave_status')  # Redirect to an appropriate page (e.g., leave status page)
-
-#     else:
-#         form = ContractualLeaveApplicationForm()
-
-#     return render(request, 'apply_contractual_leave.html', {'form': form,
-#         "casual_leave_used": casual_leave_record.availed_leaves if casual_leave_record else 0,
-#         "casual_leave_remaining": casual_leave_record.remaining_leaves if casual_leave_record else 20,
-#         "sick_leave_used": sick_leave_record.availed_leaves if sick_leave_record else 0,
-#         "sick_leave_remaining": sick_leave_record.remaining_leaves if sick_leave_record else 18,
-#         "frozen_leave_total": frozen_leave_record.leave_type.total_leaves if frozen_leave_record else 0,
-#         "frozen_leave_used": frozen_leave_record.availed_leaves if frozen_leave_record else 0,
-#         "frozen_leave_remaining": frozen_leave_record.remaining_leaves if frozen_leave_record else 0,})
 
 from .models import LeaveApplication
 
