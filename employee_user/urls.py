@@ -14,6 +14,8 @@ urlpatterns = [
     path('user/financials_kpi/form/', views.financials_kpi, name="financials_kpi"),
     path('user/learning_growth_kpi/form/', views.learning_growth_kpi, name="learning_growth_kpi"),
     path('user/kpi/summary/', views.overall_kpi_result, name="kpi_summary"),
+    path('user/update/<str:form_type>/', views.update_kpis, name="update_kpis"),
+    path('user/kpi/delete/<int:kpi_id>/<str:form_type>/', views.delete_kpi, name="delete_kpi"),
     
     
     # Ajax
