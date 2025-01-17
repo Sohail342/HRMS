@@ -57,7 +57,7 @@ class LeaveApplication(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
 
     def __str__(self):
-        return f"{self.employee.name} - {self.application_type} ({self.status})"
+        return f"{self.employee.name} - {self.application_type}"
     
     def save(self, *args, **kwargs):
         # Ensure from_date and to_date are provided

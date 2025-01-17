@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from group_head.decorators import employee_user_required 
-from .models import ContractualLeaveRecord, ContractRenewal
+from .models import ContractualLeaveRecord, ContractRenewal, LeaveApplication, EducationalDocument
 from django.contrib import messages
 import cloudinary
 from django.core.exceptions import ValidationError
@@ -8,10 +8,75 @@ from django.http import Http404
 from .forms import EducationalDocumentForm, NonInvolvementCertificateForm, StationaryRequestForm, ContractualLeaveApplicationForm
 from .forms import PermanentLeaveApplicationForm, ContractualLeaveApplicationForm, PermanentLeaveApplicationForm
 from django.shortcuts import get_object_or_404
-from django.db import models
-from .models import EducationalDocument, LeaveApplication
 from datetime import datetime
+from HRIS_App.models import Employee
 
+
+def leave_management_dashboard(request):
+    # Summary Statistics
+    total_employees = Employee.objects.count()
+    total_leave_requests = LeaveApplication.objects.count()
+    pending_approvals = LeaveApplication.objects.filter(status="pending").count()
+    
+
+    # Leave Requests
+    
+    leave_requests = LeaveApplication.objects.all()
+
+    # Adding CSS classes for status
+    for leave in leave_requests:
+        if leave.status == "Pending":
+            leave.status_class = "bg-yellow-100 text-yellow-700"
+        elif leave.status == "Approved":
+            leave.status_class = "bg-green-100 text-green-700"
+        elif leave.status == "Declined":
+            leave.status_class = "bg-red-100 text-red-700"
+        else:
+            leave.status_class = "bg-gray-100 text-gray-700"
+
+    # Employee Leave Balances
+    employees = Employee.objects.all()
+
+    context = {
+        'total_employees': total_employees,
+        'total_leave_requests': total_leave_requests,
+        'pending_approvals': pending_approvals,
+        'leave_requests': leave_requests,
+        'employees': employees,
+    }
+    return render(request, "employee_attendance/leave_management_dashboard.html", context)
+
+def approve_leave(request, pk):
+    leave_application = get_object_or_404(LeaveApplication, pk=pk)
+    if leave_application.status == "Pending":
+        leave_application.status = "Approved"
+        leave_application.save()
+        messages.success(request, f"Leave for {leave_application.employee.name} approved.")
+    else:
+        messages.error(request, "This leave application cannot be approved.")
+    return redirect('leave_management_dashboard')
+
+
+
+def decline_leave(request, pk):
+    leave_application = get_object_or_404(LeaveApplication, pk=pk)
+    if leave_application.status == "Pending":
+        leave_application.status = "Declined"
+        leave_application.save()
+        messages.success(request, f"Leave for {leave_application.employee.name} declined.")
+    else:
+        messages.error(request, "This leave application cannot be declined.")
+    return redirect('employee_attendance:leave_management_dashboard')
+
+
+
+def status_approval(request, request_id, status):
+    user = LeaveApplication.objects.get(id=request_id)
+    if status:
+        user.status = status
+        user.save()
+        messages.success(request, "Status updated")
+    return redirect("employee_attendance:leave_management_dashboard")
 
 #------------- Non-Involvement Certificate Request -------------
 
@@ -161,7 +226,9 @@ def stationaryrequests(request):
     return render(request, 'employee_attendance/stationary_request.html', {'form': form})
 
 
-#------------- Leave Application -------------
+
+from .models import LeaveApplication
+
 def apply_permanent_leave(request):
     user_type = request.user.employee_type
     try:
