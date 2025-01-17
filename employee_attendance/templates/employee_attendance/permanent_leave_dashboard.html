@@ -12,7 +12,7 @@
                     <tr class="bg-gray-100">
                         <th class="py-2 px-4 text-left">Leave Type</th>
                         <th class="py-2 px-4 text-left">Total Leave</th>
-                        <th class="py-2 px-4 text-left">Used Leave</th>
+                        <th class="py-2 px-4 text-left">Availed Leave</th>
                         <th class="py-2 px-4 text-left">Remaining Leave</th>
                     </tr>
                 </thead>
@@ -54,5 +54,85 @@
                 Apply for Leave
             </a>
         </div>
+
+        <!-- Leave Request Status Cards -->
+        <div class="mt-8">
+            <h2 class="text-2xl font-semibold">Current Leave Request Status</h2>
+            
+            <!-- Status Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
+                <!-- Approved Status Card -->
+                <div class="bg-green-100 border border-green-400 p-4 rounded-lg shadow-md text-center cursor-pointer" data-status="approved">
+                    <h3 class="font-semibold text-lg text-green-700">Approved</h3>
+                    <p class="text-2xl font-bold text-green-600">{{ approved_count }}</p>
+                    <p class="text-sm text-gray-600">Leave requests approved</p>
+                </div>
+
+                <!-- Pending Status Card -->
+                <div class="bg-yellow-100 border border-yellow-400 p-4 rounded-lg shadow-md text-center cursor-pointer" data-status='pending'>
+                    <h3 class="font-semibold text-lg text-yellow-700">Pending</h3>
+                    <p class="text-2xl font-bold text-yellow-600">{{ pending_count }}</p>
+                    <p class="text-sm text-gray-600">Leave requests pending</p>
+                </div>
+
+                <!-- Declined Status Card -->
+                <div class="bg-red-100 border border-red-400 p-4 rounded-lg shadow-md text-center cursor-pointer" data-status='declined'>
+                    <h3 class="font-semibold text-lg text-red-700">Declined</h3>
+                    <p class= "text-2xl font-bold text-red-600">{{ declined_count }}</p>
+                    <p class="text-sm text-gray-600">Leave requests declined</p>
+                </div>
+            </div>
+        </div>
+        <div id="leave-requests" class="mt-6"></div>
     </div>
+
+    <!-- JavaScript to show requests dynamically -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Function to render leave requests
+            function showRequests(status) {
+                // Parse JSON data
+                const pending = JSON.parse(document.getElementById("pending_requests").textContent);
+                const approved = JSON.parse(document.getElementById("approved_requests").textContent);
+                const declined = JSON.parse(document.getElementById("declined_requests").textContent);
+        
+                const requests = { pending, approved, declined };
+                const selectedRequests = requests[status];
+        
+                // Container to display requests
+                const requestsContainer = document.getElementById("leave-requests");
+                requestsContainer.innerHTML = ""; // Clear previous content
+        
+                if (selectedRequests && selectedRequests.length > 0) {
+                    selectedRequests.forEach(request => {
+                        const requestDiv = document.createElement("div");
+                        requestDiv.className = "bg-white shadow-md p-4 rounded-lg mt-4";
+                        requestDiv.innerHTML = `
+                            <h3 class="text-lg font-semibold">${request.application_type} Leave</h3>
+                            <p><strong>From:</strong> ${request.from_date}</p>
+                            <p><strong>To:</strong> ${request.to_date}</p>
+                            <p><strong>Reason:</strong> ${request.reason}</p>
+                        `;
+                        requestsContainer.appendChild(requestDiv);
+                    });
+                } else {
+                    requestsContainer.innerHTML = "<p>No leave requests found for this status.</p>";
+                }
+            }
+        
+            // Attach click event listeners to status cards
+            document.querySelectorAll(".status-card").forEach(card => {
+                card.addEventListener("click", function () {
+                    const status = this.getAttribute("data-status");
+                    showRequests(status);
+                });
+            });
+        });
+    
+    </script>
+
+    <!-- Use JSON Script to embed the leave requests data -->
+    <script type="application/json" id="pending_requests">{{ pending_requests|json_script:"pending_requests" }}</script>
+    <script type="application/json" id="approved_requests">{{ approved_requests|json_script:"approved_requests" }}</script>
+    <script type="application/json" id="declined_requests">{{ declined_requests|json_script:"declined_requests" }}</script>
 {% endblock %}

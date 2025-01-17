@@ -29,13 +29,20 @@ class LeaveRecordPremanent(models.Model):
 
     def __str__(self):
         return f"{self.employee.username} - {self.leave_type.name}" 
-    
+ 
+#--------------------------- Leave Management Pro --------------------------------------------
 class LeaveApplication(models.Model):
     LEAVE_CHOICES = [
         ('Casual', 'Casual Leave'),
         ('Privilege', 'Privilege Leave'),
         ('Sick', 'Sick Leave'),
     ]
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('declined', 'Declined'),
+    ]
+
     
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name="leave_applications")
     leave_date = models.DateField(default=None, blank=True, null=True)  
@@ -45,9 +52,11 @@ class LeaveApplication(models.Model):
     reason = models.TextField(default=None, blank=True, null=True)
     application_type = models.CharField(max_length=100, choices=LEAVE_CHOICES)
     supervisor_signature = models.CharField(max_length=100)
+    is_approved = models.BooleanField(default=False)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
 
     def __str__(self):
-        return f"Leave Request from {self.employee.name} for {self.leave_date}"
+        return f"{self.employee.name} - {self.application_type} ({self.status})"
     
     def save(self, *args, **kwargs):
         # Ensure from_date and to_date are provided
@@ -70,6 +79,9 @@ class LeaveApplication(models.Model):
 
         # Call the parent save method
         super().save(*args, **kwargs)
+    
+#--------------------------------------  
+
     
     
     
@@ -164,6 +176,8 @@ class ContractRenewal(models.Model):
 
     def __str__(self):
         return f"Contract Renewal Request from {self.employee.name} for {self.renewal_date}"
+
+
 
 
 #------------------------------ Stationary Request ----------------------------------------------

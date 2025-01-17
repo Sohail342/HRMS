@@ -20,7 +20,7 @@ SECRET_KEY = 'django-insecure-y6v#uewfea@x)o(5z&uemx@lrojs^*_in60ri38_pxn1!#@k@u
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*', '.vercel.app/']
 
@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'import_export',
     "widget_tweaks",
     'cloudinary',
+    'channels',
     
     # project apps
     'HRIS_App',
@@ -93,6 +94,12 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'HRMS.wsgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
 
 
 # Database
