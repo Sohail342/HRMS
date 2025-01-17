@@ -37,7 +37,13 @@ class LeaveApplication(models.Model):
         ('Privilege', 'Privilege Leave'),
         ('Sick', 'Sick Leave'),
     ]
-    
+
+    STATUS_CHOICES = [
+        ('Pending', 'Pending'),
+        ('Approved', 'Approved'),
+        ('Rejected', 'Rejected'),
+    ]
+        
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name="leave_applications")
     leave_date = models.DateField(default=None, blank=True, null=True)  
     from_date = models.DateField(default=None, blank=True, null=True)
@@ -46,6 +52,7 @@ class LeaveApplication(models.Model):
     reason = models.TextField(default=None, blank=True, null=True)
     application_type = models.CharField(max_length=100, choices=LEAVE_CHOICES)
     supervisor_signature = models.CharField(max_length=100)
+    status = models.CharField(max_length=100, choices=STATUS_CHOICES, default='Pending')
 
     def __str__(self):
         return f"Leave Request from {self.employee.name} for {self.leave_date}"

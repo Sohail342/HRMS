@@ -9,6 +9,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_protect
 from django.shortcuts import get_object_or_404
 from .models import RicpData, RicpKPI
+from django.utils.dateformat import DateFormat
 import json
 
 
@@ -157,7 +158,12 @@ def dashboard_view(request):
     sick_leaves = LeaveApplication.objects.filter(employee=request.user, application_type='Sick').values('availed_leaves')
     sick_leaves_count = sum(item['availed_leaves'] for item in sick_leaves)
     remaining_sick_leaves = 18 - sick_leaves_count
-    
+
+    pending_count = LeaveApplication.objects.filter(employee=request.user, status='Pending').count()
+    approved_count = LeaveApplication.objects.filter(employee=request.user, status='approved').count()
+    declined_count = LeaveApplication.objects.filter(employee=request.user, status='declined').count()
+
+
     
     content = {
         "user_type":str(user_type),
@@ -169,7 +175,11 @@ def dashboard_view(request):
         
         'sick_leaves': sick_leaves_count,
         'remaining_sick_leaves':remaining_sick_leaves,
-        
+
+        'pending_count': pending_count,
+        'approved_count': approved_count,
+        'declined_count': declined_count,
+
     }
     return render(request, 'employee_attendance/permanent_leave_dashboard.html', content)
 

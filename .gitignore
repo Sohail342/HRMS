@@ -1,3 +1,4 @@
+.node_modules
 # Python temp files
 __pycache__/
 *.py[cod]
