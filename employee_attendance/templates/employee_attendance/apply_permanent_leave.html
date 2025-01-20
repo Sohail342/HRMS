@@ -60,13 +60,65 @@
                           class="mt-2 px-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
             </div>
 
-            <!-- Supervisor Signature -->
-            <div class="mb-4">
-                <label for="supervisor_signature" class="block text-gray-700 font-semibold">Supervisor Signature:</label>
-                <input type="text" id="supervisor_signature" name="supervisor_signature" required 
-                       class="mt-2 px-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <!-- Replacement Employees -->
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold text-gray-700">Replacement Employees</h3>
+
+                <!-- Replacement Employee 1 -->
+                <div class="mb-4 border border-gray-300 p-4 rounded-lg">
+                    <h4 class="font-semibold text-gray-600 mb-2">Replacement Employee 1</h4>
+                    <label for="replacement_employee1_name" class="block text-gray-700 font-semibold">SAP_ID:</label>
+                    <input type="text" id="replacement_employee1_name" name="replacement_employee1_name" required 
+                        class="mt-2 px-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+                    <label for="replacement_employee1_email" class="block text-gray-700 font-semibold mt-4">Name:</label>
+                    <input type="email" id="replacement_employee1_email" name="replacement_employee1_email" required 
+                        class="mt-2 px-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+                    <label for="replacement_employee1_contact" class="block text-gray-700 font-semibold mt-4">Designation:</label>
+                    <input type="text" id="replacement_employee1_contact" name="replacement_employee1_contact" required 
+                        class="mt-2 px-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <!-- Replacement Employee 2 -->
+                <div class="mb-4 border border-gray-300 p-4 rounded-lg">
+                    <h4 class="font-semibold text-gray-600 mb-2">Replacement Employee 2</h4>
+                    <label for="replacement_employee2_name" class="block text-gray-700 font-semibold">SAP_ID:</label>
+                    <input type="text" id="replacement_employee2_name" name="replacement_employee2_name" 
+                        class="mt-2 px-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+                    <label for="replacement_employee2_email" class="block text-gray-700 font-semibold mt-4">Name:</label>
+                    <input type="email" id="replacement_employee2_email" name="replacement_employee2_email" 
+                        class="mt-2 px-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+                    <label for="replacement_employee2_contact" class="block text-gray-700 font-semibold mt-4">Designation:</label>
+                    <input type="text" id="replacement_employee2_contact" name="replacement_employee2_contact" 
+                        class="mt-2 px-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <!-- Replacement Employee 3 -->
+                <div class="mb-4 border border-gray-300 p-4 rounded-lg">
+                    <h4 class="font-semibold text-gray-600 mb-2">Replacement Employee 3</h4>
+                    <label for="replacement_employee3_name" class="block text-gray-700 font-semibold">SAP_ID:</label>
+                    <input type="text" id="replacement_employee3_name" name="replacement_employee3_name" 
+                        class="mt-2 px-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+                    <label for="replacement_employee3_email" class="block text-gray-700 font-semibold mt-4">Name:</label>
+                    <input type="email" id="replacement_employee3_email" name="replacement_employee3_email" 
+                        class="mt-2 px-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+                    <label for="replacement_employee3_contact" class="block text-gray-700 font-semibold mt-4">Designation:</label>
+                    <input type="text" id="replacement_employee3_contact" name="replacement_employee3_contact" 
+                        class="mt-2 px-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
             </div>
 
+
+           <!-- Supervisor Signature -->
+            <div class="mb-8">
+                <label for="supervisor_signature" class="block text-gray-700 font-semibold">Supervisor Signature:</label>
+                <div class="mt-4 px-8 py-4 w-full bg-white h-10"></div> <!-- Empty div for space -->
+            </div>
             <!-- Submit Button -->
             <div class="flex justify-center">
                 <button type="submit" 
