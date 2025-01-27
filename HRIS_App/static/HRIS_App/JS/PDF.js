@@ -3,7 +3,7 @@
         .addEventListener("click", () => {
             const invoice = document.getElementById("invoice");
             var opt = {
-                margin: 0,
+                margin:[10,0,10,0],
                 filename: 'file.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2 },

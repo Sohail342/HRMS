@@ -1,355 +1,567 @@
-{% extends "sidebar.html" %}
+{% extends "sidebar.html" %} {% block content %}
+<div id="invoice" class="mt-5 mb-5 break-after-always">
+  <div
+    class="bg-white shadow-md rounded-lg p-6 text-center text-lg font-bold text-gray-800 mb-2"
+  >
+    Review your submitted KPIs
+  </div>
+  <div class="bg-gray-100">
+    <div
+      class="max-w-5xl my-10 mx-auto bg-white shadow-md rounded-lg p-6"
+      id="formContent"
+    >
+      <h2 class="text-lg font-bold text-gray-800 mb-2">
+        Risk, Internal Controls & Processes
+        <a
+          href="{% url 'employee_user:update_kpis' 'ricp' %}"
+          class="text-blue-500 text-sm my-edit"
+          >Edit</a
+        >
+      </h2>
+      <p class="text-sm text-gray-600 mb-4">
+        How I will improve productivity, quality, and speed of service while
+        adhering strictly to the Bank’s regulation and processes?
+      </p>
 
-{% block content %}
-<div id="invoice">
-    <div class="bg-white shadow-md rounded-lg p-6 text-center text-lg font-bold text-gray-800 mb-2">
-      Review your submitted KPIs
-    </div>
-    <div class="bg-gray-100">
-      <div class="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6" id="formContent">
+      <input
+        type="hidden"
+        name="bsc_form_type"
+        id="bsc_form_type"
+        value="RICP"
+      />
 
-        <h2 class="text-lg font-bold text-gray-800 mb-2">
-          Risk, Internal Controls & Processes <a href="{% url 'employee_user:update_kpis' 'ricp' %}" class="text-blue-500 text-sm">Edit</a>
-        </h2>
-        <p class="text-sm text-gray-600 mb-4">
-          How I will improve productivity, quality, and speed of service while adhering strictly to the Bank’s regulation and processes?
-        </p>
-      
-        <input type="hidden" name="bsc_form_type" id="bsc_form_type" value="RICP">
-
-        <div class="overflow-x-auto">
-          <table class="w-full border-collapse border border-gray-300 text-sm" id="tableBody">
-            <thead class="bg-gray-100">
-              <tr>
-                <th class="border border-gray-300 px-4 py-1 text-left">S.No.</th>
-                <th class="border border-gray-300 px-4 py-2 text-left w-2/5">Key Performing Indicator (KPI)</th>
-                <th class="border border-gray-300 px-4 py-2 text-left w-2/5">Achievement</th>
-                <th class="border border-gray-300 px-4 py-2 text-center w-1/5">Weightage</th>
-                <th class="border border-gray-300 px-4 py-2 text-left">Target Date</th>
-                <th class="border border-gray-300 px-4 py-2 text-left">Score</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for kpi in ricp_kpis %}
-              <tr>
-                <td class="border border-gray-300 px-4 py-2 text-center">{{ forloop.counter }}</td>
-                <td class="border border-gray-300 px-4 py-2">
-                  <textarea readonly class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" value="{{ kpi.kpi }}" placeholder="Enter KPI" required>{{ kpi.kpi }}</textarea>
-                </td>
-                <td class="border border-gray-300 px-4 py-2">
-                  <textarea readonly class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" placeholder="Enter Achievement" required>{{ kpi.achievement }}</textarea>
-                </td>
-                {% if kpi.weightage %}
-                  <td class="border border-gray-300 px-4 py-2 text-center">{{ kpi.weightage }}<span></span></td>
-                {% else %}
-                  <td class="border border-gray-300 px-4 py-2 text-center"></td>
-                {% endif %}
-                <td class="border border-gray-300 px-4 py-2">
-                  <input readonly type="date" class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" value="{{ kpi.target_date|date:'Y-m-d' }}" required>
-                </td>
-                <td class="border border-gray-300 px-4 py-2">
-                  <input readonly type="text" class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" value="{{ kpi.score }}" required>
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-            <tfoot class="bg-gray-100">
-              <tr>
-                <td colspan="5" class="border border-gray-300 px-4 py-2 text-left w-2/5"><b>Total score for Risk, Internal Controls & Processes</b></td>
-                <td class="border border-gray-300 px-4 py-2 text-center">
-                  <p class="mt-4 text-lg font-semibold">
-                    <span id="finalScore">{{ricp_form_final_score}}</span>
-                  </p>
-                </td>
-              </tr>
-            </tfoot>          
-          </table>
-        </div>
+      <div class="">
+        <table
+          class="w-full table-fixed border-collapse border border-gray-300 text-sm"
+          id="tableBody"
+        >
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="border border-gray-300 px-4 py-4 w-1/12 text-center">
+                S.No.
+              </th>
+              <th class="border border-gray-300 px-4 py-4 text-center w-1/3">
+                Key Performing Indicator (KPI)
+              </th>
+              <th class="border border-gray-300 px-4 py-4 text-center w-1/4">
+                Achievement
+              </th>
+              <th class="border border-gray-300 px-4 py-4 text-center w-1/12">
+                Wet%
+              </th>
+              <th class="border border-gray-300 px-4 py-4 text-center">
+                Target Date
+              </th>
+              <th class="border border-gray-300 px-4 py-4 w-1/12 text-center">
+                Score
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for kpi in ricp_kpis %}
+            <tr>
+              <td class="border border-gray-300 px-4 py-2 text-center">
+                {{ forloop.counter }}
+              </td>
+              <td
+                class="border border-gray-300 align-top px-4 py-2 break-words"
+              >
+                {{ kpi.kpi }}
+              </td>
+              <td
+                class="border border-gray-300 align-top px-4 break-words py-2"
+              >
+                {{ kpi.achievement }}
+              </td>
+              {% if kpi.weightage %}
+              <td class="border border-gray-300 px-4 py-2 text-center">
+                {{ kpi.weightage }}<span></span>
+              </td>
+              {% else %}
+              <td class="border border-gray-300 px-4 py-2 text-center"></td>
+              {% endif %}
+              <td class="border border-gray-300 text-center px-4 py-2">
+                {{ kpi.target_date|date:'Y-m-d' }}
+              </td>
+              <td class="border border-gray-300 text-center px-4 py-2">
+                {{ kpi.score }}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot class="bg-gray-100">
+            <tr>
+              <td
+                colspan="5"
+                class="border border-gray-300 px-4 text-md py-4 font-bold text-left w-2/5"
+              >
+                Total score for Risk, Internal Controls & Processes
+              </td>
+              <td class="border border-gray-300 px-4 py-2 text-center">
+                <p class="text-lg font-semibold">
+                  <span id="finalScore">{{ricp_form_final_score}}</span>
+                </p>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
       </div>
     </div>
+  </div>
 
-    <!-- Customers KPIs -->
-      <div class="bg-gray-100">
-        <div class="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6" id="formContent">
+  <!-- Customers KPIs -->
+  <div class="bg-gray-100">
+    <div
+      class="max-w-5xl my-10 mx-auto bg-white shadow-md rounded-lg p-6"
+      id="formContent"
+    >
+      <h2 class="text-lg font-bold text-gray-800 mb-2">
+        Customers KPIs
+        <a
+          href="{% url 'employee_user:update_kpis' 'customer_kpi' %}"
+          class="text-blue-500 text-sm my-edit"
+          >Edit</a
+        >
+      </h2>
+      <p class="text-sm text-gray-600 mb-4">
+        How I will contribute in providing the highest levels of Customer
+        Service, both internally and externally?
+      </p>
 
-            <h2 class="text-lg font-bold text-gray-800 mb-2">
-              Customers KPIs <a href="{% url 'employee_user:update_kpis' 'customer_kpi' %}" class="text-blue-500 text-sm">Edit</a>
-            </h2>
-            <p  class="text-sm text-gray-600 mb-4">
-              How I will contribute in providing the highest levels of Customer Service, both internally and externally?
-            </p>
+      <input
+        type="hidden"
+        name="bsc_form_type"
+        id="bsc_form_type"
+        value="customer_kpi"
+      />
 
-            <input type="hidden" name="bsc_form_type" id="bsc_form_type" value="customer_kpi">
-
-          <div class="overflow-x-auto">
-            <table class="w-full border-collapse border border-gray-300 text-sm" id="tableBody">
-              <thead class="bg-gray-100">
-                <tr>
-                  <th class="border border-gray-300 px-4 py-1 text-left">S.No.</th>
-                  <th class="border border-gray-300 px-4 py-2 text-left w-2/5">Key Performing Indicator (KPI)</th>
-                  <th class="border border-gray-300 px-4 py-2 text-left w-2/5">Achievement</th>
-                  <th class="border border-gray-300 px-4 py-2 text-center w-1/5">Weightage</th>
-                  <th class="border border-gray-300 px-4 py-2 text-left">Target Date</th>
-                  <th class="border border-gray-300 px-4 py-2 text-left">Score</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for kpi in customer_kpis %}
-                <tr>
-                  <td class="border border-gray-300 px-4 py-2 text-center">{{ forloop.counter }}</td>
-                  <td class="border border-gray-300 px-4 py-2">
-                    <textarea readonly class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" value="{{ kpi.kpi }}" placeholder="Enter KPI" required>{{ kpi.kpi }}</textarea>
-                  </td>
-                  <td class="border border-gray-300 px-4 py-2">
-                    <textarea readonly class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" placeholder="Enter Achievement" required>{{ kpi.achievement }}</textarea>
-                  </td>
-                  {% if kpi.weightage %}
-                    <td class="border border-gray-300 px-4 py-2 text-center">{{ kpi.weightage }}<span></span></td>
-                  {% else %}
-                    <td class="border border-gray-300 px-4 py-2 text-center"></td>
-                  {% endif %}
-                  <td class="border border-gray-300 px-4 py-2">
-                    <input readonly type="date" class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" value="{{ kpi.target_date|date:'Y-m-d' }}" required>
-                  </td>
-                  <td class="border border-gray-300 px-4 py-2">
-                  <input readonly type="text" class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" value="{{ kpi.score }}" required>
-                </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-              <tfoot class="bg-gray-100">
-                <tr>
-                  <td colspan="5" class="border border-gray-300 px-4 py-2 text-left w-2/5"><b>Total score for Customers KPIs</b></td>
-                  <td class="border border-gray-300 px-4 py-2 text-center">
-                    <p class="mt-4 text-lg font-semibold">
-                      <span id="finalScore">{{customer_form_final_score}}</span>
-                    </p>
-                  </td>
-                </tr>
-              </tfoot>          
-            </table>
-          </div>
-        </div>
+      <div class="overflow-x-auto">
+        <table
+          class="w-full table-fixed border-collapse border border-gray-300 text-sm"
+          id="tableBody"
+        >
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="border border-gray-300 px-4 py-4 w-1/12 text-center">
+                S.No.
+              </th>
+              <th class="border border-gray-300 px-4 py-4 text-center w-1/3">
+                Key Performing Indicator (KPI)
+              </th>
+              <th class="border border-gray-300 px-4 py-4 text-center w-1/4">
+                Achievement
+              </th>
+              <th class="border border-gray-300 px-4 py-4 text-center w-1/12">
+                Wet%
+              </th>
+              <th class="border border-gray-300 px-4 py-4 text-center">
+                Target Date
+              </th>
+              <th class="border border-gray-300 px-4 py-4 w-1/12 text-center">
+                Score
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for kpi in customer_kpis %}
+            <tr>
+              <td class="border border-gray-300 px-4 py-2 text-center">
+                {{ forloop.counter }}
+              </td>
+              <td
+                class="border border-gray-300 align-top break-words px-4 py-2"
+              >
+                {{ kpi.kpi}}
+              </td>
+              <td
+                class="border border-gray-300 align-top break-words px-4 py-2"
+              >
+                {{ kpi.achievement }}
+              </td>
+              {% if kpi.weightage %}
+              <td class="border border-gray-300 px-4 py-2 text-center">
+                {{ kpi.weightage }}<span></span>
+              </td>
+              {% else %}
+              <td class="border border-gray-300 px-4 py-2 text-center"></td>
+              {% endif %}
+              <td class="border border-gray-300 text-center px-4 py-2">
+                {{ kpi.target_date|date:'Y-m-d' }}
+              </td>
+              <td class="border border-gray-300 text-center px-4 py-2">{{ kpi.score }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot class="bg-gray-100">
+            <tr>
+              <td
+                colspan="5"
+                class="border border-gray-300 text-md font-bold px-4 py-4 text-left w-2/5"
+              >
+                Total score for Customers KPIs
+              </td>
+              <td class="border border-gray-300 px-4 py-2 text-center">
+                <p class="text-lg font-semibold">
+                  <span id="finalScore">{{customer_form_final_score}}</span>
+                </p>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
       </div>
+    </div>
+  </div>
 
-      <!-- Financials KPIs -->
-      <div class="bg-gray-100">
-        <div class="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6" id="formContent">
+  <!-- Financials KPIs -->
+  <div class="bg-gray-100">
+    <div
+      class="max-w-5xl my-10 mx-auto bg-white shadow-md rounded-lg p-6"
+      id="formContent"
+    >
+      <h2 class="text-lg font-bold text-gray-800 mb-2">
+        Financials KPIs
+        <a
+          href="{% url 'employee_user:update_kpis' 'financials_kpi' %}"
+          class="text-blue-500 text-sm my-edit"
+          >Edit</a
+        >
+      </h2>
+      <p class="text-sm text-gray-600 mb-4">
+        How will I achieve the financial results to meet the overall objectives
+        of the Bank?
+      </p>
 
-          <h2 class="text-lg font-bold text-gray-800 mb-2">
-            Financials KPIs <a href="{% url 'employee_user:update_kpis' 'financials_kpi' %}" class="text-blue-500 text-sm">Edit</a>
+      <input
+        type="hidden"
+        name="bsc_form_type"
+        id="bsc_form_type"
+        value="financials_kpi"
+      />
+
+      <div class="">
+        <table
+          class="w-full table-fixed border-collapse border border-gray-300 text-sm"
+          id="tableBody"
+        >
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="border border-gray-300 px-4 py-4 w-1/12 text-center">
+                S.No.
+              </th>
+              <th class="border border-gray-300 px-4 py-4 text-center w-1/3">
+                Key Performing Indicator (KPI)
+              </th>
+              <th class="border border-gray-300 px-4 py-4 text-center w-1/4">
+                Achievement
+              </th>
+              <th class="border border-gray-300 px-4 py-4 text-center w-1/12">
+                Wet%
+              </th>
+              <th class="border border-gray-300 px-4 py-4 text-center">
+                Target Date
+              </th>
+              <th class="border border-gray-300 px-4 py-4 w-1/12 text-center">
+                Score
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for kpi in financials_kpis %}
+            <tr>
+              <td class="border border-gray-300 px-4 py-2 text-center">
+                {{ forloop.counter }}
+              </td>
+              <td
+                class="border border-gray-300 break-words align-top px-4 py-2"
+              >
+                {{ kpi.kpi }}
+              </td>
+              <td
+                class="border border-gray-300 break-words align-top px-4 py-2"
+              >
+                {{ kpi.achievement }}
+              </td>
+              {% if kpi.weightage %}
+              <td class="border border-gray-300 px-4 py-2 text-center">
+                {{ kpi.weightage }}<span></span>
+              </td>
+              {% else %}
+              <td class="border border-gray-300 px-4 py-2 text-center"></td>
+              {% endif %}
+              <td class="border border-gray-300 text-center px-4 py-2">
+                {{ kpi.target_date|date:'Y-m-d' }}
+              </td>
+              <td class="border border-gray-300 text-center px-4 py-2">{{ kpi.score }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot class="bg-gray-100">
+            <tr>
+              <td
+                colspan="5"
+                class="border border-gray-300 px-4 py-4 text-md font-bold text-left w-2/5"
+              >
+                Total score for Financials KPIs
+              </td>
+              <td class="border border-gray-300 px-4 py-2 text-center">
+                <p class="text-lg font-semibold">
+                  <span id="finalScore">{{financials_form_final_score}}</span>
+                </p>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Learning & Growth KPIs -->
+  <div class="bg-gray-100">
+    <div
+      class="max-w-5xl my-10 mx-auto bg-white shadow-md rounded-lg p-6"
+      id="formContent"
+    >
+      <h2 class="text-lg font-bold text-gray-800 mb-2">
+        Learning & Growth KPIs
+        <a
+          href="{% url 'employee_user:update_kpis' 'learning_growth_kpi' %}"
+          class="text-blue-500 text-sm my-edit"
+          >Edit</a
+        >
+      </h2>
+      <p class="text-sm text-gray-600 mb-4">
+        How I will sustain future performance, creating an environment of
+        continuous improvement and contributing towards personal and team’s
+        development?
+      </p>
+
+      <input
+        type="hidden"
+        name="bsc_form_type"
+        id="bsc_form_type"
+        value="learning_Growth_kpi"
+      />
+
+      <div class="">
+        <table
+          class="w-full table-fixed border-collapse border border-gray-300 text-sm"
+          id="tableBody"
+        >
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="border border-gray-300 px-4 py-4 w-1/12 text-center">
+                S.No.
+              </th>
+              <th class="border border-gray-300 px-4 py-4 text-center w-1/3">
+                Key Performing Indicator (KPI)
+              </th>
+              <th class="border border-gray-300 px-4 py-4 text-center w-1/4">
+                Achievement
+              </th>
+              <th class="border border-gray-300 px-4 py-4 text-center w-1/12">
+                Wet%
+              </th>
+              <th class="border border-gray-300 px-4 py-4 text-center">
+                Target Date
+              </th>
+              <th class="border border-gray-300 px-4 py-4 w-1/12 text-center">
+                Score
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for kpi in learning_growth_kpis %}
+            <tr>
+              <td class="border border-gray-300 px-4 py-2 text-center">
+                {{ forloop.counter }}
+              </td>
+              <td
+                class="border border-gray-300 px-4 align-top break-words py-2"
+              >
+                {{ kpi.kpi }}
+              </td>
+              <td
+                class="border border-gray-300 px-4 align-top break-words py-2"
+              >
+                {{ kpi.achievement }}
+              </td>
+              {% if kpi.weightage %}
+              <td class="border border-gray-300 px-4 py-2 text-center">
+                {{ kpi.weightage }}<span></span>
+              </td>
+              {% else %}
+              <td class="border border-gray-300 px-4 py-2 text-center"></td>
+              {% endif %}
+              <td class="border border-gray-300 text-center px-4 py-2">
+                {{ kpi.target_date|date:'Y-m-d' }}
+              </td>
+              <td class="border border-gray-300 text-center px-4 py-2">{{ kpi.score }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot class="bg-gray-100">
+            <tr>
+              <td
+                colspan="5"
+                class="border border-gray-300 px-4 py-4 text-md font-bold text-left w-2/5"
+              >
+                Total score for Learning & Growth KPIs
+              </td>
+              <td class="border border-gray-300 px-4 py-2 text-center">
+                <p class="text-lg font-semibold">
+                  <span id="finalScore"
+                    >{{learning_growth_form_final_score}}</span
+                  >
+                </p>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overall KPIs -->
+  <div class="py-4">
+    <form
+      method="post"
+      action="{% url 'employee_user:submit_ricp_data' %}"
+      class="space-y-12"
+    >
+      <div class="max-w-5xl mx-auto bg-white shadow-lg rounded-lg p-10">
+        <h1 class="text-3xl font-extrabold mb-8 text-center text-gray-800">
+          Performance Review Form
+        </h1>
+        {% csrf_token %}
+
+        <!-- KPIs/Job Objectives Section -->
+        <div class="space-y-6">
+          <h2 class="text-xl font-semibold text-gray-800 border-b pb-3">
+            KPIs/Job Objectives
           </h2>
-          <p class="text-sm text-gray-600 mb-4">
-            How will I achieve the financial results to meet the overall objectives of the Bank?     
-          </p>
-        
-          <input type="hidden" name="bsc_form_type" id="bsc_form_type" value="financials_kpi">
-
-          <div class="overflow-x-auto">
-            <table class="w-full border-collapse border border-gray-300 text-sm" id="tableBody">
-              <thead class="bg-gray-100">
-                <tr>
-                  <th class="border border-gray-300 px-4 py-1 text-left">S.No.</th>
-                  <th class="border border-gray-300 px-4 py-2 text-left w-2/5">Key Performing Indicator (KPI)</th>
-                  <th class="border border-gray-300 px-4 py-2 text-left w-2/5">Achievement</th>
-                  <th class="border border-gray-300 px-4 py-2 text-center w-1/5">Weightage</th>
-                  <th class="border border-gray-300 px-4 py-2 text-left">Target Date</th>
-                  <th class="border border-gray-300 px-4 py-2 text-left">Score</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for kpi in financials_kpis %}
-                <tr>
-                  <td class="border border-gray-300 px-4 py-2 text-center">{{ forloop.counter }}</td>
-                  <td class="border border-gray-300 px-4 py-2">
-                    <textarea readonly class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" value="{{ kpi.kpi }}" placeholder="Enter KPI" required>{{ kpi.kpi }}</textarea>
-                  </td>
-                  <td class="border border-gray-300 px-4 py-2">
-                    <textarea readonly class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" placeholder="Enter Achievement" required>{{ kpi.achievement }}</textarea>
-                  </td>
-                  {% if kpi.weightage %}
-                    <td class="border border-gray-300 px-4 py-2 text-center">{{ kpi.weightage }}<span></span></td>
-                  {% else %}
-                    <td class="border border-gray-300 px-4 py-2 text-center"></td>
-                  {% endif %}
-                  <td class="border border-gray-300 px-4 py-2">
-                    <input readonly type="date" class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" value="{{ kpi.target_date|date:'Y-m-d' }}" required>
-                  </td>
-                  <td class="border border-gray-300 px-4 py-2">
-                  <input readonly type="text" class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" value="{{ kpi.score }}" required>
-                </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-              <tfoot class="bg-gray-100">
-                <tr>
-                  <td colspan="5" class="border border-gray-300 px-4 py-2 text-left w-2/5"><b>Total score for Financials KPIs</b></td>
-                  <td class="border border-gray-300 px-4 py-2 text-center">
-                    <p class="mt-4 text-lg font-semibold">
-                      <span id="finalScore">{{financials_form_final_score}}</span>
-                    </p>
-                  </td>
-                </tr>
-              </tfoot>          
-            </table>
+          <div class="flex items-center space-x-4">
+            <label for="overall_score" class="text-sm text-gray-600 font-medium"
+              >Overall Score:</label
+            >
+            <span class="text-lg font-bold text-gray-900"
+              >{{ total_score }}</span
+            >
           </div>
         </div>
-      </div>
 
-      <!-- Learning & Growth KPIs -->
-      <div class="bg-gray-100">
-        <div class="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6" id="formContent">
-      
-          <h2 class="text-lg font-bold text-gray-800 mb-2">
-            Learning & Growth KPIs <a href="{% url 'employee_user:update_kpis' 'learning_growth_kpi' %}" class="text-blue-500 text-sm">Edit</a>
+        <div class="space-y-8 mt-8">
+          {% comment %}
+          <h2 class="text-xl font-semibold text-gray-800 border-b pb-3">
+            Agreement Details
           </h2>
-          <p class="text-sm text-gray-600 mb-4">
-            How I will sustain future performance, creating an environment of continuous improvement and contributing towards personal and team’s development?
-          </p>
-        
-          <input type="hidden" name="bsc_form_type" id="bsc_form_type" value="learning_Growth_kpi">
-      
-          <div class="overflow-x-auto">
-            <table class="w-full border-collapse border border-gray-300 text-sm" id="tableBody">
-              <thead class="bg-gray-100">
-                <tr>
-                  <th class="border border-gray-300 px-4 py-1 text-left">S.No.</th>
-                  <th class="border border-gray-300 px-4 py-2 text-left w-2/5">Key Performing Indicator (KPI)</th>
-                  <th class="border border-gray-300 px-4 py-2 text-left w-2/5">Achievement</th>
-                  <th class="border border-gray-300 px-4 py-2 text-center w-1/5">Weightage</th>
-                  <th class="border border-gray-300 px-4 py-2 text-left">Target Date</th>
-                  <th class="border border-gray-300 px-4 py-2 text-left">Score</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for kpi in learning_growth_kpis %}
-                <tr>
-                  <td class="border border-gray-300 px-4 py-2 text-center">{{ forloop.counter }}</td>
-                  <td class="border border-gray-300 px-4 py-2">
-                    <textarea readonly class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" value="{{ kpi.kpi }}" placeholder="Enter KPI" required>{{ kpi.kpi }}</textarea>
-                  </td>
-                  <td class="border border-gray-300 px-4 py-2">
-                    <textarea readonly class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" placeholder="Enter Achievement" required>{{ kpi.achievement }}</textarea>
-                  </td>
-                  {% if kpi.weightage %}
-                    <td class="border border-gray-300 px-4 py-2 text-center">{{ kpi.weightage }}<span></span></td>
-                  {% else %}
-                    <td class="border border-gray-300 px-4 py-2 text-center"></td>
-                  {% endif %}
-                  <td class="border border-gray-300 px-4 py-2">
-                    <input readonly type="date" class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" value="{{ kpi.target_date|date:'Y-m-d' }}" required>
-                  </td>
-                  <td class="border border-gray-300 px-4 py-2">
-                  <input readonly type="text" class="dynamic-textarea px-2 py-1 w-full bg-transparent focus:outline-none resize-none overflow-hidden" value="{{ kpi.score }}" required>
-                </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-              <tfoot class="bg-gray-100">
-                <tr>
-                  <td colspan="5" class="border border-gray-300 px-4 py-2 text-left w-2/5"><b>Total score for Learning & Growth KPIs</b></td>
-                  <td class="border border-gray-300 px-4 py-2 text-center">
-                    <p class="mt-4 text-lg font-semibold">
-                      <span id="finalScore">{{learning_growth_form_final_score}}</span>
-                    </p>
-                  </td>
-                </tr>
-              </tfoot>          
-            </table>
+          {% endcomment %}
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+            <h4 class="text-xl font-semibold text-gray-800 border-b mt-4 pb-1">
+              Agreed for APA?
+            </h4>
+            <select
+              id="agreement_status"
+              name="agreement_status"
+              class="w-full mt-3 px-4 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="" disabled selected>Select an option</option>
+              <option value="agreed">Agreed</option>
+              <option value="disagreed">Disagreed</option>
+            </select>
+
+            {% comment %}
+            <div>
+              <label class="block text-sm text-gray-600 font-medium"
+                >1st Appraiser Name & Signature:</label
+              >
+              <div class="border-b border-gray-400 mt-4"></div>
+            </div>
+            <div>
+              <label class="block text-sm text-gray-600 font-medium"
+                >2nd Appraiser Name & Signature:</label
+              >
+              <div class="border-b border-gray-400 mt-4"></div>
+            </div>
+            {% endcomment %}
           </div>
+        </div>
+
+        <!-- Ratings Section -->
+        <div class="space-y-6 mt-10">
+          <h3 class="text-xl font-semibold text-gray-800 border-b pb-3">
+            Ratings
+          </h3>
+          <div class="flex items-center space-x-4">
+            <label
+              for="full_year_rating"
+              class="text-sm text-gray-600 font-medium"
+              >Overall Full Year Rating:</label
+            >
+            <span class="text-lg font-bold text-gray-900"
+              >{{ final_evaluation }}</span
+            >
+          </div>
+          <div class="mt-6">
+            <h4 class="text-sm font-semibold text-gray-600">
+              Rating Definitions
+            </h4>
+            <ul class="list-disc ml-6 mt-4 text-sm text-gray-700 space-y-2">
+              <li><strong>5</strong> - Outstanding</li>
+              <li><strong>4</strong> - Very Good</li>
+              <li><strong>3</strong> - Good</li>
+              <li><strong>2</strong> - Needs Improvement</li>
+              <li><strong>1</strong> - Unsatisfactory</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Employee Comments Section -->
+        <div class="space-y-6 mt-10">
+          <h3 class="text-xl font-semibold text-gray-800 border-b pb-3">
+            Employee Comments
+          </h3>
+          <textarea
+            name="employee_comments"
+            id="employee_comments"
+            rows="4"
+            placeholder="Enter your comments here"
+            class="w-full mt-3 px-2 py-14 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+          ></textarea>
         </div>
       </div>
 
-      <!-- Overall KPIs -->
-      <div class="bg-gray-50 py-4 ">
-        <form method="post" action="{% url 'employee_user:submit_ricp_data' %}" class="space-y-12">
-            <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-10">
-                <h1 class="text-3xl font-extrabold mb-8 text-center text-gray-800">Performance Review Form</h1>
-                {% csrf_token %}
-
-                <!-- KPIs/Job Objectives Section -->
-                <div class="space-y-6">
-                    <h2 class="text-xl font-semibold text-gray-800 border-b pb-3">KPIs/Job Objectives</h2>
-                    <div class="flex items-center space-x-4">
-                        <label for="overall_score" class="text-sm text-gray-600 font-medium">Overall Score:</label>
-                        <span class="text-lg font-bold text-gray-900">{{ total_score }}</span>
-                    </div>
-                </div>
-
-                <div class="space-y-8 mt-8">
-                    {% comment %} <h2 class="text-xl font-semibold text-gray-800 border-b pb-3">Agreement Details</h2> {% endcomment %}
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                        
-                            <h4 class="text-xl font-semibold text-gray-800 border-b mt-4 pb-1">Agreed for APA?</h4>
-                            <select id="agreement_status" name="agreement_status" class="w-full mt-3 px-4 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="" disabled selected>Select an option</option>
-                                <option value="agreed">Agreed</option>
-                                <option value="disagreed">Disagreed</option>
-                            </select>
-                        
-                        {% comment %} <div>
-                            <label class="block text-sm text-gray-600 font-medium">1st Appraiser Name & Signature:</label>
-                            <div class="border-b border-gray-400 mt-4"></div>
-                        </div>
-                        <div>
-                            <label class="block text-sm text-gray-600 font-medium">2nd Appraiser Name & Signature:</label>
-                            <div class="border-b border-gray-400 mt-4"></div>
-                        </div> {% endcomment %}
-                    </div>
-                </div>
-
-                <!-- Ratings Section -->
-                <div class="space-y-6 mt-10">
-                    <h3 class="text-xl font-semibold text-gray-800 border-b pb-3">Ratings</h3>
-                    <div class="flex items-center space-x-4">
-                        <label for="full_year_rating" class="text-sm text-gray-600 font-medium">Overall Full Year Rating:</label>
-                        <span class="text-lg font-bold text-gray-900">{{ final_evaluation }}</span>
-                    </div>
-                    <div class="mt-6">
-                        <h4 class="text-sm font-semibold text-gray-600">Rating Definitions</h4>
-                        <ul class="list-disc ml-6 mt-4 text-sm text-gray-700 space-y-2">
-                            <li><strong>5</strong> - Outstanding</li>
-                            <li><strong>4</strong> - Very Good</li>
-                            <li><strong>3</strong> - Good</li>
-                            <li><strong>2</strong> - Needs Improvement</li>
-                            <li><strong>1</strong> - Unsatisfactory</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Employee Comments Section -->
-                <div class="space-y-6 mt-10">
-                    <h3 class="text-xl font-semibold text-gray-800 border-b pb-3">Employee Comments</h3>
-                    <textarea name="employee_comments" id="employee_comments" rows="4" placeholder="Enter your comments here" class="w-full mt-3 px-2 py-14 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"></textarea>
-                </div>
-            </div>
-
-            <div class="mt-12 flex justify-center">
-              <button type="button" id="download" class="bg-green-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-700 hover:shadow-lg transition duration-200">
-                  Download
-              </button>
-            </div>
-      </form>
+      <div class="mt-12 flex justify-center">
+        <button
+          type="button"
+          id="download"
+          class="bg-green-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-700 hover:shadow-lg transition duration-200"
+        >
+          Download
+        </button>
+      </div>
+    </form>
   </div>
 </div>
 <script>
   document.getElementById("download").addEventListener("click", function () {
-      const button = this;
+    const button = this;
+    const edit = document.getElementsByClassName("my-edit");
+    Array.from(edit).forEach((edit) => {
+      edit.style.display = "none"; // Change background color of all elements
+    });
+    // Hide the button
+    button.style.display = "none";
+    // edit.style.display = "none";
 
-      // Hide the button
-      button.style.display = "none";
+    // Simulate PDF generation and download
+    generatePDF();
 
-      // Simulate PDF generation and download
-      generatePDF();
-
-      // Show the button again (if necessary, after some delay)
-      setTimeout(() => {
-          button.style.display = "block";
-      }, 3000); // Adjust the timeout as needed
+    // Show the button again (if necessary, after some delay)
+    setTimeout(() => {
+      button.style.display = "block";
+    }, 3000); // Adjust the timeout as needed
   });
 </script>
 
-
-
- {% endblock content %}
+{% endblock content %}
