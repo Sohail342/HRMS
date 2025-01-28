@@ -16,7 +16,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-y6v#uewfea@x)o(5z&uemx@lrojs^*_in60ri38_pxn1!#@k@u'
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -185,8 +185,8 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 9000
 
 # Cloudinary configuration
 cloudinary.config(
-    cloud_name="dqvuzjoji",
-    api_key='795997967248592',
-    api_secret="LdggdzrPdn6__w4I6CBL7cu9sdM",
+    cloud_name=os.getenv("cloud_name"),
+    api_key=os.getenv("api_key"),
+    api_secret=os.getenv("api_secret"),
     secure=True  
 )
