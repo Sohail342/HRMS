@@ -2,85 +2,80 @@
 
 {% block content %}
 <div class="container mx-auto px-4 mt-10">
-    <div class="max-w-2xl mx-auto p-6 border border-gray-300 rounded-lg shadow-lg bg-white dark:bg-gray-800">
-        <h2 class="text-2xl font-semibold text-center mb-6 text-blue-600 dark:text-blue-400">Leave Application</h2>
+    <div class="max-w-2xl mx-auto p-8 border border-gray-300 rounded-lg shadow-lg bg-white dark:bg-gray-800">
+        <!-- Header -->
+        <h2 class="text-3xl font-bold text-center mb-8 text-blue-600 dark:text-blue-400">Leave Application</h2>
 
+        <!-- Flash Messages -->
         {% if messages %}
-            <div class="mt-4">
+            <div class="mt-4 space-y-4">
                 {% for message in messages %}
-                    {% if message.tags == 'success' %}
-                        <div class="p-4 mb-4 text-sm text-green-700 bg-green-100 rounded-lg" role="alert">
-                            {{ message }}
-                        </div>
-                    {% elif message.tags == 'error' %}
-                        <div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg" role="alert">
-                            {{ message }}
-                        </div>
-                    {% else %}
-                        <div class="p-4 mb-4 text-sm text-gray-700 bg-gray-100 rounded-lg" role="alert">
-                            {{ message }}
-                        </div>
-                    {% endif %}
+                    <div class="p-4 text-sm rounded-lg 
+                        {% if message.tags == 'success' %}bg-green-100 text-green-700
+                        {% elif message.tags == 'error' %}bg-red-100 text-red-700
+                        {% else %}bg-gray-100 text-gray-700{% endif %}">
+                        {{ message }}
+                    </div>
                 {% endfor %}
             </div>
         {% endif %}
 
-        <form method="POST">
+        <!-- Form -->
+        <form method="POST" class="space-y-6">
             {% csrf_token %}
 
             <!-- Application Type -->
-            <div class="mb-6">
+            <div>
                 <label for="application_type" class="block text-gray-800 dark:text-gray-200 font-semibold mb-2">Type of Leave:</label>
                 <select id="application_type" name="application_type" required 
-                        class="mt-1 px-4 py-3 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-blue-400 transition dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300">
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-blue-400 transition dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300">
                     {% for choice in form.application_type.field.choices %}
-                        
                         {% if user_type == "Contractual" %}
                             {% if not choice.1 == "Privilege Leave" %}
-                            <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+                                <option value="{{ choice.0 }}">{{ choice.1 }}</option>
                             {% endif %}
                         {% else %}
                             <option value="{{ choice.0 }}">{{ choice.1 }}</option>
                         {% endif %}
-                        
                     {% endfor %}
                 </select>
             </div>
 
-            <!-- From Date -->
-            <div class="mb-6">
-                <label for="from_date" class="block text-gray-800 dark:text-gray-200 font-semibold mb-2">From:</label>
-                <input type="date" id="from_date" name="from_date" required 
-                       class="mt-1 px-4 py-3 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-blue-400 transition dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300">
+            <!-- Date Range -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <!-- From Date -->
+                <div>
+                    <label for="from_date" class="block text-gray-800 dark:text-gray-200 font-semibold mb-2">From:</label>
+                    <input type="date" id="from_date" name="from_date" required 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-blue-400 transition dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300">
+                </div>
+
+                <!-- To Date -->
+                <div>
+                    <label for="to_date" class="block text-gray-800 dark:text-gray-200 font-semibold mb-2">To:</label>
+                    <input type="date" id="to_date" name="to_date" required 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-blue-400 transition dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300">
+                </div>
             </div>
 
-            <!-- To Date -->
-            <div class="mb-6">
-                <label for="to_date" class="block text-gray-800 dark:text-gray-200 font-semibold mb-2">To:</label>
-                <input type="date" id="to_date" name="to_date" required 
-                       class="mt-1 px-4 py-3 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-blue-400 transition dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300">
-            </div>
-
-            <!-- Reason -->
-            <div class="mb-6">
+            <!-- Reason for Leave -->
+            <div>
                 <label for="reason" class="block text-gray-800 dark:text-gray-200 font-semibold mb-2">Reason for Leave:</label>
                 <textarea id="reason" name="reason" rows="4" required 
                           placeholder="Briefly explain your reason..." 
-                          class="mt-1 px-4 py-3 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-blue-400 transition dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300"></textarea>
+                          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-blue-400 transition dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300"></textarea>
             </div>
 
             <!-- Supervisor Signature -->
-            <div class="mb-6">
+            <div class="mt-8">
                 <label for="supervisor_signature" class="block text-gray-800 dark:text-gray-200 font-semibold mb-2">Supervisor Signature:</label>
-                <input type="text" id="supervisor_signature" name="supervisor_signature" required 
-                       placeholder="Enter supervisor's name" 
-                       class="mt-1 px-4 py-3 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-blue-400 transition dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300">
+                <div class="w-full h-12 border border-gray-300 rounded-lg bg-white dark:bg-gray-700"></div>
             </div>
 
             <!-- Submit Button -->
-            <div class="flex justify-center">
+            <div class="flex justify-center mt-10">
                 <button type="submit" 
-                        class="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-lg shadow-md hover:from-blue-600 hover:to-blue-700 transition focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        class="px-8 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-lg shadow-md hover:from-blue-600 hover:to-blue-700 transition focus:outline-none focus:ring-2 focus:ring-blue-500">
                     Submit Application
                 </button>
             </div>

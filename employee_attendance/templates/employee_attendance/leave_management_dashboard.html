@@ -1,7 +1,7 @@
 {% extends "sidebar.html" %}
 
 {% block content %}
-<div class="container flex justify-center item-center flex-col mx-auto p-6 bg-gray-50 min-h-screen">
+<div class="container mx-auto p-6 bg-gray-50 min-h-screen">
 
     <!-- Flash Messages -->
     {% if messages %}
@@ -22,52 +22,80 @@
     {% endif %}
 
     <!-- Header -->
-    <h1 class="text-3xl font-extrabold text-blue-600 text-center mb-8">Leave Management Dashboard</h1>
+    <div class="text-center mb-10">
+        <h1 class="text-4xl font-extrabold text-blue-600">Leave Management Dashboard</h1>
+        <p class="mt-2 text-gray-600">Manage employee leave requests and approvals efficiently.</p>
+    </div>
 
     <!-- Summary Section -->
-    <div>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <!-- Total Employees -->
-            <div class="bg-blue-100 border border-blue-400 p-6 rounded-lg shadow-lg text-center transition hover:scale-105">
-                <h3 class="font-semibold text-xl text-blue-700">Total Employees</h3>
-                <p class="text-3xl font-extrabold text-blue-600 mt-2">{{ total_employees }}</p>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
+        <!-- Total Employees -->
+        <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-700">Total Employees</h3>
+                    <p class="text-3xl font-bold text-blue-600 mt-2">{{ total_employees }}</p>
+                </div>
+                <div class="p-3 bg-blue-100 rounded-full">
+                    <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                </div>
             </div>
+        </div>
 
-            <!-- Total Leave Requests -->
-            <div class="bg-green-100 border border-green-400 p-6 rounded-lg shadow-lg text-center transition hover:scale-105">
-                <h3 class="font-semibold text-xl text-green-700">Total Leave Requests</h3>
-                <p class="text-3xl font-extrabold text-green-600 mt-2">{{ total_leave_requests }}</p>
+        <!-- Total Leave Requests -->
+        <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-700">Total Leave Requests</h3>
+                    <p class="text-3xl font-bold text-green-600 mt-2">{{ total_leave_requests }}</p>
+                </div>
+                <div class="p-3 bg-green-100 rounded-full">
+                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
             </div>
+        </div>
 
-            <!-- Pending Approvals -->
-            <div class="bg-yellow-100 border border-yellow-400 p-6 rounded-lg shadow-lg text-center transition hover:scale-105">
-                <h3 class="font-semibold text-xl text-yellow-700">Pending Approvals</h3>
-                <p class="text-3xl font-extrabold text-yellow-600 mt-2">{{ pending_approvals }}</p>
+        <!-- Pending Approvals -->
+        <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-700">Pending Approvals</h3>
+                    <p class="text-3xl font-bold text-yellow-600 mt-2">{{ pending_approvals }}</p>
+                </div>
+                <div class="p-3 bg-yellow-100 rounded-full">
+                    <svg class="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Leave Requests Management -->
-    <div class="">
-        <table class="min-w-full bg-white rounded-lg shadow-lg mt-5 rounded">
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+        <table class="min-w-full">
             <thead class="bg-gradient-to-r from-blue-500 to-blue-700 text-white">
                 <tr>
-                    <th class="py-4 px-6 text-center font-semibold text-sm uppercase tracking-wider">Leave Type</th>
-                    <th class="py-4 px-6 text-center font-semibold text-sm uppercase tracking-wider">Employee Name</th>
-                    <th class="py-4 px-6 text-center font-semibold text-sm uppercase tracking-wider">From</th>
-                    <th class="py-4 px-6 text-center font-semibold text-sm uppercase tracking-wider">To</th>
-                    <th class="py-4 px-6 text-center font-semibold text-sm uppercase tracking-wider">leave_status</th>
-                    <th class="py-4 px-6 text-center font-semibold text-sm uppercase tracking-wider">Actions</th>
+                    <th class="py-4 px-6 text-left font-semibold text-sm uppercase tracking-wider">Employee Name</th>
+                    <th class="py-4 px-6 text-left font-semibold text-sm uppercase tracking-wider">Leave Type</th>
+                    <th class="py-4 px-6 text-left font-semibold text-sm uppercase tracking-wider">From</th>
+                    <th class="py-4 px-6 text-left font-semibold text-sm uppercase tracking-wider">To</th>
+                    <th class="py-4 px-6 text-left font-semibold text-sm uppercase tracking-wider">Status</th>
+                    <th class="py-4 px-6 text-left font-semibold text-sm uppercase tracking-wider">Actions</th>
                 </tr>
             </thead>
             <tbody class="text-gray-700">
                 {% for request in leave_requests %}
-                <tr class="border-b last:border-0 hover:bg-gray-100 transition">
-                    <td class="py-4 text-center px-6 font-medium">{{ request.employee.name }}</td>
-                    <td class="py-4 text-center px-6">{{ request.application_type }}</td>
-                    <td class="py-4 text-center px-6">{{ request.from_date }}</td>
-                    <td class="py-4 text-center px-6">{{ request.to_date }}</td>
-                    <td class="py-4 text-center  px-6">
+                <tr class="border-b last:border-0 hover:bg-gray-50 transition">
+                    <td class="py-4 px-6">{{ request.employee.name }}</td>
+                    <td class="py-4 px-6">{{ request.application_type }}</td>
+                    <td class="py-4 px-6">{{ request.from_date }}</td>
+                    <td class="py-4 px-6">{{ request.to_date }}</td>
+                    <td class="py-4 px-6">
                         <span class="px-3 py-1 text-sm font-medium rounded 
                             {% if request.leave_status == 'pending' %}bg-yellow-200 text-yellow-800
                             {% elif request.leave_status == 'approved' %}bg-green-200 text-green-800
@@ -75,7 +103,7 @@
                             {{ request.leave_status | title }}
                         </span>
                     </td>
-                    <td class="py-4 text-center px-6">
+                    <td class="py-4 px-6">
                         {% if request.leave_status == "pending" %}
                         <div class="flex space-x-2">
                             <a href="{% url 'employee_attendance:status_approval' request.id 'Approved' %}" 

@@ -159,13 +159,13 @@ def dashboard_view(request):
     sick_leaves_count = sum(item['availed_leaves'] for item in sick_leaves)
     remaining_sick_leaves = 18 - sick_leaves_count
     
-    pending_count = LeaveApplication.objects.filter(employee=request.user, status='pending').count()
-    approved_count = LeaveApplication.objects.filter(employee=request.user, status='approved').count()
-    declined_count = LeaveApplication.objects.filter(employee=request.user, status='declined').count()
+    pending_count = LeaveApplication.objects.filter(employee=request.user, leave_status='pending').count()
+    approved_count = LeaveApplication.objects.filter(employee=request.user, leave_status='approved').count()
+    declined_count = LeaveApplication.objects.filter(employee=request.user, leave_status='declined').count()
     
-    pending_requests = LeaveApplication.objects.filter(employee=request.user, status='pending')
-    approved_requests = LeaveApplication.objects.filter(employee=request.user, status='approved')
-    declined_requests = LeaveApplication.objects.filter(employee=request.user, status='declined')
+    pending_requests = LeaveApplication.objects.filter(employee=request.user, leave_status='pending')
+    approved_requests = LeaveApplication.objects.filter(employee=request.user, leave_status='approved')
+    declined_requests = LeaveApplication.objects.filter(employee=request.user, leave_status='declined')
     
     approved_requests_list = list(approved_requests.values('application_type', 'from_date', 'to_date', 'reason'))
     pending_requests_list = list(pending_requests.values('application_type', 'from_date', 'to_date','reason'))
