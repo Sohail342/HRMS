@@ -56,7 +56,7 @@
                     <th class="py-4 px-6 text-center font-semibold text-sm uppercase tracking-wider">Employee Name</th>
                     <th class="py-4 px-6 text-center font-semibold text-sm uppercase tracking-wider">From</th>
                     <th class="py-4 px-6 text-center font-semibold text-sm uppercase tracking-wider">To</th>
-                    <th class="py-4 px-6 text-center font-semibold text-sm uppercase tracking-wider">Status</th>
+                    <th class="py-4 px-6 text-center font-semibold text-sm uppercase tracking-wider">leave_status</th>
                     <th class="py-4 px-6 text-center font-semibold text-sm uppercase tracking-wider">Actions</th>
                 </tr>
             </thead>
@@ -69,14 +69,14 @@
                     <td class="py-4 text-center px-6">{{ request.to_date }}</td>
                     <td class="py-4 text-center  px-6">
                         <span class="px-3 py-1 text-sm font-medium rounded 
-                            {% if request.status == 'pending' %}bg-yellow-200 text-yellow-800
-                            {% elif request.status == 'approved' %}bg-green-200 text-green-800
+                            {% if request.leave_status == 'pending' %}bg-yellow-200 text-yellow-800
+                            {% elif request.leave_status == 'approved' %}bg-green-200 text-green-800
                             {% else %}bg-red-200 text-red-800{% endif %}">
-                            {{ request.status | title }}
+                            {{ request.leave_status | title }}
                         </span>
                     </td>
                     <td class="py-4 text-center px-6">
-                        {% if request.status == "pending" %}
+                        {% if request.leave_status == "pending" %}
                         <div class="flex space-x-2">
                             <a href="{% url 'employee_attendance:status_approval' request.id 'Approved' %}" 
                                class="bg-green-600 text-white py-1 px-4 rounded-md hover:bg-green-700 transition">
@@ -88,7 +88,7 @@
                             </a>
                         </div>
                         {% else %}
-                        <span class="text-gray-500">{{ request.status | title }}</span>
+                        <span class="text-gray-500">{{ request.leave_status | title }}</span>
                         {% endif %}
                     </td>
                 </tr>

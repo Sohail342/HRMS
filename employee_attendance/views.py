@@ -16,23 +16,23 @@ def leave_management_dashboard(request):
     # Summary Statistics
     total_employees = Employee.objects.count()
     total_leave_requests = LeaveApplication.objects.count()
-    pending_approvals = LeaveApplication.objects.filter(status="pending").count()
+    pending_approvals = LeaveApplication.objects.filter(leave_status="pending").count()
     
 
     # Leave Requests
     
     leave_requests = LeaveApplication.objects.all()
 
-    # Adding CSS classes for status
+    # Adding CSS classes for leave_status
     for leave in leave_requests:
-        if leave.status == "Pending":
-            leave.status_class = "bg-yellow-100 text-yellow-700"
-        elif leave.status == "Approved":
-            leave.status_class = "bg-green-100 text-green-700"
-        elif leave.status == "Declined":
-            leave.status_class = "bg-red-100 text-red-700"
+        if leave.leave_status == "Pending":
+            leave.leave_status_class = "bg-yellow-100 text-yellow-700"
+        elif leave.leave_status == "Approved":
+            leave.leave_status_class = "bg-green-100 text-green-700"
+        elif leave.leave_status == "Declined":
+            leave.leave_status_class = "bg-red-100 text-red-700"
         else:
-            leave.status_class = "bg-gray-100 text-gray-700"
+            leave.leave_status_class = "bg-gray-100 text-gray-700"
 
     # Employee Leave Balances
     employees = Employee.objects.all()
@@ -48,8 +48,8 @@ def leave_management_dashboard(request):
 
 def approve_leave(request, pk):
     leave_application = get_object_or_404(LeaveApplication, pk=pk)
-    if leave_application.status == "Pending":
-        leave_application.status = "Approved"
+    if leave_application.leave_status == "Pending":
+        leave_application.leave_status = "Approved"
         leave_application.save()
         messages.success(request, f"Leave for {leave_application.employee.name} approved.")
     else:
@@ -60,8 +60,8 @@ def approve_leave(request, pk):
 
 def decline_leave(request, pk):
     leave_application = get_object_or_404(LeaveApplication, pk=pk)
-    if leave_application.status == "Pending":
-        leave_application.status = "Declined"
+    if leave_application.leave_status == "Pending":
+        leave_application.leave_status = "Declined"
         leave_application.save()
         messages.success(request, f"Leave for {leave_application.employee.name} declined.")
     else:
@@ -70,12 +70,12 @@ def decline_leave(request, pk):
 
 
 
-def status_approval(request, request_id, status):
+def status_approval(request, request_id, leave_status):
     user = LeaveApplication.objects.get(id=request_id)
-    if status:
-        user.status = status
+    if leave_status:
+        user.leave_status = leave_status
         user.save()
-        messages.success(request, "Status updated")
+        messages.success(request, "leave_status updated")
     return redirect("employee_attendance:leave_management_dashboard")
 
 #------------- Non-Involvement Certificate Request -------------

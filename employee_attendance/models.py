@@ -54,7 +54,7 @@ class LeaveApplication(models.Model):
     application_type = models.CharField(max_length=100, choices=LEAVE_CHOICES)
     supervisor_signature = models.CharField(max_length=100)
     is_approved = models.BooleanField(default=False)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    leave_status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
 
     def __str__(self):
         return f"{self.employee.name} - {self.application_type}"
