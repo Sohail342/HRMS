@@ -20,7 +20,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*', '.vercel.app/']
 
@@ -100,21 +100,20 @@ WSGI_APPLICATION = 'HRMS.wsgi.application'
 
 
 # Get DATABASE_URL from environment
-DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_NAME = os.getenv("DATABASE_NAME")
 
 # Parse the DATABASE_URL
-if DATABASE_URL:
-    tmpPostgres = urlparse(DATABASE_URL)
+if DATABASE_NAME:
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': tmpPostgres.path.lstrip('/'),
-            'USER': tmpPostgres.username,
-            'PASSWORD': tmpPostgres.password,
-            'HOST': tmpPostgres.hostname,
-            'PORT': tmpPostgres.port or 5432,
-        }
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv("DATABASE_NAME"),
+        'USER': os.getenv("DATABASE_USER"),
+        'PASSWORD': os.getenv("DATABASE_PASSWORD"),
+        'HOST': os.getenv("DATABASE_HOST"),
+        'OPTIONS': {'sslmode': 'require'},
     }
+}
 else:
     # Fallback for local development
     DATABASES = {

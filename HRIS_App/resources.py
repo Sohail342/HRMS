@@ -1,4 +1,5 @@
 from import_export import resources, fields
+from import_export.widgets import DateWidget
 from import_export.widgets import ForeignKeyWidget, ManyToManyWidget
 from .models import Employee, Designation, Cadre, EmployeeType, EmployeeGrade, Branch, Qualification, Region, FunctionalGroup, Group
 
@@ -48,6 +49,7 @@ class EmployeeResource(resources.ModelResource):
         attribute='designation',
         widget=ForeignKeyWidget(Designation, field='title')
     )
+    
     cadre = fields.Field(
         column_name='cadre',
         attribute='cadre',
@@ -84,7 +86,10 @@ class EmployeeResource(resources.ModelResource):
         fields = (
             'id', 'SAP_ID', 'email', 'password', 'name', 'designation', 'cadre', 'employee_type',
             'employee_grade', 'branch', 'region', 'qualifications', 'date_of_joining',
-            'mobile_number', 'date_of_last_promotion', 'remarks', 'grade_assignment',
+            'mobile_number', 'date_of_last_promotion', 'remarks', 'grade_assignment', 'date_of_joining', 
+            'date_of_retirement', 'birth_date', 'date_of_contract_expiry', 'date_current_posting', 
+            'date_current_assignment',
+            
         )
         export_order = (
             'id', 'SAP_ID', 'email', 'name', 'designation', 'cadre', 'employee_type',

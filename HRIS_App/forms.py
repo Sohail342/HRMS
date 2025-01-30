@@ -24,7 +24,7 @@ class AdminEmployeeForm(forms.ModelForm):
             'region', 
             'branch',
             'qualifications', 
-            'date_of_last_promotion', 
+            'date_of_retirement', 
             'date_current_posting', 
             'date_current_assignment', 
             'mobile_number', 
