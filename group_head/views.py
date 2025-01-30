@@ -233,12 +233,17 @@ class SearchEmployee(View):
         url = None
 
         try:
-            employee = Employee.objects.get(SAP_ID__icontains=query) if query else None
+            query = int(query) if query.isdigit() else None
+            employee = Employee.objects.filter(SAP_ID=query) if query else None
 
             if query:
                 employee_pdf_files = Employee.objects.filter(SAP_ID__icontains=query).values('name', 'pdf_file')
+            
+            if not employee:
+                messages.error(request, 'No employees found matching your search.')
 
         except Employee.DoesNotExist:
+
             messages.error(request, 'No employees found matching your search.')
             
 

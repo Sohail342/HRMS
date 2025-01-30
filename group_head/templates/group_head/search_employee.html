@@ -38,6 +38,7 @@
 {% if employee %}
     <div class="mt-8">
         <ul class="space-y-4">
+            {% for employee in employee %}
                 <li class="bg-gray-100 p-6 rounded-lg shadow-lg hover:bg-gray-200 transition-all flex justify-between items-center">
                     <span class="text-lg font-medium text-gray-800">{{ employee.name }}</span>
                     {% if employee.pdf_file %}
@@ -54,6 +55,7 @@
                         Upload PDF
                     </a>
                 </li>
+            {% endfor %}
         </ul>
     </div>
   

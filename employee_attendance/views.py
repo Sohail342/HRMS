@@ -14,7 +14,7 @@ from HRIS_App.models import Employee
 
 def leave_management_dashboard(request):
     # Summary Statistics
-    total_employees = Employee.objects.count()
+    total_employees = Employee.objects.exclude(is_admin=True).count()
     total_leave_requests = LeaveApplication.objects.count()
     pending_approvals = LeaveApplication.objects.filter(leave_status="pending").count()
     
