@@ -417,9 +417,7 @@ def update_kpis(request, form_type):
     elif form_type == "learning_growth_kpi":
         kpis = RicpKPI.objects.filter(ricp_data=ricp_data, bsc_form_type="learning_Growth_kpi")
         
-    from icecream import ic
-    for i in kpis:
-        ic(i.id)
+
     
     if request.method == "POST":
         for kpi in kpis:
