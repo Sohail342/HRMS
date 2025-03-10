@@ -11,19 +11,35 @@
      <div class="mb-12">    
         <div class="mb-8 text-center">
             <label for="application_date" class="block text-sm font-medium text-gray-700">Enter Application date:</label>
-            <input type="text" id="application_date" class="mt-2 p-2 w-full max-w-xs mx-auto border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder-gray-500 text-sm" required placeholder="e.g.  {{current_time |date:"j-F-Y"}}">
+            <input type="date" id="application_date" class="mt-2 p-2 w-full max-w-xs mx-auto border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder-gray-500 text-sm" required placeholder="e.g.  {{current_time |date:"j-F-Y"}}">
         </div>
         <div class="mb-8 text-center">
             <label for="granted_leaves" class="block text-sm font-medium text-gray-700">Granted Leaves:</label>
-            <input type="text" id="granted_leaves" class="mt-2 p-2 w-full max-w-xs mx-auto border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder-gray-500 text-sm" required placeholder="e.g.  20 days">
+            <input type="date" id="granted_leaves" class="mt-2 p-2 w-full max-w-xs mx-auto border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder-gray-500 text-sm" required placeholder="e.g.  20 days">
         </div>
         <div class="mb-8 text-center">
             <label for="effect_from" class="block text-sm font-medium text-gray-700">Effect from:</label>
-            <input type="text" id="effect_from" class="mt-2 p-2 w-full max-w-xs mx-auto border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder-gray-500 text-sm" required placeholder="e.g.  4-Nov-2025 to 4-Nov-2024">
+            <input type="date" id="effect_from" class="mt-2 p-2 w-full max-w-xs mx-auto border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder-gray-500 text-sm" required placeholder="e.g.  4-Nov-2025 to 4-Nov-2024">
         </div>
+        <div class="mb-8 text-center">
+            <label for="leave_type_option" class="block text-sm font-medium text-gray-700">Leave type:</label>
+            <select id="leave_type_option" name="leave_type_option" class="w-1/4 bg-white border border-blue-500 py-2 px-4 rounded-lg focus:outline-none focus:border-blue-700 transition-colors duration-300 shadow-md">
+                <option value="Priviliege Leave">Priviliege Leave</option>
+                <option value="Mandatory Leave">Mandatory Leave</option>
+                <option value="Casual Leave">Casual Leave</option>
+                <option value="Ex-Pakistan">Ex-Pakistan</option>
+                <option value="Sick Leave">Sick Leave</option>                
+                
+            </select>
+        </div>
+        <div class="mb-8 text-center">
+            <label for="purpose" class="block text-sm font-medium text-gray-700">Leave Purpose:</label>
+            <input type="text" id="purpose" class="mt-2 p-2 w-full max-w-xs mx-auto border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder-gray-500 text-sm" required placeholder="e.g.  study purpose">
+        </div>
+        
     </div>  
 
-    <div id="print" class="max-w-screen-md mx-auto bg-white p-12 border border-gray-300">
+    <div id="printo" class="max-w-screen-md mx-auto bg-white p-12 border border-gray-300">
         <!-- Header Section -->
         <div class="mb-4">
             <div class="flex justify-between items-center">
@@ -52,8 +68,8 @@
         <!-- Body Text -->
         <p class="mb-4" style="text-align: justify;">
             With reference to his application dated <b><span id="application_date_text">______________</span></b> Mr. {{employee.name}}, OG-II/{{employee.employee_type}} SAP ID: {{employee.SAP_ID}}, 
-            NBP, Regional Office, Faisalabad is advised that he has been granted <span id="granted_leaves_text">______________</span> (Ex-Pakistan Leave) for study purpose - Research Master Program in Management, from IAE AIX-Marseille Graduate School 
-            of Management, France with effect from <span id="effect_from_text">_____________</span>.
+            NBP, Regional Office, Faisalabad is advised that he has been granted <span id="granted_leaves_text">______________</span> <span id="leave_type_text">______________</span> for - <span id="purpose_text">______________</span>,
+            with effect from <span id="effect_from_text">_____________</span>.
         </p>
         <p class="mb-4" style="text-align: justify;">
             He will accordingly stand relieved to his duties as of close of office today i.e. <b>Jan 9, 2022</b> to avail sanctioned leaves. It is further advised that no extension in leave will be allowed to him under any circumstances.
@@ -103,7 +119,7 @@
         const granted_leaves = document.getElementById('granted_leaves').value;
         const effect_from = document.getElementById('effect_from').value;
 
-        const form = document.querySelector('select');
+        const form = document.getElementById('form_type');
         form.style.visibility = 'hidden'; // Make the select element invisible but keep its position
         
         if(application_date && granted_leaves && effect_from){
@@ -113,7 +129,7 @@
             
         
         
-            const element = document.getElementById('print');
+            const element = document.getElementById('printo');
             
             // Options for generating PDF
             const options = {
@@ -145,6 +161,14 @@
 
     document.getElementById('effect_from').addEventListener('input', function() {
         document.getElementById('effect_from_text').textContent = this.value || "______________";
+    });
+
+    document.getElementById('leave_type_option').addEventListener('change', function() {
+        document.getElementById('leave_type_text').textContent = this.value || "______________";
+    });
+
+    document.getElementById('purpose').addEventListener('input', function() {
+        document.getElementById('purpose_text').textContent = this.value || "______________";
     });
 
 

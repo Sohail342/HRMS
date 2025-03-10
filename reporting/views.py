@@ -17,7 +17,7 @@ def get_employee_data(request):
 
     
     data = {
-        'full_name': employee.name,
+        'name': employee.name,
         'designation': str(employee.designation),
     }
     
