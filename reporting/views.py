@@ -4,21 +4,39 @@ from django.utils.decorators import method_decorator
 from django.utils import timezone
 from group_head.decorators import admin_required
 from django.http import JsonResponse
+from .models import Signature
 from django.views.generic import DetailView, ListView
 from HRIS_App.models import Employee
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView
 
 
+
+def get_employee_data(request):
+    sap_id = request.GET.get('sap_id')
+    employee = get_object_or_404(Employee, SAP_ID=sap_id)
+    data = {
+        'employee_name': employee.name,
+        'designation': employee.designation,
+    }
+    return JsonResponse(data)
+
+
+
 #  AJAX request
 def get_employee_data(request):
     sap_id = request.GET.get('sap_id')
-    employee = get_object_or_404(Employee, SAP_ID=sap_id, admin_signature=True)
+    employee = get_object_or_404(Signature, SAP_ID=sap_id)
 
     
     data = {
-        'name': employee.name,
-        'designation': str(employee.designation),
+        'employee_name': employee.employee_name if employee.employee_name else "",
+        'designation': str(employee.designation) if employee.designation else "",
+        'grade': str(employee.grade) if employee.grade else "",
+        'department': str(employee.department) if employee.department else "",
+        'wing': str(employee.wing) if employee.wing else "",
+        'division': str(employee.division) if employee.division else "",
+        'group': str(employee.group) if employee.group else "", 
     }
     
     return JsonResponse(data)
@@ -35,13 +53,18 @@ class MemorandumMixin:
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['admin_signuture'] = Employee.objects.filter(admin_signature=True)
         context['employees'] = Employee.objects.all()
         context['current_time'] = timezone.now()
         return context
     
 @method_decorator(admin_required, name='dispatch')
 class LeaveMemorandum(MemorandumMixin, DetailView):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['employees'] = Employee.objects.all()
+        context['current_time'] = timezone.now()
+        context['admin_signuture'] = Signature.objects.all()
+        return context
     template_name = 'reporting/letter_templates/leave_memorandum.html' 
 
     

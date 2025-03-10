@@ -15,7 +15,7 @@
         </div>
         <div class="mb-8 text-center">
             <label for="granted_leaves" class="block text-sm font-medium text-gray-700">Granted Leaves:</label>
-            <input type="date" id="granted_leaves" class="mt-2 p-2 w-full max-w-xs mx-auto border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder-gray-500 text-sm" required placeholder="e.g.  20 days">
+            <input type="number" id="granted_leaves" class="mt-2 p-2 w-full max-w-xs mx-auto border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder-gray-500 text-sm" required placeholder="e.g.  20 days">
         </div>
         <div class="mb-8 text-center">
             <label for="effect_from" class="block text-sm font-medium text-gray-700">Effect from:</label>
@@ -32,9 +32,14 @@
                 
             </select>
         </div>
+        
         <div class="mb-8 text-center">
             <label for="purpose" class="block text-sm font-medium text-gray-700">Leave Purpose:</label>
             <input type="text" id="purpose" class="mt-2 p-2 w-full max-w-xs mx-auto border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder-gray-500 text-sm" required placeholder="e.g.  study purpose">
+        </div>
+        <div class="mb-8 text-center">
+            <label for="absence_employee" class="block text-sm font-medium text-gray-700">Employee Back-up SAP ID:</label>
+            <input type="number" id="absence_employee" class="mt-2 p-2 w-full max-w-xs mx-auto border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder-gray-500 text-sm" required placeholder="e.g. 83787">
         </div>
         
     </div>  
@@ -75,7 +80,7 @@
             He will accordingly stand relieved to his duties as of close of office today i.e. <b>Jan 9, 2022</b> to avail sanctioned leaves. It is further advised that no extension in leave will be allowed to him under any circumstances.
         </p>
         <p class="mb-4" style="text-align: justify;">
-            During his absence, Miss. Saira Rafiq, OG-I, SAP ID: 18245, will look after his assignment.
+            During his absence, <span id="employee_backup_name">_____________</span>, <span id="employee_backup_designation">_____________</span>, SAP ID: <span id="employee_backup_sapID">_____________</span>, will look after his assignment.
         </p>
 
         
@@ -83,7 +88,7 @@
             <select id="form_type" name="form_type" class="w-1/4 bg-white border border-blue-500 py-2 px-4 rounded-lg focus:outline-none focus:border-blue-700 transition-colors duration-300 shadow-md">
                 <option value="">Admin Signature</option>
                 {% for employee in admin_signuture %}
-                    <option value="{{ employee.SAP_ID }}">{{ employee.name }} ({{ employee.SAP_ID }})</option>
+                    <option value="{{ employee.SAP_ID }}">{{ employee.employee_name }} ({{ employee.SAP_ID }})</option>
                 {% endfor %}
             </select>
         </div>
@@ -171,35 +176,81 @@
         document.getElementById('purpose_text').textContent = this.value || "______________";
     });
 
+    // Fetch employee data based on SAP ID
+    document.getElementById('absence_employee').addEventListener('input', function() {
+    const sapId = this.value;
 
-    // Ajax data
+    if (sapId) {
+        // Make an AJAX request to fetch employee data
+        fetch(`/get_employee_data/?sap_id=${sapId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.employee_name && data.designation) {
+                    // Update the DOM with the fetched data
+                    document.getElementById('employee_backup_name').textContent = data.employee_name;
+                    document.getElementById('employee_backup_designation').textContent = data.designation;
+                    document.getElementById('employee_backup_sapID').textContent = sapId;
+                } else {
+                    // If no data is found, reset the placeholders
+                    resetPlaceholders();
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching employee data:', error);
+                resetPlaceholders();
+            });
+    } else {
+        // If the input is empty, reset the placeholders
+        resetPlaceholders();
+    }
+});
+
+function resetPlaceholders() {
+    document.getElementById('employee_backup_name').textContent = "_____________";
+    document.getElementById('employee_backup_designation').textContent = "_____________";
+    document.getElementById('employee_backup_sapID').textContent = "_____________";
+}
+
+
     $(document).ready(function() {
-        $('#form_type').on('change', function() {
-            var sapId = $(this).val();
-            if (sapId) {
-                $.ajax({
-                    url: "{% url 'reporting:get_employee_data' %}", 
-                    data: {
-                        'sap_id': sapId
-                    },
-                    dataType: 'json',
-                    success: function(data) {
-                        // Update the employee details section with retrieved data
-                        $('#employee-details').html(`
-                            <p>_________________________</p>
-                            <p class="font-semibold">${data.name}</p>
-                            <p class="text-sm">${data.designation}/Administration</p>
-                        `);
-                    },
-                    error: function() {
-                        $('#employee-details').html('<p class="text-red-500">Error loading data.</p>');
+    $('#form_type').on('change', function() {
+        var sapId = $(this).val();
+        if (sapId) {
+            $.ajax({
+                url: "{% url 'reporting:get_employee_data' %}", 
+                data: {
+                    'sap_id': sapId
+                },
+                dataType: 'json',
+                success: function(data) {
+                    // Determine the text for the upper <p> (grade/designation/group)
+                    var upperText = `${data.grade}/${data.designation}`;
+                    if (!data.department && data.wing) {
+                        upperText += `/${data.group}`; // Append group if condition is met
                     }
-                });
-            } else {
-                $('#employee-details').empty();
-            }
-        });
+
+                    // Determine the text for the lower <p> (wing/department/group)
+                    var lowerText = data.wing || data.department || data.group ? 
+                        `${data.wing ? data.wing + '-' : ''}${data.department ? data.department + '-' : ''}${data.group}` : 
+                        '';
+
+                    // Update the employee details section with retrieved data
+                    $('#employee-details').html(`
+                        <p>_________________________</p>
+                        <p class="font-semibold">${data.employee_name}</p>
+                        <p class="text-sm">${upperText}</p>
+                        <p class="text-sm">${lowerText}</p>
+                    `);
+                },
+                error: function() {
+                    $('#employee-details').html('<p class="text-red-500">Error loading data.</p>');
+                }
+            });
+        } else {
+            $('#employee-details').empty();
+        }
     });
+});
 
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
