@@ -51,7 +51,7 @@
 
         <!-- Body Text -->
         <p class="mb-4" style="text-align: justify;">
-            With reference to his application dated <b><span id="application_date_text">______________</span></b> Mr. {{employee.full_name}}, OG-II/{{employee.employee_type}} SAP ID: {{employee.SAP_ID}}, 
+            With reference to his application dated <b><span id="application_date_text">______________</span></b> Mr. {{employee.name}}, OG-II/{{employee.employee_type}} SAP ID: {{employee.SAP_ID}}, 
             NBP, Regional Office, Faisalabad is advised that he has been granted <span id="granted_leaves_text">______________</span> (Ex-Pakistan Leave) for study purpose - Research Master Program in Management, from IAE AIX-Marseille Graduate School 
             of Management, France with effect from <span id="effect_from_text">_____________</span>.
         </p>
@@ -67,7 +67,7 @@
             <select id="form_type" name="form_type" class="w-1/4 bg-white border border-blue-500 py-2 px-4 rounded-lg focus:outline-none focus:border-blue-700 transition-colors duration-300 shadow-md">
                 <option value="">Admin Signature</option>
                 {% for employee in admin_signuture %}
-                    <option value="{{ employee.SAP_ID }}">{{ employee.full_name }} ({{ employee.SAP_ID }})</option>
+                    <option value="{{ employee.SAP_ID }}">{{ employee.name }} ({{ employee.SAP_ID }})</option>
                 {% endfor %}
             </select>
         </div>
@@ -81,7 +81,7 @@
 
         <!-- Recipient Information Section -->
         <div class="mt-8">
-            <p class="font-semibold">Mr. {{employee.full_name}}</p>
+            <p class="font-semibold">Mr. {{employee.name}}</p>
             <p class="text-sm">OG-II/{{employee.employee_type}}</p>
             <p class="text-sm">SAP ID: {{employee.SAP_ID}}</p>
         </div>
@@ -118,7 +118,7 @@
             // Options for generating PDF
             const options = {
                 margin:       10,
-                filename:     '{{employee.full_name}}.pdf',
+                filename:     '{{employee.name}}.pdf',
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2 }, // For high-quality rendering
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
@@ -163,7 +163,7 @@
                         // Update the employee details section with retrieved data
                         $('#employee-details').html(`
                             <p>_________________________</p>
-                            <p class="font-semibold">${data.full_name}</p>
+                            <p class="font-semibold">${data.name}</p>
                             <p class="text-sm">${data.designation}/Administration</p>
                         `);
                     },

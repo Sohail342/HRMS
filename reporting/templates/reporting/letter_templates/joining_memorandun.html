@@ -70,7 +70,7 @@
         <!-- Recipient Information Section -->
         <div class="mt-8">
             <p>_________________________</p>
-            <p class="font-semibold">Mr. {{employee.full_name}}</p>
+            <p class="font-semibold">Mr. {{employee.name}}</p>
             <p class="text-sm">OG-II/{{employee.employee_type}}</p>
             <p class="text-sm">SAP ID: {{employee.SAP_ID}}</p>
         </div>
@@ -122,7 +122,7 @@
             const element = document.getElementById('print');
             const options = {
                 margin:       10,
-                filename:     '{{employee.full_name}}.pdf',
+                filename:     '{{employee.name}}.pdf',
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2 },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }

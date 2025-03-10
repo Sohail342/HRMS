@@ -66,7 +66,7 @@
             <select id="form_type" name="form_type" class="w-1/4 bg-white border border-blue-500 py-2 px-4 rounded-lg focus:outline-none focus:border-blue-700 transition-colors duration-300 shadow-md">
                 <option value="">Select</option>
                 {% for employee in admin_signuture %}
-                    <option value="{{ employee.SAP_ID }}">{{ employee.full_name }} ({{ employee.SAP_ID }})</option>
+                    <option value="{{ employee.SAP_ID }}">{{ employee.name }} ({{ employee.SAP_ID }})</option>
                 {% endfor %}
             </select>
         </div>
@@ -100,7 +100,7 @@
         // Adjusted PDF generation options for a better fit
         const options = {
             margin:       5,  // Reduced margin to better fit content on A4
-            filename:     '{{employee.full_name}}.pdf',
+            filename:     '{{employee.name}}.pdf',
             image:        { type: 'jpeg', quality: 0.98 },
             html2canvas:  { scale: 1.5 }, // Slightly lower scale for better fitting
             jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
@@ -127,7 +127,7 @@
                         // Update the employee details section with retrieved data
                         $('#employee-details').html(`
                             <p>_________________________</p>
-                            <p class="font-semibold">${data.full_name}</p>
+                            <p class="font-semibold">${data.name}</p>
                             <p class="text-sm">${data.designation}/Administration</p>
                         `);
                     },
