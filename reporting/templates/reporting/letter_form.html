@@ -10,6 +10,23 @@
             <p>{{ errors }}</p>
         </div>
         {% endif %}
+        <!-- Display all messages -->
+        {% if messages %}
+            <div class="space-y-4 mb-4">
+                {% for message in messages %}
+                    <div class="p-4 rounded-lg 
+                        {% if message.tags == 'error' %}
+                            bg-red-100 border-l-4 border-red-500 text-red-700
+                        {% elif message.tags == 'success' %}
+                            bg-green-100 border-l-4 border-green-500 text-green-700
+                        {% else %}
+                            bg-blue-100 border-l-4 border-blue-500 text-blue-700
+                        {% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
 
         <form method="POST" action="">
             {% csrf_token %}
@@ -53,14 +70,35 @@
 
         <!-- Buttons in a row -->
         <div class="flex justify-center space-x-4 mt-6">
-            <!-- Add Employee Button -->
-            <a href="{% url 'admin:HRIS_App_employee_add' %}">
-                <button type="button"
-                    class="bg-blue-500 text-white px-6 py-2 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-colors">
-                    Add Employee
-                </button>
-            </a>
+            
+            <!-- Form Section -->
+        <form action="" method="post" enctype="multipart/form-data" class="space-y-4 mt-6">
+            {% csrf_token %}
+            
+            <div class="text-center">
+                <span class="text-2xl font-semibold text-gray-700"><i class="fas fa-upload mr-2"></i>Upload Letter Templates</span>
+            </div>
+
+            <div class="mb-6">
+                <label for="pdf_file" class="block text-sm font-medium text-gray-700">Choose PDF File</label>
+                <input type="file" name="pdf_file" id="pdf_file" 
+                    class="mt-2 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" 
+                    required>
+            </div>
+            <div class="mb-6">
+                <label for="sap_id_for_template_upload" class="block text-sm font-medium text-gray-700">Employee SAP ID</label>
+                <input type="number" name="sap_id_for_template_upload" id="sap_id_for_template_upload" 
+                    class="mt-2 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" 
+                    required>
+            </div>
+
+            <button type="submit" 
+                class="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                Upload Template
+            </button>
+        </form>
         </div>
+        
     </div>
 </div>
 {% endblock %}

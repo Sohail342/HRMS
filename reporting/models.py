@@ -1,5 +1,6 @@
 from django.db import models
-
+from HRIS_App.models import Employee
+from cloudinary.models import CloudinaryField
 
 
 class Signature(models.Model):
@@ -19,4 +20,16 @@ class Signature(models.Model):
 
     def __str__(self):
         return self.employee_name
+
+
+
+class LetterTemplates(models.Model):
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    template_url = CloudinaryField(blank=True, null=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.employee.name
 

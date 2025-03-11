@@ -4,7 +4,10 @@ from django.utils.decorators import method_decorator
 from django.utils import timezone
 from group_head.decorators import admin_required
 from django.http import JsonResponse
-from .models import Signature
+from django.core.exceptions import ValidationError
+from django.contrib import messages
+import cloudinary
+from .models import Signature, LetterTemplates
 from django.views.generic import DetailView, ListView
 from HRIS_App.models import Employee
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -147,9 +150,43 @@ class LetterForm(LoginRequiredMixin, ListView):
         'relieving_order': 'reporting:relieving_order',
     }
 
+
+
     def post(self, request, *args, **kwargs):
         form_type = request.POST.get('form_type')
         sap_id = request.POST.get('sap_id')
+        sap_id_for_template_upload = request.POST.get('sap_id_for_template_upload')
+
+        if 'pdf_file' in request.FILES:
+            uploaded_file = request.FILES['pdf_file']
+
+            # Validate the file type (only allow PDF)
+            if not uploaded_file.name.endswith('.pdf'):
+                messages.error(request, "Only PDF files are allowed.")
+                return redirect('reporting:lettername')
+
+            # Get the employee object
+            employee = get_object_or_404(Employee, SAP_ID=sap_id_for_template_upload)
+
+            try:
+                # Upload PDF to Cloudinary
+                upload_result = cloudinary.uploader.upload(
+                    uploaded_file, resource_type="raw", format="pdf", folder="BSC Forms"
+                )
+                template_url = upload_result['secure_url']
+
+                # Save template record
+                template_upload = LetterTemplates(employee=employee, template_url=template_url)
+                template_upload.save()
+
+                messages.success(request, "Template uploaded successfully.")
+                return redirect('reporting:lettername')
+
+            except ValidationError as e:
+                messages.error(request, f"Error uploading file: {e}")
+
+                return redirect('reporting:lettername')
+
         
         # Validate SAP ID
         try:

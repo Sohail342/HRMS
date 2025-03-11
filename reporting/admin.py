@@ -1,7 +1,7 @@
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 from unfold.contrib.import_export.forms import ExportForm, ImportForm
-from .models import Signature
+from .models import Signature, LetterTemplates
 from unfold.admin import ModelAdmin
 
 @admin.register(Signature)
@@ -12,5 +12,9 @@ class SignatureAdmin(ImportExportModelAdmin, ModelAdmin):
     
     import_form = ImportForm
     export_form = ExportForm
+
+@admin.register(LetterTemplates)
+class LetterTemplatesAdmin(ImportExportModelAdmin, ModelAdmin):
+    list_display = ['employee']
 
 
