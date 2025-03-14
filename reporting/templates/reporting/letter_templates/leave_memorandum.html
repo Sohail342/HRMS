@@ -3,81 +3,82 @@
 
 {% block content %}
 <body class="p-8 bg-gray-100">
-    <div class="mt-3 mb-5 text-center">
-        <button type="button" id="download" class="bg-blue-500 text-white px-6 py-2 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">Download as a PDF</button>
-    </div>
 
-     <!-- Input Fields for User Data -->
-     <div class="mb-12">    
-        <div class="mb-8 text-center">
-            <label for="application_date" class="block text-sm font-medium text-gray-700">Enter Application date:</label>
-            <input type="date" id="application_date" class="mt-2 p-2 w-full max-w-xs mx-auto border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder-gray-500 text-sm" required placeholder="e.g.  {{current_time |date:"j-F-Y"}}">
+    <!-- Leave Application Form -->
+<div class="max-w-screen-md mx-auto p-6 bg-white shadow-lg rounded-lg my-10">
+    <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Application Form</h2>
+    
+    <!-- Input Fields for User Data -->
+    <div class="space-y-6">
+        <div>
+            <label for="application_date" class="block text-sm font-medium text-gray-700">Application Date:</label>
+            <input type="date" id="application_date" class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required>
         </div>
-        <div class="mb-8 text-center">
+
+        <div>
             <label for="granted_leaves" class="block text-sm font-medium text-gray-700">Granted Leaves:</label>
-            <input type="number" id="granted_leaves" class="mt-2 p-2 w-full max-w-xs mx-auto border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder-gray-500 text-sm" required placeholder="e.g.  20 days">
+            <input type="number" id="granted_leaves" class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required placeholder="e.g. 20 days">
         </div>
-        <div class="mb-8 text-center">
-            <label for="effect_from" class="block text-sm font-medium text-gray-700">Effect from:</label>
-            <input type="date" id="effect_from" class="mt-2 p-2 w-full max-w-xs mx-auto border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder-gray-500 text-sm" required placeholder="e.g.  4-Nov-2025 to 4-Nov-2024">
+
+        <div>
+            <label for="effect_from" class="block text-sm font-medium text-gray-700">Effect From:</label>
+            <input type="date" id="effect_from" class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required>
         </div>
-        <div class="mb-8 text-center">
-            <label for="leave_type_option" class="block text-sm font-medium text-gray-700">Leave type:</label>
-            <select id="leave_type_option" name="leave_type_option" class="w-1/4 bg-white border border-blue-500 py-2 px-4 rounded-lg focus:outline-none focus:border-blue-700 transition-colors duration-300 shadow-md">
-                <option value="Priviliege Leave"></option>
-                <option value="Priviliege Leave">Priviliege Leave</option>
+
+        <div>
+            <label for="leave_type_option" class="block text-sm font-medium text-gray-700">Leave Type:</label>
+            <select id="leave_type_option" name="leave_type_option" class="mt-1 p-3 w-full border border-blue-500 rounded-lg focus:outline-none focus:border-blue-700 transition-colors duration-300 shadow-md">
+                <option value="">Select Leave Type</option>
+                <option value="Priviliege Leave">Privilege Leave</option>
                 <option value="Mandatory Leave">Mandatory Leave</option>
                 <option value="Casual Leave">Casual Leave</option>
                 <option value="Ex-Pakistan">Ex-Pakistan</option>
-                <option value="Sick Leave">Sick Leave</option>                
-                
+                <option value="Sick Leave">Sick Leave</option>
             </select>
         </div>
-        
-        <div class="mb-8 text-center">
+
+        <div>
             <label for="purpose" class="block text-sm font-medium text-gray-700">Leave Purpose:</label>
-            <input type="text" id="purpose" class="mt-2 p-2 w-full max-w-xs mx-auto border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder-gray-500 text-sm" required placeholder="e.g.  study purpose">
-        </div>
-        <div class="mb-8 text-center">
-            <label for="absence_employee" class="block text-sm font-medium text-gray-700">Employee Back-up SAP ID:</label>
-            <input type="number" id="absence_employee" class="mt-2 p-2 w-full max-w-xs mx-auto border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder-gray-500 text-sm" required placeholder="e.g. 83787">
-            
-            <button id="fetch_employee_data" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                Fetch Employee
-            </button>
+            <input type="text" id="purpose" class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required placeholder="e.g. Study purpose">
         </div>
 
-        <div class="mb-8 text-center">
-            <label class="block text-sm font-medium text-gray-700">It is further advised that no extension in leave will be allowed to him/her under any circumstances.</label>
-            
-            <div class="flex justify-center items-center space-x-4 mt-2">
+        <div>
+            <label for="absence_employee" class="block text-sm font-medium text-gray-700">Employee Back-up SAP ID:</label>
+            <div class="flex space-x-2">
+                <input value="" type="number" id="absence_employee" class="mt-1 p-3 flex-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required placeholder="e.g. 83787">
+                <button onclick="btnclick()" id="fetch_employee_data" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    Fetch
+                </button>
+            </div>
+        </div>
+
+        <div>
+            <p class="text-sm font-medium text-gray-700">Leave Extension Policy:</p>
+            <div class="flex items-center space-x-6 mt-2">
                 <label class="flex items-center space-x-2">
                     <input type="radio" name="extension" value="allowed" class="focus:ring-2 focus:ring-blue-500">
                     <span>Allowed</span>
                 </label>
-                
                 <label class="flex items-center space-x-2">
                     <input type="radio" name="extension" value="not_allowed" class="focus:ring-2 focus:ring-blue-500" checked>
                     <span>Not Allowed</span>
                 </label>
             </div>
         </div>
-        
+    </div>
 
-        <!-- Error Toast -->
-        <div id="errorToast" class="fixed bottom-5 right-5 hidden bg-red-500 text-white text-base px-6 py-3 w-auto min-w-[250px] max-w-xs rounded-xl shadow-lg transition-opacity duration-300">
-            Employee with this SAP ID not found!
-        </div>
+    <!-- Error Toast -->
+    <div id="errorToast" class="fixed bottom-5 right-5 hidden bg-red-500 text-white text-base px-6 py-3 rounded-xl shadow-lg transition-opacity duration-300">
+        Employee with this SAP ID not found!
+    </div>
 
-        <!--Success Toast-->
-        <div id="sucessToast" class="fixed bottom-5 right-5 hidden bg-green-500 text-white text-base px-6 py-3 w-auto min-w-[250px] max-w-xs rounded-xl shadow-lg transition-opacity duration-300">
-            Employee found!
-        </div>
+    <!-- Success Toast -->
+    <div id="sucessToast" class="fixed bottom-5 right-5 hidden bg-green-500 text-white text-base px-6 py-3 rounded-xl shadow-lg transition-opacity duration-300">
+        Employee found!
+    </div>
+</div>
 
-        
-    </div>  
-
-    <div id="printo" class="max-w-screen-md mx-auto bg-white p-12 borde">
+    <div id="download_letter" class="max-w-screen-md mx-auto bg-white p-12 borde">
         <!-- Header Section -->
         <div class="mb-4">
             <div class="flex justify-between items-center">
@@ -141,7 +142,7 @@
         </div>
 
         <!-- Footer Section -->
-        <div class="mt-28">
+        <div class="mt-36">
             <hr class="border-t border-gray-400 mt-28 mb-2">
             <div class="text-center text-xs text-gray-600">
                 <p class="font-semibold">National Bank of Pakistan</p>
@@ -151,6 +152,9 @@
         </div>
     </div>
 
+    <div class="mt-3 mb-5 text-center">
+        <button type="button" id="download" class="bg-blue-500 text-white px-6 py-2 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">Download as a PDF</button>
+    </div>
 </body>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
@@ -166,10 +170,8 @@
             document.getElementById('application_date_text').textContent = application_date;
             document.getElementById('granted_leaves_text').textContent = granted_leaves;
             document.getElementById('effect_from_text').textContent = effect_from;
-            
-        
-        
-            const element = document.getElementById('printo');
+           
+            const element = document.getElementById('download_letter');
             
             // Options for generating PDF
             const options = {
@@ -363,6 +365,7 @@
             }
         });
     });
+   
 
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
