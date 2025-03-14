@@ -24,6 +24,7 @@
         <div class="mb-8 text-center">
             <label for="leave_type_option" class="block text-sm font-medium text-gray-700">Leave type:</label>
             <select id="leave_type_option" name="leave_type_option" class="w-1/4 bg-white border border-blue-500 py-2 px-4 rounded-lg focus:outline-none focus:border-blue-700 transition-colors duration-300 shadow-md">
+                <option value="Priviliege Leave"></option>
                 <option value="Priviliege Leave">Priviliege Leave</option>
                 <option value="Mandatory Leave">Mandatory Leave</option>
                 <option value="Casual Leave">Casual Leave</option>
@@ -40,11 +41,43 @@
         <div class="mb-8 text-center">
             <label for="absence_employee" class="block text-sm font-medium text-gray-700">Employee Back-up SAP ID:</label>
             <input type="number" id="absence_employee" class="mt-2 p-2 w-full max-w-xs mx-auto border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder-gray-500 text-sm" required placeholder="e.g. 83787">
+            
+            <button id="fetch_employee_data" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                Fetch Employee
+            </button>
         </div>
+
+        <div class="mb-8 text-center">
+            <label class="block text-sm font-medium text-gray-700">It is further advised that no extension in leave will be allowed to him/her under any circumstances.</label>
+            
+            <div class="flex justify-center items-center space-x-4 mt-2">
+                <label class="flex items-center space-x-2">
+                    <input type="radio" name="extension" value="allowed" class="focus:ring-2 focus:ring-blue-500">
+                    <span>Allowed</span>
+                </label>
+                
+                <label class="flex items-center space-x-2">
+                    <input type="radio" name="extension" value="not_allowed" class="focus:ring-2 focus:ring-blue-500" checked>
+                    <span>Not Allowed</span>
+                </label>
+            </div>
+        </div>
+        
+
+        <!-- Error Toast -->
+        <div id="errorToast" class="fixed bottom-5 right-5 hidden bg-red-500 text-white text-base px-6 py-3 w-auto min-w-[250px] max-w-xs rounded-xl shadow-lg transition-opacity duration-300">
+            Employee with this SAP ID not found!
+        </div>
+
+        <!--Success Toast-->
+        <div id="sucessToast" class="fixed bottom-5 right-5 hidden bg-green-500 text-white text-base px-6 py-3 w-auto min-w-[250px] max-w-xs rounded-xl shadow-lg transition-opacity duration-300">
+            Employee found!
+        </div>
+
         
     </div>  
 
-    <div id="printo" class="max-w-screen-md mx-auto bg-white p-12 border border-gray-300">
+    <div id="printo" class="max-w-screen-md mx-auto bg-white p-12 borde">
         <!-- Header Section -->
         <div class="mb-4">
             <div class="flex justify-between items-center">
@@ -62,7 +95,7 @@
                 <p class="font-semibold pr-3">Administration Division</p>
             </div>
             <div class="text-sm mt-1 mb-12">
-                <p>No. OPG/EX-PAK/ADMN/FRZ/2022/7514</p>
+                <p>No. OPG/<span id="leave_type_text"></span>/ADMN/FRZ/2022/7514</p>
                 <p class="font-semibold">{{current_time |date:"F j, Y" }}</p>  
             </div>
         </div>
@@ -77,10 +110,10 @@
             with effect from <span id="effect_from_text">_____________</span>.
         </p>
         <p class="mb-4" style="text-align: justify;">
-            He will accordingly stand relieved to his duties as of close of office today i.e. <b>Jan 9, 2022</b> to avail sanctioned leaves. It is further advised that no extension in leave will be allowed to him under any circumstances.
+            He/She will accordingly stand relieved to his duties as of close of office today i.e. <b>Jan 9, 2022</b> to avail sanctioned leaves.<span id="extension_text"></span>
         </p>
-        <p class="mb-4" style="text-align: justify;">
-            During his absence, <span id="employee_backup_name">_____________</span>, <span id="employee_backup_designation">_____________</span>, SAP ID: <span id="employee_backup_sapID">_____________</span>, will look after his assignment.
+        <p id="during_absence" class="mb-4" style="text-align: justify;">
+            During his/her absence, <span id="employee_backup_name">_____________</span>, <span id="employee_backup_designation">_____________</span>, SAP ID: <span id="employee_backup_sapID">_____________</span>, will look after his assignment.
         </p>
 
         
@@ -108,11 +141,13 @@
         </div>
 
         <!-- Footer Section -->
-        <hr class="border-t border-gray-400 mt-20 mb-2">
-        <div class="text-center text-xs text-gray-600">
-            <p class="font-semibold">National Bank of Pakistan</p>
-            <p>Head Office: I.I. Chundrigar Road, Karachi. Ph: 9212100 (50 lines)</p>
-            <p>Website: www.nbp.com.pk</p>
+        <div class="mt-28">
+            <hr class="border-t border-gray-400 mt-28 mb-2">
+            <div class="text-center text-xs text-gray-600">
+                <p class="font-semibold">National Bank of Pakistan</p>
+                <p>Head Office: I.I. Chundrigar Road, Karachi. Ph: 9212100 (50 lines)</p>
+                <p>Website: www.nbp.com.pk</p>
+            </div>
         </div>
     </div>
 
@@ -155,61 +190,107 @@
         }
     });
 
+    // Date formatting 
+
+    function formatDate(inputId, outputId) {
+        const inputField = document.getElementById(inputId);
+        const outputField = document.getElementById(outputId);
     
-    document.getElementById('application_date').addEventListener('input', function() {
-        document.getElementById('application_date_text').textContent = this.value || "______________";
-    });
+        function updateDate() {
+            const inputDate = new Date(inputField.value);
+            if (!isNaN(inputDate.getTime())) {
+                const formattedDate = inputDate.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                outputField.textContent = formattedDate;
+            } else {
+                outputField.textContent = "______________";
+            }
+        }
+    
+        // Set default value to today's date in YYYY-MM-DD format
+        const today = new Date();
+        const todayFormatted = today.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+        inputField.value = todayFormatted;
+        
+        updateDate(); // Display formatted date immediately
+    
+        inputField.addEventListener('change', updateDate);
+    }
+
+    // Apply formatting to both date inputs
+    formatDate('application_date', 'application_date_text');
+    formatDate('effect_from', 'effect_from_text');
+
 
     document.getElementById('granted_leaves').addEventListener('input', function() {
         document.getElementById('granted_leaves_text').textContent = this.value || "______________";
     });
 
-    document.getElementById('effect_from').addEventListener('input', function() {
-        document.getElementById('effect_from_text').textContent = this.value || "______________";
-    });
-
     document.getElementById('leave_type_option').addEventListener('change', function() {
-        document.getElementById('leave_type_text').textContent = this.value || "______________";
+        const leaveTypeTextElements = document.querySelectorAll('#leave_type_text');
+        leaveTypeTextElements.forEach(element => {
+            element.textContent = this.value || "______________";
+        });
     });
 
     document.getElementById('purpose').addEventListener('input', function() {
         document.getElementById('purpose_text').textContent = this.value || "______________";
     });
 
-    // Fetch employee data based on SAP ID
-    document.getElementById('absence_employee').addEventListener('input', function() {
-    const sapId = this.value;
+    document.getElementById('fetch_employee_data').addEventListener('click', function() {
+        const sapId = document.getElementById('absence_employee').value;
 
-    if (sapId) {
-        // Make an AJAX request to fetch employee data
-        fetch(`/get_employee_data/?sap_id=${sapId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.employee_name && data.designation) {
-                    // Update the DOM with the fetched data
-                    document.getElementById('employee_backup_name').textContent = data.employee_name;
-                    document.getElementById('employee_backup_designation').textContent = data.designation;
-                    document.getElementById('employee_backup_sapID').textContent = sapId;
-                } else {
-                    // If no data is found, reset the placeholders
-                    resetPlaceholders();
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching employee data:', error);
-                resetPlaceholders();
-            });
-    } else {
-        // If the input is empty, reset the placeholders
-        resetPlaceholders();
+        if (sapId) {
+            fetch(`/get_employee_data/?sap_id=${sapId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.employee_name && data.designation) {
+                        document.getElementById('employee_backup_name').textContent = data.employee_name;
+                        document.getElementById('employee_backup_designation').textContent = data.designation;
+                        document.getElementById('employee_backup_sapID').textContent = sapId;
+                        showSuccessToast("Employee found!");
+                    } else {
+                        resetPlaceholders();
+                    }
+                })
+                .catch(error => {
+                    showErrorToast("Employee with this SAP ID not found!");
+                });
+        } else {
+            showErrorToast("Please enter an SAP ID before fetching data.");
+        }
+    });
+
+    function resetPlaceholders() {
+        document.getElementById('employee_backup_name').textContent = "_____________";
+        document.getElementById('employee_backup_designation').textContent = "_____________";
+        document.getElementById('employee_backup_sapID').textContent = "_____________";
     }
-});
 
-function resetPlaceholders() {
-    document.getElementById('employee_backup_name').textContent = "_____________";
-    document.getElementById('employee_backup_designation').textContent = "_____________";
-    document.getElementById('employee_backup_sapID').textContent = "_____________";
-}
+    function showErrorToast(message) {
+        const toast = document.getElementById('errorToast');
+        toast.textContent = message;
+        toast.classList.remove('hidden');
+        toast.classList.add('opacity-100');
+
+        setTimeout(() => {
+            toast.classList.add('hidden');
+        }, 3000);
+    }
+
+    function showSuccessToast(message) {
+        const toast = document.getElementById('sucessToast');
+        toast.textContent = message;
+        toast.classList.remove('hidden');
+        toast.classList.add('opacity-100');
+
+        setTimeout(() => {
+            toast.classList.add('hidden');
+        }, 3000);
+    }
 
 
     $(document).ready(function() {
@@ -251,6 +332,19 @@ function resetPlaceholders() {
         }
     });
 });
+
+
+    document.querySelectorAll('input[name="extension"]').forEach((radio) => {
+        radio.addEventListener("change", function () {
+            if (this.value === "allowed") {
+                document.getElementById("extension_text").textContent = 
+                    "It is further advised that no extension in leave will be allowed to him/her under any circumstances.";
+            } else {
+                document.getElementById("extension_text").textContent = 
+                    "";
+            }
+        });
+    });
 
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
