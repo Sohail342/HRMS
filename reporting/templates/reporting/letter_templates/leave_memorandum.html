@@ -332,23 +332,13 @@
                 },
                 dataType: 'json',
                 success: function(data) {
-                    // Determine the text for the upper <p> (grade/designation/group)
-                    var upperText = `${data.grade}/${data.designation}`;
-                    if (!data.department && data.wing) {
-                        upperText += `/${data.group}`; // Append group if condition is met
-                    }
-
-                    // Determine the text for the lower <p> (wing/department/group)
-                    var lowerText = data.wing || data.department || data.group ? 
-                        `${data.wing ? data.wing + '-' : ''}${data.department ? data.department + '-' : ''}${data.group}` : 
-                        '';
 
                     // Update the employee details section with retrieved data
                     $('#employee-details').html(`
                         <p>_________________________</p>
                         <p class="font-semibold">${data.employee_name}</p>
-                        <p class="text-sm">${upperText}</p>
-                        <p class="text-sm">${lowerText}</p>
+                        <p class="text-sm">${data.grade}/${data.designation}</p>
+                        <p class="text-sm">${data.wing} Wing - ${data.division} Div (${data.group})</p>
                     `);
                 },
                 error: function() {
