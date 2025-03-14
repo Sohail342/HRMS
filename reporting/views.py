@@ -15,12 +15,17 @@ from django.views.generic import ListView
 
 
 
-def get_employee_data(request):
+def get_employee(request):
     sap_id = request.GET.get('sap_id')
     employee = get_object_or_404(Employee, SAP_ID=sap_id)
+
+    from icecream import ic
+    ic(employee.employee_grade)
     data = {
         'employee_name': employee.name,
-        'designation': employee.designation,
+        'designation': employee.designation_id,
+        'sap_id': str(employee.SAP_ID) if employee.SAP_ID else "", 
+        'employee_grade': str(employee.employee_grade)
     }
     return JsonResponse(data)
 
@@ -82,8 +87,8 @@ class JoiningMemorandum(MemorandumMixin, DetailView):
 
 
 @method_decorator(admin_required, name='dispatch')
-class ApprovalPermissionHospitilization(MemorandumMixin, DetailView):
-    template_name = 'reporting/letter_templates/approval_permission_hospitalization.html'
+class Hospitilization(MemorandumMixin, DetailView):
+    template_name = 'reporting/letter_templates/hospitalization.html'
 
 
 @method_decorator(admin_required, name='dispatch')
@@ -111,10 +116,6 @@ class ReimbursementMemorandum(MemorandumMixin, DetailView):
   template_name = 'reporting/letter_templates/reimbursement.html' 
 
 
-@method_decorator(admin_required, name='dispatch')
-class PermissionOfHospitalization(MemorandumMixin, DetailView): 
-  template_name = 'reporting/letter_templates/permission_of_hospitalization.html'  
-
 
 @method_decorator(admin_required, name='dispatch')
 class ReimbursementAgainstPurchase(MemorandumMixin, DetailView): 
@@ -139,13 +140,12 @@ class LetterForm(LoginRequiredMixin, ListView):
         'leave_memorandum': 'reporting:leave_memorandum',
         'joining_memorandum': 'reporting:joining_memorandum',
         'order_office_memorandun': 'reporting:order_office_memorandun',
-        'approval_permission_hospitalization': 'reporting:approval_permission_hospitalization',
+        'hospitalization': 'reporting:hospitalization',
         'maternity_Leave': 'reporting:maternity_Leave',
         'request_for_issuance': 'reporting:request_for_issuance',
         'payment_of_bill': 'reporting:payment_of_bill',
         'grant_of_extension': 'reporting:grant_of_extension',
         'reimbursement': 'reporting:reimbursement',
-        'permission_of_hospitalization': 'reporting:permission_of_hospitalization',
         'reimbursement_against_purchase': 'reporting:reimbursement_against_purchase',
         'relieving_order': 'reporting:relieving_order',
     }
