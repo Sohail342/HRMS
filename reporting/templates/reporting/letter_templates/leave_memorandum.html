@@ -95,7 +95,7 @@
                 <p class="font-semibold pr-3">Administration Division</p>
             </div>
             <div class="text-sm mt-1 mb-12">
-                <p>No. OPG/<span id="leave_type_text"></span>/ADMN/FRZ/2022/7514</p>
+                <p>No. OPG/<span id="leave_type_text"></span>/ADMN/2024/SAPID{{employee.SAP_ID}}/</p>
                 <p class="font-semibold">{{current_time |date:"F j, Y" }}</p>  
             </div>
         </div>
@@ -110,7 +110,7 @@
             with effect from <span id="effect_from_text">_____________</span>.
         </p>
         <p class="mb-4" style="text-align: justify;">
-            He/She will accordingly stand relieved to his duties as of close of office today i.e. <b>Jan 9, 2022</b> to avail sanctioned leaves.<span id="extension_text"></span>
+            He/She will accordingly stand relieved to his duties as of close of office today i.e. <b>Jan 9, 2022</b> to avail sanctioned leave(s). <span id="extension_text"></span>
         </p>
         <p id="during_absence" class="mb-4" style="text-align: justify;">
             During his/her absence, <span id="employee_backup_name">_____________</span>, <span id="employee_backup_designation">_____________</span>, SAP ID: <span id="employee_backup_sapID">_____________</span>, will look after his assignment.
@@ -225,10 +225,6 @@
     formatDate('effect_from', 'effect_from_text');
 
 
-    document.getElementById('granted_leaves').addEventListener('input', function() {
-        document.getElementById('granted_leaves_text').textContent = this.value || "______________";
-    });
-
     document.getElementById('leave_type_option').addEventListener('change', function() {
         const leaveTypeTextElements = document.querySelectorAll('#leave_type_text');
         leaveTypeTextElements.forEach(element => {
@@ -238,6 +234,38 @@
 
     document.getElementById('purpose').addEventListener('input', function() {
         document.getElementById('purpose_text').textContent = this.value || "______________";
+    });
+
+    // numbers to Aplhabets
+    function numberToWords(num) {
+        const ones = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"];
+        const teens = ["Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"];
+        const tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+
+        if (num === 0) return "Zero";
+
+        let words = "";
+
+        if (num < 10) {
+            words = ones[num];
+        } else if (num < 20) {
+            words = teens[num - 10];
+        } else if (num < 100) {
+            words = tens[Math.floor(num / 10)] + (num % 10 !== 0 ? " " + ones[num % 10] : "");
+        } else {
+            words = ones[Math.floor(num / 100)] + " Hundred" + (num % 100 !== 0 ? " " + numberToWords(num % 100) : "");
+        }
+
+        return words;
+    }
+
+    document.getElementById('granted_leaves').addEventListener('input', function() {
+        let value = parseInt(this.value, 10);
+        if (!isNaN(value) && value > 0) {
+            document.getElementById('granted_leaves_text').textContent = `${numberToWords(value)} (${value.toString().padStart(2, '0')}) day(s)`;
+        } else {
+            document.getElementById('granted_leaves_text').textContent = "______________";
+        }
     });
 
     document.getElementById('fetch_employee_data').addEventListener('click', function() {
