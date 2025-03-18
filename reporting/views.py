@@ -44,7 +44,7 @@ def get_employee_data(request):
         'division': str(employee.division) if employee.division else "",
         'group': str(employee.group) if employee.group else "", 
     }
-    
+
     return JsonResponse(data)
 
 

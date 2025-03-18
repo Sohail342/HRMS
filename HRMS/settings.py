@@ -192,19 +192,19 @@ cloudinary.config(
     secure=True  
 )
 
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': os.getenv('REDIS_URL', 'rediss://related-alpaca-33827.upstash.io:6379'),
-        'OPTIONS': {
-            'password': os.getenv("password_redis"),
-            'ssl_cert_reqs': None,
-        },
-    }
-}
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+#         'LOCATION': os.getenv('REDIS_URL', 'rediss://related-alpaca-33827.upstash.io:6379'),
+#         'OPTIONS': {
+#             'password': os.getenv("password_redis"),
+#             'ssl_cert_reqs': True,
+#         },
+#     }
+# }
 
-CACHE_MIDDLEWARE_SECONDS = 600  # Cache for 10 minutes
-CACHE_MIDDLEWARE_KEY_PREFIX = "my_site_cache"
+# CACHE_MIDDLEWARE_SECONDS = 120  # Cache for 2 minutes
+# CACHE_MIDDLEWARE_KEY_PREFIX = "my_site_cache"
 
 
 

@@ -29,11 +29,11 @@
             <label for="leave_type_option" class="block text-sm font-medium text-gray-700">Leave Type:</label>
             <select id="leave_type_option" name="leave_type_option" class="mt-1 p-3 w-full border border-blue-500 rounded-lg focus:outline-none focus:border-blue-700 transition-colors duration-300 shadow-md">
                 <option value="">Select Leave Type</option>
-                <option value="Priviliege Leave">Privilege Leave</option>
-                <option value="Mandatory Leave">Mandatory Leave</option>
-                <option value="Casual Leave">Casual Leave</option>
-                <option value="Ex-Pakistan">Ex-Pakistan</option>
-                <option value="Sick Leave">Sick Leave</option>
+                <option value="PL">Privilege Leave</option>
+                <option value="ML">Mandatory Leave</option>
+                <option value="CL">Casual Leave</option>
+                <option value="Ex-Pak">Ex-Pakistan</option>
+                <option value="SL">Sick Leave</option>
             </select>
         </div>
 
@@ -91,12 +91,12 @@
             </div>
             <!-- Full-width border under the header section -->
             <hr class="border-t border-gray-400">
-            <div class="text-sm mt-1 flex justify-between items-center">
+            <div class="text-sm mt-2 flex justify-between items-center">
                 <p class="font-semibold">National Bank of Pakistan</p>
                 <p class="font-semibold pr-3">Administration Division</p>
             </div>
-            <div class="text-sm mt-1 mb-12">
-                <p>No. OPG/<span id="leave_type_text"></span>/ADMN/2024/SAPID{{employee.SAP_ID}}/</p>
+            <div class="text-sm mt-3 mb-12">
+                <p>No. OPG/<span id="leave_type_text"></span>/ADMN/{{current_time |date:"Y" }}/{{employee.SAP_ID}}/</p>
                 <p class="font-semibold">{{current_time |date:"F j, Y" }}</p>  
             </div>
         </div>
@@ -107,7 +107,7 @@
         <!-- Body Text -->
         <p class="mb-4" style="text-align: justify;">
             With reference to his application dated <b><span id="application_date_text">______________</span></b> Mr. {{employee.name}}, OG-II/{{employee.employee_type}} SAP ID: {{employee.SAP_ID}}, 
-            NBP, Regional Office, Faisalabad is advised that he has been granted <span id="granted_leaves_text">______________</span> <span id="leave_type_text">______________</span> for - <span id="purpose_text">______________</span>,
+            NBP, Regional Office, Faisalabad is advised that he has been granted <span id="granted_leaves_text">______________</span> <span id="leave_type_text">______________</span> <span id="purpose_text"></span>,
             with effect from <span id="effect_from_text">_____________</span>.
         </p>
         <p class="mb-4" style="text-align: justify;">
@@ -340,7 +340,7 @@
                         <p>_________________________</p>
                         <p class="font-semibold">${data.employee_name}</p>
                         <p class="text-sm">${data.grade}/${data.designation}</p>
-                        <p class="text-sm">${data.wing} Wing - ${data.division} Div (${data.group})</p>
+                        <p class="text-sm">${data.wing} ${data.division} (${data.group})</p>
                     `);
                 },
                 error: function() {

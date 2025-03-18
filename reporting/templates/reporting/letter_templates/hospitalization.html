@@ -16,6 +16,13 @@
                 <option value="Post Facto Approval">Post Facto Approval</option>
             </select>
         </div>
+
+        <!-- Hidden Hospital Advice Date Field -->
+        <div id="hospital_advice_date" class="mt-4 hidden">
+            <label for="hospital_advice_date_input" class="block text-sm font-medium text-gray-700">Hospital Advice Date:</label>
+            <input type="date" id="hospital_advice_date_input" class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+        </div>
+
     
         <!-- Sub Category -->
         <div class="mt-4">
@@ -149,13 +156,13 @@
         <p class="mb-1" style="text-align: justify;">
             Dear Sir,
         </p>
-        <p class="mb-4 pl-8" style="text-align: justify;">
+        <p class="mb-4 pl-4" style="text-align: justify;">
             <b><u><span id="approval_type_text">______________</span> FOR <span id="purpose_text">_____________</span> AT <span id="hospital_text">_____________</span> <span class="upper font-bold" id="family_member"></span>
                 <span id="employee_name">_____________</span>, <span id="employee_grade">_____________</span>, SAP ID: <span id="employee_sapID">_____________</span>, OPERATIONS GROUP, NBP, HEAD-OFFICE, KARACHI.</b></u>
         </p>
        
         <p class="mb-4 pl-8" style="text-align: justify;">
-            Enclosed please find a self-explanatory Doctor's advice dated 30-12-2021 on the captioned subject.
+            Enclosed please find a self-explanatory Doctor's advice dated <span id="hospital_advice_date_text">_____________</span> on the captioned subject.
         </p>
         <p class="mb-4 pl-8" style="text-align: justify;">
             Kindly accord necessary approval for Ms. Rameen (CNIC No. 45504-8403706-2, W/o Zohaib Ghani Larik, 
@@ -397,6 +404,45 @@ document.getElementById('category_type_option').addEventListener('change', funct
 // Max disgits
 document.getElementById('family_member_cnic').addEventListener('input', function (e) {
     this.value = this.value.replace(/\D/g, '').slice(0, 13); // Allow only numbers & max 13 characters
+});
+
+
+// Show/hide Hospital Advice Date field based on selected approval type
+document.getElementById('approval_type_option').addEventListener('change', function() {
+    const hospitalAdviceDateField = document.getElementById('hospital_advice_date');
+
+    if (this.value === "Approval/Permission") {
+        hospitalAdviceDateField.classList.remove('hidden'); // Show the field
+    } else {
+        hospitalAdviceDateField.classList.add('hidden'); // Hide the field
+    }
+});
+
+
+// Update the span with the selected Hospital Advice Date in "Month Day, Year" format
+document.getElementById('hospital_advice_date_input').addEventListener('change', function() {
+    const hospitalAdviceDateText = document.getElementById('hospital_advice_date_text');
+
+    // Get the selected date value
+    const selectedDate = this.value;
+
+    if (selectedDate) {
+        // Convert the date string to a Date object
+        const date = new Date(selectedDate);
+
+        // Format the date as "Month Day, Year"
+        const formattedDate = date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+        // Update the span with the formatted date
+        hospitalAdviceDateText.textContent = formattedDate;
+    } else {
+        // If no date is selected, display the fallback text
+        hospitalAdviceDateText.textContent = "_____________";
+    }
 });
 
 
