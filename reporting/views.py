@@ -19,8 +19,6 @@ def get_employee(request):
     sap_id = request.GET.get('sap_id')
     employee = get_object_or_404(Employee, SAP_ID=sap_id)
 
-    from icecream import ic
-    ic(employee.employee_grade)
     data = {
         'employee_name': employee.name,
         'designation': employee.designation_id,
@@ -88,6 +86,14 @@ class JoiningMemorandum(MemorandumMixin, DetailView):
 
 @method_decorator(admin_required, name='dispatch')
 class Hospitilization(MemorandumMixin, DetailView):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['employees'] = Employee.objects.all()
+        context['current_time'] = timezone.now()
+
+        employee_type = str(context['employee'].employee_type)
+        context['employee_type'] = employee_type
+        return context
     template_name = 'reporting/letter_templates/hospitalization.html'
 
 
