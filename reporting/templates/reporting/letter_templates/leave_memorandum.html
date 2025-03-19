@@ -53,6 +53,16 @@
         </div>
 
         <div>
+            <label for="absence_employee2" class="block text-sm font-medium text-gray-700">Employee Back-up SAP ID:</label>
+            <div class="flex space-x-2">
+                <input value="" type="number" id="absence_employee2" class="mt-1 p-3 flex-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required placeholder="e.g. 83787">
+                <button id="fetch_employee_data2" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    Fetch
+                </button>
+            </div>
+        </div>
+
+        <div>
             <p class="text-sm font-medium text-gray-700">Leave Extension Policy:</p>
             <div class="flex items-center space-x-6 mt-2">
                 <label class="flex items-center space-x-2">
@@ -116,6 +126,9 @@
         <p id="during_absence" class="mb-4" style="text-align: justify;">
             During his/her absence, <span id="employee_backup_name">_____________</span>, <span id="employee_backup_designation">_____________</span>, SAP ID: <span id="employee_backup_sapID">_____________</span>, will look after his assignment.
         </p>
+        <p id="during_absence2" class="mb-4" style="text-align: justify;">
+            And During his/her absence, <span id="employee_backup_name2">_____________</span>, <span id="employee_backup_designation2">_____________</span>, SAP ID: <span id="employee_backup_sapID2">_____________</span>, will look after his assignment.
+        </p>
 
         
         <div class="mt-10 text-right mb-4">
@@ -162,33 +175,53 @@
         const application_date = document.getElementById('application_date').value;
         const granted_leaves = document.getElementById('granted_leaves').value;
         const effect_from = document.getElementById('effect_from').value;
-
+        const sapId = document.getElementById('absence_employee').value;
+        const sapId2 = document.getElementById('absence_employee2').value;
+    
         const form = document.getElementById('form_type');
         form.style.visibility = 'hidden'; // Make the select element invisible but keep its position
-        
-        if(application_date && granted_leaves && effect_from){
+    
+        // Check if SAP ID is provided for the first backup employee
+        const absenceParagraph = document.getElementById('during_absence');
+        if (!sapId || sapId.trim() === '') {
+            absenceParagraph.style.display = 'none';
+        } else {
+            absenceParagraph.style.display = 'block';
+        }
+    
+        // Check if SAP ID is provided for the second backup employee
+        const absenceParagraph2 = document.getElementById('during_absence2');
+        if (!sapId2 || sapId2.trim() === '') {
+            absenceParagraph2.style.display = 'none';
+        } else {
+            absenceParagraph2.style.display = 'block';
+        }
+    
+        if (application_date && granted_leaves && effect_from) {
             document.getElementById('application_date_text').textContent = application_date;
             document.getElementById('granted_leaves_text').textContent = granted_leaves;
             document.getElementById('effect_from_text').textContent = effect_from;
-           
+    
             const element = document.getElementById('download_letter');
-            
+    
             // Options for generating PDF
             const options = {
-                margin:       10,
-                filename:     '{{employee.name}}.pdf',
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2 }, // For high-quality rendering
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                margin: 10,
+                filename: '{{employee.name}}.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 }, // For high-quality rendering
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
-        
+    
             // Generate the PDF
             html2pdf().from(element).set(options).save().then(() => {
-                // You can add some code here if needed after the PDF is saved
+                // After PDF is saved, reset the display of the paragraphs
+                absenceParagraph.style.display = 'block';
+                absenceParagraph2.style.display = 'block';
             });
         } else {
-            // Show an alert if either field is empty
-            alert("Please fill out the fields ");
+            // Show an alert if required fields are empty
+            alert("Please fill out the fields");
         }
     });
 
@@ -261,6 +294,7 @@
         return words;
     }
 
+    // Fetch Data
     document.getElementById('granted_leaves').addEventListener('input', function() {
         let value = parseInt(this.value, 10);
         if (!isNaN(value) && value > 0) {
@@ -270,6 +304,8 @@
         }
     });
 
+
+    // backup employee 1
     document.getElementById('fetch_employee_data').addEventListener('click', function() {
         const sapId = document.getElementById('absence_employee').value;
 
@@ -298,6 +334,41 @@
         document.getElementById('employee_backup_name').textContent = "_____________";
         document.getElementById('employee_backup_designation').textContent = "_____________";
         document.getElementById('employee_backup_sapID').textContent = "_____________";
+    }
+
+
+    // backup employee 2
+    document.getElementById('fetch_employee_data2').addEventListener('click', function() {
+        const sapId2 = document.getElementById('absence_employee2').value;
+
+        if (sapId2) {
+            fetch(`/get_employee_data/?sap_id=${sapId2}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.employee_name && data.designation) {
+                        // Update the placeholders for the second backup employee
+                        document.getElementById('employee_backup_name2').textContent = data.employee_name;
+                        document.getElementById('employee_backup_designation2').textContent = data.designation;
+                        document.getElementById('employee_backup_sapID2').textContent = sapId2;
+                        console.log(sapId2)
+                        showSuccessToast("Employee found!");
+                    } else {
+                        resetPlaceholders2();
+                    }
+                })
+                .catch(error => {
+                    showErrorToast("Employee with this SAP ID not found!");
+                });
+        } else {
+            showErrorToast("Please enter an SAP ID before fetching data.");
+        }
+    });
+
+    // Function to reset placeholders for the second backup employee
+    function resetPlaceholders2() {
+        document.getElementById('employee_backup_name2').textContent = "_____________";
+        document.getElementById('employee_backup_designation2').textContent = "_____________";
+        document.getElementById('employee_backup_sapID2').textContent = "_____________";
     }
 
     function showErrorToast(message) {
