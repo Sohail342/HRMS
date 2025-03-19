@@ -43,7 +43,7 @@
         </div>
 
         <div>
-            <label for="absence_employee" class="block text-sm font-medium text-gray-700">Employee Back-up SAP ID:</label>
+            <label for="absence_employee" class="block text-sm font-medium text-gray-700">Employee Back-up SAP ID 1:</label>
             <div class="flex space-x-2">
                 <input value="" type="number" id="absence_employee" class="mt-1 p-3 flex-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required placeholder="e.g. 83787">
                 <button id="fetch_employee_data" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -53,7 +53,7 @@
         </div>
 
         <div>
-            <label for="absence_employee2" class="block text-sm font-medium text-gray-700">Employee Back-up SAP ID:</label>
+            <label for="absence_employee2" class="block text-sm font-medium text-gray-700">Employee Back-up SAP ID 2:</label>
             <div class="flex space-x-2">
                 <input value="" type="number" id="absence_employee2" class="mt-1 p-3 flex-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required placeholder="e.g. 83787">
                 <button id="fetch_employee_data2" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -123,12 +123,13 @@
         <p class="mb-4" style="text-align: justify;">
             He/She will accordingly stand relieved to his duties as of close of office today i.e. <b>Jan 9, 2022</b> to avail sanctioned leave(s). <span id="extension_text"></span>
         </p>
+
+
         <p id="during_absence" class="mb-4" style="text-align: justify;">
-            During his/her absence, <span id="employee_backup_name">_____________</span>, <span id="employee_backup_designation">_____________</span>, SAP ID: <span id="employee_backup_sapID">_____________</span>, will look after his assignment.
+            During his/her absence, <span id="employee_backup_name">_____________</span>, <span id="employee_backup_designation">_____________</span>, SAP ID: <span id="employee_backup_sapID">_____________</span> 
+            <span id="second_backup_section">and <span id="employee_backup_name2">_____________</span>, <span id="employee_backup_designation2">_____________</span>, SAP ID: <span id="employee_backup_sapID2">_____________</span></span>, will look after his assignment.
         </p>
-        <p id="during_absence2" class="mb-4" style="text-align: justify;">
-            And During his/her absence, <span id="employee_backup_name2">_____________</span>, <span id="employee_backup_designation2">_____________</span>, SAP ID: <span id="employee_backup_sapID2">_____________</span>, will look after his assignment.
-        </p>
+        
 
         
         <div class="mt-10 text-right mb-4">
@@ -184,17 +185,19 @@
         // Check if SAP ID is provided for the first backup employee
         const absenceParagraph = document.getElementById('during_absence');
         if (!sapId || sapId.trim() === '') {
+            // Hide the entire paragraph if no SAP ID is provided for the first backup employee
             absenceParagraph.style.display = 'none';
         } else {
             absenceParagraph.style.display = 'block';
         }
     
         // Check if SAP ID is provided for the second backup employee
-        const absenceParagraph2 = document.getElementById('during_absence2');
+        const secondBackupSection = document.getElementById('second_backup_section');
         if (!sapId2 || sapId2.trim() === '') {
-            absenceParagraph2.style.display = 'none';
+            // Hide the second backup section if no SAP ID is provided
+            secondBackupSection.style.display = 'none';
         } else {
-            absenceParagraph2.style.display = 'block';
+            secondBackupSection.style.display = 'inline';
         }
     
         if (application_date && granted_leaves && effect_from) {
@@ -215,9 +218,9 @@
     
             // Generate the PDF
             html2pdf().from(element).set(options).save().then(() => {
-                // After PDF is saved, reset the display of the paragraphs
+                // After PDF is saved, reset the display of the paragraph and section
                 absenceParagraph.style.display = 'block';
-                absenceParagraph2.style.display = 'block';
+                secondBackupSection.style.display = 'inline';
             });
         } else {
             // Show an alert if required fields are empty
@@ -305,7 +308,7 @@
     });
 
 
-    // backup employee 1
+    // Event listener for the first backup employee's "Fetch" button
     document.getElementById('fetch_employee_data').addEventListener('click', function() {
         const sapId = document.getElementById('absence_employee').value;
 
@@ -330,14 +333,7 @@
         }
     });
 
-    function resetPlaceholders() {
-        document.getElementById('employee_backup_name').textContent = "_____________";
-        document.getElementById('employee_backup_designation').textContent = "_____________";
-        document.getElementById('employee_backup_sapID').textContent = "_____________";
-    }
-
-
-    // backup employee 2
+    // Event listener for the second backup employee's "Fetch" button
     document.getElementById('fetch_employee_data2').addEventListener('click', function() {
         const sapId2 = document.getElementById('absence_employee2').value;
 
@@ -346,11 +342,9 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.employee_name && data.designation) {
-                        // Update the placeholders for the second backup employee
                         document.getElementById('employee_backup_name2').textContent = data.employee_name;
                         document.getElementById('employee_backup_designation2').textContent = data.designation;
                         document.getElementById('employee_backup_sapID2').textContent = sapId2;
-                        console.log(sapId2)
                         showSuccessToast("Employee found!");
                     } else {
                         resetPlaceholders2();
@@ -363,6 +357,13 @@
             showErrorToast("Please enter an SAP ID before fetching data.");
         }
     });
+
+    // Function to reset placeholders for the first backup employee
+    function resetPlaceholders() {
+        document.getElementById('employee_backup_name').textContent = "_____________";
+        document.getElementById('employee_backup_designation').textContent = "_____________";
+        document.getElementById('employee_backup_sapID').textContent = "_____________";
+    }
 
     // Function to reset placeholders for the second backup employee
     function resetPlaceholders2() {
