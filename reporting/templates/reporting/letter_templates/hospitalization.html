@@ -139,7 +139,7 @@
                 <p class="font-semibold pr-3">Administration Division</p>
             </div>
             <div class="text-sm mt-4 mb-8">
-                <p class="mt-6">No.OPG/ADMN/2024/SAPID{{employee.SAP_ID}}</p>
+                <p class="mt-6">No.OPG/ADMN/2024/{{employee.SAP_ID}}</p>
                 <p class="font-semibold">Date: {{current_time |date:"F j, Y" }}</p> 
                 <div class="mt-4">
                     <p>The Senior Welfare Officer</p>
@@ -156,17 +156,16 @@
         <p class="mb-1" style="text-align: justify;">
             Dear Sir,
         </p>
-        <p class="mb-4 pl-4" style="text-align: justify;">
-            <b><u><span id="approval_type_text">______________</span> FOR <span id="purpose_text">_____________</span> AT <span id="hospital_text">_____________</span> <span class="upper font-bold" id="family_member"></span>
-                <span id="employee_name">_____________</span>, <span id="employee_grade">_____________</span>, SAP ID: <span id="employee_sapID">_____________</span>, OPERATIONS GROUP, NBP, HEAD-OFFICE, KARACHI.</b></u>
+        <p class="mb-4 pl-4" style="text-align: justify; text-transform: uppercase;">
+            <b><span id="approval_type_text">______________</span> FOR <span id="purpose_text">_____________</span> AT <span id="hospital_text">_____________</span> <span class="upper font-bold" id="family_member"></span>
+                <span id="employee_name">_____________</span>, <span id="employee_grade">_____________</span>, SAP ID: <span id="employee_sapID">_____________</span>, OPERATIONS GROUP, NBP, HEAD-OFFICE, KARACHI.</b>
         </p>
        
         <p class="mb-4 pl-8" style="text-align: justify;">
             Enclosed please find a self-explanatory Doctor's advice dated <span id="hospital_advice_date_text">_____________</span> on the captioned subject.
         </p>
-        <p class="mb-4 pl-8" style="text-align: justify;">
-            Kindly accord necessary approval for Ms. Rameen (CNIC No. 45504-8403706-2, W/o Zohaib Ghani Larik, 
-            SVP, SAP ID: 7099 as advised as by Concerned Doctor. (Reference Letter Attached).
+        <p class="mb-4 pl-8" style="text-align: justify;" id="family_approval_text">
+            Kindly accord necessary approval for <span id="family_member_name_text">_____________</span> (CNIC No. <span id="family_member_cnic_text">_____________</span>, <span id="family_member_relation_text">_____________</span> of <span id="employee_name_relation">_____________</span>, <span id="employee_grade_relation">_____________</span>, SAP ID: <span id="employee_sapid_relation">_____________</span>) as advised by Concerned Doctor. (Reference Letter Attached).
         </p>
         <p class="mb-4 pl-8" style="text-align: justify;">
             Kindly arrange to issue necessary permission as per Bank rules.
@@ -174,18 +173,23 @@
         <p class="mb-4 mt-8" style="text-align: justify;">
             Yours faithfully,
         </p>
-        
 
-        <!-- Recipient Information Section -->
-        <div class="mt-6">
-            <p class="font-semibold">Mr. {{employee.name}}</p>
-            <p class="text-sm">OG-II/{{employee.employee_type}}</p>
-            <p class="text-sm">SAP ID: {{employee.SAP_ID}}</p>
-            <p class="text-sm">NBP, RO, Faisalabad.</p>
+        <!-- Signature Section -->
+        <div id="employee-details" class="text-right" style="margin-right: 40px; margin-top: 0;">
+            <!-- Data will be inserted here dynamically-->
         </div>
 
         <div class="mt-6">
             <p>Encl: a.a</p>
+        </div>
+
+        <div class="mt-10 text-right mb-4">
+            <select id="form_type" name="form_type" class="w-1/4 bg-white border border-blue-500 py-2 px-4 rounded-lg focus:outline-none focus:border-blue-700 transition-colors duration-300 shadow-md">
+                <option value="">Admin Signature</option>
+                {% for employee in admin_signuture %}
+                    <option value="{{ employee.SAP_ID }}">{{ employee.employee_name }} ({{ employee.SAP_ID }})</option>
+                {% endfor %}
+            </select>
         </div>
 
         <!-- Footer Section -->
@@ -204,10 +208,10 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
     document.getElementById('download').addEventListener('click', function() {      
-
         const form = document.getElementById('form_type');
-           
-            const element = document.getElementById('download_letter');
+        form.style.visibility = 'hidden';
+        
+        const element = document.getElementById('download_letter');
             
             // Options for generating PDF
             const options = {
@@ -225,13 +229,65 @@
     });
 
 
-    // Dynamic text
+    // Dynamic text and family approval text visibility
     document.getElementById('approval_type_option').addEventListener('change', function() {
         const leaveTypeTextElements = document.querySelectorAll('#approval_type_text');
+        const familyApprovalText = document.getElementById('family_approval_text');
+        const categoryType = document.getElementById('category_type_option').value;
+
         leaveTypeTextElements.forEach(element => {
             element.textContent = this.value || "______________";
         });
+
+        // Show family approval text only for Family/Dependents category when approval type is Approval/Permission
+        if (this.value === 'Approval/Permission' && categoryType === 'Family/Dependents') {
+            familyApprovalText.style.display = 'block';
+        } else {
+            familyApprovalText.style.display = 'none';
+        }
     });
+
+    // Update family approval text visibility when category changes
+    document.getElementById('category_type_option').addEventListener('change', function() {
+        const familyApprovalText = document.getElementById('family_approval_text');
+        const approvalType = document.getElementById('approval_type_option').value;
+
+        if (approvalType === 'Approval/Permission' && this.value === 'Family/Dependents') {
+            familyApprovalText.style.display = 'block';
+        } else {
+            familyApprovalText.style.display = 'none';
+        }
+    });
+
+    // Update family member details in approval text
+    function updateFamilyApprovalText() {
+        const nameText = document.getElementById('family_member_name_text');
+        const cnicText = document.getElementById('family_member_cnic_text');
+        const relationText = document.getElementById('family_member_relation_text');
+        const employeeNameText = document.getElementById('employee_name_relation');
+        const employeeGradeText = document.getElementById('employee_grade_relation');
+        const employeeSapIdText = document.getElementById('employee_sapid_relation');
+
+        // Get the family member details
+        const familyMemberName = document.getElementById('family_member_name').value || '_____________';
+        const familyMemberCnic = document.getElementById('family_member_cnic').value || '_____________';
+        const familyMemberRelation = document.getElementById('family_member_relation').value || '_____________';
+
+        // Update the family member details
+        nameText.textContent = familyMemberName;
+        cnicText.textContent = familyMemberCnic;
+        relationText.textContent = familyMemberRelation;
+
+        // Keep the employee fields as placeholders
+        employeeNameText.textContent = '_____________';
+        employeeGradeText.textContent = '_____________';
+        employeeSapIdText.textContent = '_____________';
+    }
+
+    // Add event listeners for family member details updates
+    document.getElementById('family_member_name').addEventListener('input', updateFamilyApprovalText);
+    document.getElementById('family_member_cnic').addEventListener('input', updateFamilyApprovalText);
+    document.getElementById('family_member_relation').addEventListener('change', updateFamilyApprovalText);
 
     // Function to update the purpose and hospital spans
 function updateSpans() {
@@ -337,9 +393,16 @@ document.getElementById('category_type_option').addEventListener('change', funct
                 .then(response => response.json())
                 .then(data => {
                     if (data.employee_name && data.designation) {
+                        // Update employee details in approval header
                         document.getElementById('employee_name').textContent = "MRS/MS " + data.employee_name;
                         document.getElementById('employee_sapID').textContent = sapId;
                         document.getElementById('employee_grade').textContent = data.employee_grade;
+
+                        // Update employee details in family approval text
+                        document.getElementById('employee_name_relation').textContent = "MRS/MS " + data.employee_name;
+                        document.getElementById('employee_sapid_relation').textContent = sapId;
+                        document.getElementById('employee_grade_relation').textContent = data.employee_grade;
+
                         showSuccessToast("Employee found!");
                     } else {
                         resetPlaceholders();
@@ -353,10 +416,17 @@ document.getElementById('category_type_option').addEventListener('change', funct
 
     // Reset placeholders when no employee is found
     function resetPlaceholders() {
+        // Reset employee details in approval header
         document.getElementById('employee_name').textContent = "_____________";
-        document.getElementById('employee_designation').textContent = "_____________";
         document.getElementById('employee_sapID').textContent = "_____________";
         document.getElementById('employee_grade').textContent = "_____________";
+
+        // Reset employee details in family approval text
+        document.getElementById('employee_name_relation').textContent = "_____________";
+        document.getElementById('employee_sapid_relation').textContent = "_____________";
+        document.getElementById('employee_grade_relation').textContent = "_____________";
+
+        showErrorToast("Employee with this SAP ID not found!");
     }
 
     // Show Error Toast
@@ -445,6 +515,25 @@ document.getElementById('hospital_advice_date_input').addEventListener('change',
     }
 });
 
+
+// Update employee signature details
+document.getElementById('form_type').addEventListener('change', function() {
+    const employeeDetails = document.getElementById('employee-details');
+    const selectedOption = this.options[this.selectedIndex];
+    
+    if (this.value) {
+        const employeeName = selectedOption.text.split(' (')[0];
+        const sapId = this.value;
+        
+        employeeDetails.innerHTML = `
+            <p class="mb-1">________________</p>
+            <p class="mb-1">${employeeName}</p>
+            <p>SAP ID: ${sapId}</p>
+        `;
+    } else {
+        employeeDetails.innerHTML = '';
+    }
+});
 
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>

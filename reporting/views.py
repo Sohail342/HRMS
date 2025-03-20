@@ -90,6 +90,7 @@ class Hospitilization(MemorandumMixin, DetailView):
         context = super().get_context_data(**kwargs)
         context['employees'] = Employee.objects.all()
         context['current_time'] = timezone.now()
+        context['admin_signuture'] = Signature.objects.all()
 
         employee_type = str(context['employee'].employee_type)
         context['employee_type'] = employee_type

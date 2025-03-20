@@ -128,12 +128,17 @@
                     },
                     dataType: 'json',
                     success: function(data) {
+                        console.log(data);
                         // Update the employee details section with retrieved data
-                        $('#employee-details').html(`
-                            <p>_________________________</p>
-                            <p class="font-semibold">${data.name}</p>
-                            <p class="text-sm">${data.designation}/Administration</p>
-                        `);
+                        if (data && data.employee_name) {
+                            $('#employee-details').html(`
+                                <p>_________________________</p>
+                                <p class="font-semibold">${data.employee_name}</p>
+                                <p class="text-sm">${data.designation || 'Officer'}/Administration</p>
+                            `);
+                        } else {
+                            $('#employee-details').html('<p class="text-red-500">No employee data found.</p>');
+                        }
                     },
                     error: function() {
                         $('#employee-details').html('<p class="text-red-500">Error loading data.</p>');
