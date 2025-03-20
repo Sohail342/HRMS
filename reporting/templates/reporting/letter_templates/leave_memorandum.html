@@ -201,9 +201,15 @@
         }
     
         if (application_date && granted_leaves && effect_from) {
-            document.getElementById('application_date_text').textContent = application_date;
-            document.getElementById('granted_leaves_text').textContent = granted_leaves;
-            document.getElementById('effect_from_text').textContent = effect_from;
+            // Store the formatted values before PDF generation
+            const applicationDateFormatted = document.getElementById('application_date_text').textContent;
+            const grantedLeavesFormatted = document.getElementById('granted_leaves_text').textContent;
+            const effectFromFormatted = document.getElementById('effect_from_text').textContent;
+            
+            // Temporarily set the formatted values
+            document.getElementById('application_date_text').textContent = applicationDateFormatted;
+            document.getElementById('granted_leaves_text').textContent = grantedLeavesFormatted;
+            document.getElementById('effect_from_text').textContent = effectFromFormatted;
     
             const element = document.getElementById('download_letter');
     
@@ -216,9 +222,29 @@
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
     
+            // Before generating PDF, ensure we're using the formatted values
+            const applicationDateElement = document.getElementById('application_date_text');
+            const grantedLeavesElement = document.getElementById('granted_leaves_text');
+            const effectFromElement = document.getElementById('effect_from_text');
+
+            // Store original values
+            const originalValues = {
+                applicationDate: applicationDateElement.textContent,
+                grantedLeaves: grantedLeavesElement.textContent,
+                effectFrom: effectFromElement.textContent
+            };
+
+            // Set formatted values for PDF
+            applicationDateElement.textContent = applicationDateElement.getAttribute('data-formatted-date') || originalValues.applicationDate;
+            grantedLeavesElement.textContent = grantedLeavesElement.getAttribute('data-formatted-value') || originalValues.grantedLeaves;
+            effectFromElement.textContent = effectFromElement.getAttribute('data-formatted-date') || originalValues.effectFrom;
+
             // Generate the PDF
             html2pdf().from(element).set(options).save().then(() => {
-                // After PDF is saved, reset the display of the paragraph and section
+                // After PDF is saved, restore original values and display
+                applicationDateElement.textContent = originalValues.applicationDate;
+                grantedLeavesElement.textContent = originalValues.grantedLeaves;
+                effectFromElement.textContent = originalValues.effectFrom;
                 absenceParagraph.style.display = 'block';
                 secondBackupSection.style.display = 'inline';
             });
@@ -237,14 +263,16 @@
         function updateDate() {
             const inputDate = new Date(inputField.value);
             if (!isNaN(inputDate.getTime())) {
-                const formattedDate = inputDate.toLocaleDateString('en-US', {
+                const formattedDate = new Intl.DateTimeFormat('en-US', {
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric'
-                });
+                }).format(inputDate);
                 outputField.textContent = formattedDate;
+                outputField.setAttribute('data-formatted-date', formattedDate);
             } else {
                 outputField.textContent = "______________";
+                outputField.removeAttribute('data-formatted-date');
             }
         }
     
@@ -301,9 +329,12 @@
     document.getElementById('granted_leaves').addEventListener('input', function() {
         let value = parseInt(this.value, 10);
         if (!isNaN(value) && value > 0) {
-            document.getElementById('granted_leaves_text').textContent = `${numberToWords(value)} (${value.toString().padStart(2, '0')}) day(s)`;
+            const formattedValue = `${numberToWords(value)} (${value.toString().padStart(2, '0')}) day(s)`;
+            document.getElementById('granted_leaves_text').textContent = formattedValue;
+            document.getElementById('granted_leaves_text').setAttribute('data-formatted-value', formattedValue);
         } else {
             document.getElementById('granted_leaves_text').textContent = "______________";
+            document.getElementById('granted_leaves_text').removeAttribute('data-formatted-value');
         }
     });
 
