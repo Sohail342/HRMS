@@ -156,18 +156,21 @@
         <p class="mb-1" style="text-align: justify;">
             Dear Sir,
         </p>
-        <p class="mb-4 pl-4" style="text-align: justify; text-transform: uppercase;">
+        <p class="mb-4" style="text-align: justify; text-transform: uppercase;">
             <b><span id="approval_type_text">______________</span> FOR <span id="purpose_text">_____________</span> AT <span id="hospital_text">_____________</span> <span class="upper font-bold" id="family_member"></span>
                 <span id="employee_name">_____________</span>, <span id="employee_grade">_____________</span>, SAP ID: <span id="employee_sapID">_____________</span>, OPERATIONS GROUP, NBP, HEAD-OFFICE, KARACHI.</b>
         </p>
        
-        <p class="mb-4 pl-8" style="text-align: justify;">
-            Enclosed please find a self-explanatory Doctor's advice dated <span id="hospital_advice_date_text">_____________</span> on the captioned subject.
+        <p class="mb-4" style="text-align: justify;" id="doctors_advice_text">
+            <span id="doctors_advice_with_date">Enclosed please find a self-explanatory Doctor's advice dated <span id="hospital_advice_date_text">_____________</span> on the captioned subject.</span>
         </p>
-        <p class="mb-4 pl-8" style="text-align: justify;" id="family_approval_text">
+        <p class="mb-4" style="text-align: justify;" id="medical_bill_text">
+            We enclose herewith Medical bill of Mr./Mrs. <span id="employee_name_text"></span>, <span id="employee_grade_text"></span>, SAP ID: <span id="employee_sapID_text"></span>, along with its enclosure for issuance of Post Facto Approval for reimbursement of his medical bill to the above captioned executive as per bank policy.
+        </p>
+        <p class="mb-4" style="text-align: justify;" id="family_approval_text">
             Kindly accord necessary approval for <span id="family_member_name_text">_____________</span> (CNIC No. <span id="family_member_cnic_text">_____________</span>, <span id="family_member_relation_text">_____________</span> of <span id="employee_name_relation">_____________</span>, <span id="employee_grade_relation">_____________</span>, SAP ID: <span id="employee_sapid_relation">_____________</span>) as advised by Concerned Doctor. (Reference Letter Attached).
         </p>
-        <p class="mb-4 pl-8" style="text-align: justify;">
+        <p class="mb-4" style="text-align: justify;">
             Kindly arrange to issue necessary permission as per Bank rules.
         </p>
         <p class="mb-4 mt-8" style="text-align: justify;">
@@ -394,6 +397,7 @@ document.getElementById('category_type_option').addEventListener('change', funct
                 .then(data => {
                     if (data.employee_name && data.designation) {
                         // Update employee details in approval header
+                        // Update employee details in approval header
                         document.getElementById('employee_name').textContent = "MRS/MS " + data.employee_name;
                         document.getElementById('employee_sapID').textContent = sapId;
                         document.getElementById('employee_grade').textContent = data.employee_grade;
@@ -402,6 +406,11 @@ document.getElementById('category_type_option').addEventListener('change', funct
                         document.getElementById('employee_name_relation').textContent = "MRS/MS " + data.employee_name;
                         document.getElementById('employee_sapid_relation').textContent = sapId;
                         document.getElementById('employee_grade_relation').textContent = data.employee_grade;
+
+                        // Update employee details in medical bill text
+                        document.getElementById('employee_name_text').textContent = "MRS/MS " + data.employee_name;
+                        document.getElementById('employee_sapID_text').textContent = sapId;
+                        document.getElementById('employee_grade_text').textContent = data.employee_grade;
 
                         showSuccessToast("Employee found!");
                     } else {
@@ -457,16 +466,38 @@ document.getElementById('category_type_option').addEventListener('change', funct
     document.getElementById('category_type_option').addEventListener('change', function() {
         const familyDetails = document.getElementById('family_details');
         const selfDetails = document.getElementById('self_details');
+        const doctorsAdviceText = document.getElementById('doctors_advice_text');
+        const medicalBillText = document.getElementById('medical_bill_text');
+        const familyApprovalText = document.getElementById('family_approval_text');
+        const approvalType = document.getElementById('approval_type_option').value;
 
         if (this.value === "Family/Dependents") {
             familyDetails.classList.remove('hidden');
             selfDetails.classList.add('hidden');
+            doctorsAdviceText.style.display = 'block';
+            medicalBillText.style.display = 'none';
+            if (approvalType === "Post Facto Approval") {
+                familyApprovalText.style.display = 'block';
+            } else {
+                familyApprovalText.style.display = 'none';
+            }
         } else if (this.value === "Self") {
             selfDetails.classList.remove('hidden');
             familyDetails.classList.add('hidden');
+            familyApprovalText.style.display = 'none';
+            if (approvalType === "Post Facto Approval") {
+                doctorsAdviceText.style.display = 'none';
+                medicalBillText.style.display = 'block';
+            } else {
+                doctorsAdviceText.style.display = 'block';
+                medicalBillText.style.display = 'none';
+            }
         } else {
             selfDetails.classList.add('hidden');
             familyDetails.classList.add('hidden');
+            doctorsAdviceText.style.display = 'block';
+            medicalBillText.style.display = 'none';
+            familyApprovalText.style.display = 'none';
         }
     });
 
@@ -477,14 +508,47 @@ document.getElementById('family_member_cnic').addEventListener('input', function
 });
 
 
-// Show/hide Hospital Advice Date field based on selected approval type
+// Show/hide Hospital Advice Date field and text paragraphs based on selected approval type and category
 document.getElementById('approval_type_option').addEventListener('change', function() {
     const hospitalAdviceDateField = document.getElementById('hospital_advice_date');
+    const doctorsAdviceText = document.getElementById('doctors_advice_text');
+    const medicalBillText = document.getElementById('medical_bill_text');
+    const familyApprovalText = document.getElementById('family_approval_text');
+    const categoryType = document.getElementById('category_type_option').value;
+    const employeeNameText = document.getElementById('employee_name_text');
+    const employeeGradeText = document.getElementById('employee_grade_text');
+    const employeeSapIDText = document.getElementById('employee_sapID_text');
+    const employeeName = document.getElementById('employee_name').textContent;
+    const employeeGrade = document.getElementById('employee_grade').textContent;
+    const employeeSapID = document.getElementById('employee_sapID').textContent;
 
-    if (this.value === "Approval/Permission") {
-        hospitalAdviceDateField.classList.remove('hidden'); // Show the field
+    if (this.value === "Post Facto Approval") {
+        hospitalAdviceDateField.classList.add('hidden');
+        doctorsAdviceText.style.display = 'none';
+        medicalBillText.style.display = 'none';
+    } else if (this.value === "Approval/Permission") {
+        hospitalAdviceDateField.classList.remove('hidden');
+        doctorsAdviceText.innerHTML = 'Enclosed please find a self-explanatory Doctor\'s advice dated <span id="hospital_advice_date_text">_____________</span> on the captioned subject.';
+        doctorsAdviceText.style.display = 'block';
+        medicalBillText.style.display = 'none';
+        if (this.value === "Post Facto Approval" && categoryType === "Family/Dependents") {
+            familyApprovalText.style.display = 'block';
+        } else {
+            familyApprovalText.style.display = 'none';
+        }
+    } else if (this.value === "Post Facto Approval" && categoryType === "Self") {
+        hospitalAdviceDateField.classList.add('hidden');
+        doctorsAdviceText.style.display = 'none';
+        medicalBillText.style.display = 'block';
+        familyApprovalText.style.display = 'none';
+        employeeNameText.textContent = employeeName;
+        employeeGradeText.textContent = employeeGrade;
+        employeeSapIDText.textContent = employeeSapID;
     } else {
-        hospitalAdviceDateField.classList.add('hidden'); // Hide the field
+        hospitalAdviceDateField.classList.add('hidden');
+        doctorsAdviceText.style.display = 'block';
+        medicalBillText.style.display = 'none';
+        familyApprovalText.style.display = 'none';
     }
 });
 
