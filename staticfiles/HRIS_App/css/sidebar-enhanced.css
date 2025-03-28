@@ -1,0 +1,156 @@
+/* Enhanced Sidebar Styles */
+
+/* Base animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(-20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* Sidebar container */
+#sidebar {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: fadeIn 0.5s ease-out;
+  background: linear-gradient(to bottom, #ffffff, #f9fafb);
+}
+
+#sidebar.hidden {
+  transform: translateX(-100%);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Toggle button */
+#toggleSidebar {
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+}
+
+#toggleSidebar:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* Menu items */
+#sidebar a {
+  transition: all 0.2s ease;
+  border-radius: 8px;
+  margin-bottom: 4px;
+  overflow: hidden;
+}
+
+#sidebar a:hover {
+  transform: translateX(5px);
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+/* Animate menu items on load */
+#sidebar nav a, #sidebar nav div {
+  opacity: 0;
+  animation: slideInLeft 0.3s ease-out forwards;
+}
+
+/* Stagger the animations */
+#sidebar nav a:nth-child(1), #sidebar nav div:nth-child(1) { animation-delay: 0.1s; }
+#sidebar nav a:nth-child(2), #sidebar nav div:nth-child(2) { animation-delay: 0.15s; }
+#sidebar nav a:nth-child(3), #sidebar nav div:nth-child(3) { animation-delay: 0.2s; }
+#sidebar nav a:nth-child(4), #sidebar nav div:nth-child(4) { animation-delay: 0.25s; }
+#sidebar nav a:nth-child(5), #sidebar nav div:nth-child(5) { animation-delay: 0.3s; }
+#sidebar nav a:nth-child(6), #sidebar nav div:nth-child(6) { animation-delay: 0.35s; }
+#sidebar nav a:nth-child(7), #sidebar nav div:nth-child(7) { animation-delay: 0.4s; }
+#sidebar nav a:nth-child(8), #sidebar nav div:nth-child(8) { animation-delay: 0.45s; }
+#sidebar nav a:nth-child(9), #sidebar nav div:nth-child(9) { animation-delay: 0.5s; }
+#sidebar nav a:nth-child(10), #sidebar nav div:nth-child(10) { animation-delay: 0.55s; }
+
+/* Icons */
+#sidebar svg {
+  transition: all 0.3s ease;
+}
+
+#sidebar a:hover svg {
+  transform: scale(1.2);
+  color: #3b82f6 !important;
+}
+
+/* Dropdown menu */
+#dropdownMenu {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+}
+
+#dropdownMenu:not(.hidden) {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* Dropdown items */
+#dropdownMenu a {
+  transition: all 0.2s ease;
+}
+
+#dropdownMenu a:hover {
+  background-color: rgba(59, 130, 246, 0.1);
+  transform: translateX(5px);
+}
+
+/* Logo/title */
+#sidebar h5 {
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+#sidebar h5:after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background-color: #3b82f6;
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+#sidebar a:hover h5 {
+  color: #3b82f6;
+}
+
+#sidebar a:hover h5:after {
+  width: 50%;
+}
+
+/* Active state for menu items */
+.active-nav-item {
+  background-color: rgba(59, 130, 246, 0.1);
+  border-left: 3px solid #3b82f6;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  #sidebar {
+    width: 100%;
+    position: fixed;
+    z-index: 40;
+  }
+  
+  #sidebar.hidden {
+    transform: translateY(-100%);
+  }
+}

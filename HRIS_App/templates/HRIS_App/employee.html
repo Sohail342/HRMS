@@ -1,9 +1,13 @@
 {% extends "sidebar.html" %}
 {% load static %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'HRIS_App/css/enhanced-ui.css' %}">
+{% endblock %}
+
 {% block content %}
 
-    <h1 class="text-xl text-center font-bold mb-4">Select columns</h1>
+    <h1 class="text-xl text-center font-bold mb-4 slide-in-top">Select columns</h1>
 <form action="{% url 'HRMS:download_employees_csv' %}" method="get">
     <div class="grid grid-cols-8 gap-4 mt-4">
         <!-- Row 1 -->
@@ -64,20 +68,20 @@
     
 
     <div class="flex justify-center items-center">
-        <button type="submit" onclick="downloadCsv(event)" class="p-2 pl-5 pr-5 bg-transparent border-2 border-green-500 text-green-500 text-lg rounded-lg hover:bg-green-500 hover:text-gray-100 focus:border-4 focus:border-green-300 mt-4">
+        <button type="submit" onclick="downloadCsv(event)" class="btn btn-secondary p-2 pl-5 pr-5 text-lg rounded-lg mt-4 slide-in-bottom">
             Download CSV
         </button>
     </div>
     
 </form>
 
-<div id="invoice" class="py-3">
+<div id="invoice" class="py-3 fade-in">
     <div class="container mx-auto p-4">
         <!-- Search Bar -->
         <form method="get" action="{% url 'HRMS:employees_view' %}"> 
             <div class="w-full flex justify-center p-1 mb-4">
                 <div class="relative w-full">
-                    <input type="text" name="search" class="w-full backdrop-blur-sm bg-blue-100 border border-blue-300 py-2 pl-10 pr-4 rounded-lg focus:outline-none focus:border-blue-500 transition-colors duration-300 shadow-md" placeholder="Search by SAP ID...">
+                    <input type="text" name="search" class="search-bar w-full backdrop-blur-sm bg-blue-100 border border-blue-300 py-2 pl-10 pr-4 rounded-lg focus:outline-none focus:border-blue-500 transition-colors duration-300 shadow-md" placeholder="Search by SAP ID...">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <svg class="w-4 h-4 text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
@@ -88,13 +92,13 @@
         </form>
 
         <div class="flex items-center justify-between">
-            <h1 class="text-xl font-bold mb-4">{{request.user.region}} Region</h1>
+            <h1 class="text-xl font-bold mb-4 slide-in-left">{{request.user.region}} Region</h1>
         </div>
 
         <div class="container text-center mx-auto px-4 py-6">
             <div class="flex overflow-x-auto space-x-4">
                 {% for grade_data in remaining_grades %}
-                <div class="flex-shrink-0 bg-white border border-gray-200 shadow rounded-lg p-4 w-1/4 md:w-1/5 lg:w-1/6">
+                <div class="card flex-shrink-0 bg-white border border-gray-200 shadow rounded-lg p-4 w-1/4 md:w-1/5 lg:w-1/6 fade-in delay-{{forloop.counter}}00">
                     <div class="font-medium text-gray-900 text-lg mb-2">{{ grade_data.grade }}</div>
                     <div class="text-sm text-gray-500">
                         <div><strong>Total:</strong> {{ grade_data.total }}</div>
@@ -110,7 +114,7 @@
         <div class="overflow-x-auto mt-4">
             <table class="min-w-full border-collapse border border-gray-300">
                 <thead>
-                    <tr class="bg-gray-200 text-gray-700">
+                    <tr class="text-white">
                         <th class="border border-gray-300 px-10 py-8 text-left text-sm md:text-base">Branch Code</th>
                         <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Branch
                             <select id="branchFilter" name="branch" class="w-24 border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out text-gray-700 bg-white hover:bg-gray-50" onchange="filterEmployees()">
@@ -168,7 +172,7 @@
                 <tbody>
                     {% if page_obj %}
                         {% for employee in page_obj %}
-                        <tr class="hover:bg-gray-100 transition duration-150 ease-in-out">
+                        <tr class="employee-card hover:bg-gray-100 transition duration-150 ease-in-out fade-in delay-{{forloop.counter}}00">
                             
                             <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.branch.branch_code }}</td>
                             {% if  employee.branch %}
@@ -196,11 +200,11 @@
                             </td>
                             <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.remarks }}</td>
                             <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">
-                                <a  href="{% url 'transfer_employees:pending' employee.SAP_ID %}" class="bg-blue-500 text-white px-4 py-1 rounded-md hover:bg-blue-600 transition duration-150">Update</a>
+                                <a href="{% url 'transfer_employees:pending' employee.SAP_ID %}" class="btn btn-primary px-4 py-1 rounded-md">Update</a>
                             </td>
                             <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">
                                 {% if not employee.transfer_remarks %}
-                                <a  href="{% url 'transfer_employees:transfer' employee.SAP_ID %}" class="bg-blue-500 text-white px-4 py-1 rounded-md hover:bg-blue-600 transition duration-150">Transfer</a>
+                                <a  href="{% url 'transfer_employees:transfer' employee.SAP_ID %}" class="btn btn-secondary px-4 py-1 rounded-md">Transfer</a>
                                 {% endif %}
                             </td>  
                             <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.transfer_remarks }}</td>

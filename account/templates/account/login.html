@@ -2,22 +2,22 @@
 {% load widget_tweaks %}
 
 {% block content %}
-<section class="bg-gray-50 py-16 min-h-screen flex items-center">
-    <div class="container mx-auto px-6">
-        <div class="flex justify-center">
-            <div class="w-full md:w-2/3 lg:w-1/3">
-                <h2 class="text-center text-3xl font-extrabold text-gray-800 mb-6">Welcome Back</h2>
-                <p class="text-center text-gray-600 mb-8">Please log in to your account</p>
-                
-                <div class="bg-white rounded-lg shadow-lg p-8">
+<div class="min-h-screen flex items-center justify-center w-full bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900 dark:to-indigo-950">
+    <div class="bg-white dark:bg-gray-900 shadow-lg rounded-lg px-8 py-8 max-w-md w-full login-card fade-in">
+        <h2 class="text-center text-2xl font-bold text-gray-900 dark:text-gray-200 mb-6">Welcome Back</h2>
+        <p class="text-center text-gray-600 dark:text-gray-400 mb-8">Please log in to your account</p>
                     <form class="space-y-6" action="{% url 'account:login' %}" method="post">
                         {% csrf_token %}
                         
                         {# Display messages #}
                         {% if messages %}
-                            <div class="space-y-3">
+                            <div class="mb-4">
                                 {% for message in messages %}
-                                    <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded">
+                                    <div class="text-sm p-3 rounded-md shadow-sm 
+                                        {% if message.tags == 'success' %} bg-green-100 text-green-600
+                                        {% elif message.tags == 'error' %} bg-red-100 text-red-600
+                                        {% else %} bg-yellow-100 text-yellow-600 {% endif %}
+                                    ">
                                         {{ message }}
                                     </div>
                                 {% endfor %}
@@ -26,29 +26,31 @@
 
                         {# Display non-field errors #}
                         {% if form.non_field_errors %}
-                            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded">
+                            <div class="text-sm p-3 rounded-md shadow-sm bg-red-100 text-red-600 mb-4">
                                 {{ form.non_field_errors }}
                             </div>
                         {% endif %}
 
-                        <div>
-                            <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                            {{ form.email|attr:"class:form-input mt-2 block w-full h-12 px-4 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-400 focus:outline-none focus:border-blue-500" }}
-                            {% if form.email.errors %}
-                                <p class="text-red-500 text-xs mt-1">{{ form.email.errors }}</p>
-                            {% endif %}
+                        <div class="stagger-fade-in">
+                            <div class="mb-6">
+                                <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email</label>
+                                {{ form.email|attr:"class:shadow-sm rounded-md w-full px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 animated-input" }}
+                                {% if form.email.errors %}
+                                    <p class="text-red-500 text-xs mt-1">{{ form.email.errors }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-6">
+                                <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Password</label>
+                                {{ form.password|attr:"class:shadow-sm rounded-md w-full px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 animated-input" }}
+                                {% if form.password.errors %}
+                                    <p class="text-red-500 text-xs mt-1">{{ form.password.errors }}</p>
+                                {% endif %}
+                            </div>
                         </div>
                         
-                        <div>
-                            <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                            {{ form.password|attr:"class:form-input mt-2 block w-full h-12 px-4 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-400 focus:outline-none focus:border-blue-500" }}
-                            {% if form.password.errors %}
-                                <p class="text-red-500 text-xs mt-1">{{ form.password.errors }}</p>
-                            {% endif %}
-                        </div>
-                        
-                        <div>
-                            <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg shadow hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-300 transition duration-200">
+                        <div class="mb-6">
+                            <button type="submit" class="w-full login-gradient-bg text-white font-semibold py-3 rounded-lg shadow login-button transition duration-200 hover:shadow-lg">
                                 Sign In
                             </button>
                         </div>
@@ -66,5 +68,5 @@
             </div>
         </div>
     </div>
-</section>
+</div>
 {% endblock %}
