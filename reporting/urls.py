@@ -8,6 +8,7 @@ urlpatterns = [
     #  Letter Templates
     path('leave_memorandum/<str:sap_id>/', views.LeaveMemorandum.as_view(), name="leave_memorandum"),
     path('hospitalization/<str:sap_id>/', views.Hospitilization.as_view(), name="hospitalization"),
+    path('request_for_issuance/<str:sap_id>/', views.RequestForIssuanceOfficeMemorandum.as_view(), name="request_for_issuance"),
     
 
 

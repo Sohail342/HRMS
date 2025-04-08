@@ -21,6 +21,16 @@ def admin_required(view_func):
         if not getattr(request.user, 'is_admin', False):
             raise Http404("Page not found")
         return view_func(request, *args, **kwargs)
+    return _wrapped_view 
+
+
+def is_letter_template_admin_required(view_func):
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        # Check if the user has the required admin access
+        if not getattr(request.user, 'is_letter_template_admin', False):
+            raise Http404("Page not found")
+        return view_func(request, *args, **kwargs)
     return _wrapped_view
 
 

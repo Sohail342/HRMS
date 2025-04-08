@@ -10,6 +10,7 @@ class AdminEmployeeForm(forms.ModelForm):
         fields = (
             'email', 
             'password',
+            'is_letter_template_admin',
             'name', 
             'is_active', 
             'is_admin', 
