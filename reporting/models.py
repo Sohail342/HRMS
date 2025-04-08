@@ -3,6 +3,15 @@ from HRIS_App.models import Employee
 from cloudinary.models import CloudinaryField
 
 
+class HospitalName(models.Model):
+    hospital_name = models.CharField(max_length=100, unique=True, blank=True, null=True)
+    address = models.CharField(max_length=100, blank=True, null=True)
+    phone = models.CharField(max_length=100, blank=True, null=True)
+    email = models.CharField(max_length=100, blank=True, null=True)
+    website = models.CharField(max_length=100, blank=True, null=True)
+    logo = CloudinaryField(blank=True, null=True)
+
+
 class Signature(models.Model):
     SAP_ID = models.IntegerField(blank=True, null=True)
     employee_name = models.CharField(max_length=100, blank=True, null=True)

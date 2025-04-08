@@ -7,7 +7,7 @@ from django.http import JsonResponse
 from django.core.exceptions import ValidationError
 from django.contrib import messages
 import cloudinary
-from .models import Signature, LetterTemplates
+from .models import Signature, LetterTemplates, HospitalName
 from django.views.generic import DetailView, ListView
 from HRIS_App.models import Employee
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -23,7 +23,8 @@ def get_employee(request):
         'employee_name': employee.name,
         'designation': employee.designation_id,
         'sap_id': str(employee.SAP_ID) if employee.SAP_ID else "", 
-        'employee_grade': str(employee.employee_grade)
+        'employee_grade': str(employee.employee_grade),
+        'employee_salutation': str(employee.employee_salutation),
     }
     return JsonResponse(data)
 
@@ -70,18 +71,9 @@ class LeaveMemorandum(MemorandumMixin, DetailView):
         context['employees'] = Employee.objects.all()
         context['current_time'] = timezone.now()
         context['admin_signuture'] = Signature.objects.all()
+        context['hospital_name'] = HospitalName.objects.all()
         return context
     template_name = 'reporting/letter_templates/leave_memorandum.html' 
-
-    
-@method_decorator(admin_required, name='dispatch')
-class GrantOfExtensionMemorandum(MemorandumMixin, DetailView):
-    template_name = 'reporting/letter_templates/grant_of_extension.html'
-
-
-@method_decorator(admin_required, name='dispatch')
-class JoiningMemorandum(MemorandumMixin, DetailView):
-    template_name = 'reporting/letter_templates/joining_memorandun.html'
 
 
 @method_decorator(admin_required, name='dispatch')
@@ -91,6 +83,7 @@ class Hospitilization(MemorandumMixin, DetailView):
         context['employees'] = Employee.objects.all()
         context['current_time'] = timezone.now()
         context['admin_signuture'] = Signature.objects.all()
+        context['hospital_name'] = HospitalName.objects.all()
 
         employee_type = str(context['employee'].employee_type)
         context['employee_type'] = employee_type

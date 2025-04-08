@@ -53,7 +53,12 @@
             </div>
             <div class="mt-4">
                 <label for="self_hospital" class="block text-sm font-medium text-gray-700">Hospital Name:</label>
-                <input type="text" id="self_hospital" class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" placeholder="e.g. at memon hospital">
+                <select id="self_hospital" class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+                    <option value="">Select Hospital</option>
+                    {% for hospital in hospital_name %}
+                        <option value="{{ hospital.hospital_name }}">{{ hospital.hospital_name }}</option>
+                    {% endfor %}
+                </select>
             </div>
         </div>
 
@@ -94,7 +99,12 @@
             </div>
             <div class="mt-4">
                 <label for="family_hospital" class="block text-sm font-medium text-gray-700">Hospital Name:</label>
-                <input type="text" id="family_hospital" class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" placeholder="e.g. at memon hospital">
+                <select id="family_hospital" class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+                    <option value="">Select Hospital</option>
+                    {% for hospital in hospital_name %}
+                        <option value="{{ hospital.hospital_name }}">{{ hospital.hospital_name }}</option>
+                    {% endfor %}
+                </select>
             </div>
 
             <!-- Employee Backup SAP ID -->
@@ -121,7 +131,7 @@
     </div>
     
 
-    <div id="download_letter" class="max-w-screen-md mx-auto bg-white p-10">
+    <div id="download_letter" class="max-w-screen-md mx-auto bg-white p-10" style="position: relative; min-height: 1123px; display: flex; flex-direction: column; page-break-inside: avoid;">
         <!-- Header Section -->
         <div class="mb-4">
             <div class="flex justify-between items-center">
@@ -196,10 +206,13 @@
         </div>
 
         <!-- Footer Section -->
-        <hr class="border-t border-gray-400 mt-20 mb-2">
-        <div class="text-center text-xs text-gray-600">
-            <p class="font-semibold">National Bank of Pakistan</p>
-            <p>Head Office: I.I. Chundrigar Road, Karachi. Ph: 9212100 (50 lines) Website: www.nbp.com.pk</p>
+        <div style="position: relative; margin-top: 0; left: 0; right: 0; width: 100%; page-break-inside: avoid; page-break-before: avoid;" class="footer">
+            <hr class="border-t border-gray-400 mb-2">
+            <div class="text-center text-xs text-gray-600">
+                <p class="font-semibold">National Bank of Pakistan</p>
+                <p>Head Office: I.I. Chundrigar Road, Karachi. Ph: 9212100 (50 lines)</p>
+                <p>Website: www.nbp.com.pk</p>
+            </div>
         </div>
     </div>
 
@@ -222,7 +235,9 @@
                 filename:     '{{employee.name}}.pdf',
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2 }, // For high-quality rendering
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak:    { mode: ['avoid-all', 'css', 'legacy'], before: '.page-break-before', after: '.page-break-after', avoid: '.footer' },
+                footer:       { height: '28mm', contents: { } }
             };
         
             // Generate the PDF
@@ -322,11 +337,11 @@ function updateSpans() {
 
 // Add event listeners to Self fields
 document.getElementById('self_purpose').addEventListener('input', updateSpans);
-document.getElementById('self_hospital').addEventListener('input', updateSpans);
+document.getElementById('self_hospital').addEventListener('change', updateSpans);
 
 // Add event listeners to Family fields
 document.getElementById('family_purpose').addEventListener('input', updateSpans);
-document.getElementById('family_hospital').addEventListener('input', updateSpans);
+document.getElementById('family_hospital').addEventListener('change', updateSpans);
 
 // Add event listener to toggle between Self and Family sections
 document.getElementById('category_type_option').addEventListener('change', function() {
@@ -398,17 +413,17 @@ document.getElementById('category_type_option').addEventListener('change', funct
                     if (data.employee_name && data.designation) {
                         // Update employee details in approval header
                         // Update employee details in approval header
-                        document.getElementById('employee_name').textContent = "MRS/MS " + data.employee_name;
+                        document.getElementById('employee_name').textContent = data.employee_salutation + " " + data.employee_name;
                         document.getElementById('employee_sapID').textContent = sapId;
                         document.getElementById('employee_grade').textContent = data.employee_grade;
 
                         // Update employee details in family approval text
-                        document.getElementById('employee_name_relation').textContent = "MRS/MS " + data.employee_name;
+                        document.getElementById('employee_name_relation').textContent = data.employee_salutation + " " + data.employee_name;
                         document.getElementById('employee_sapid_relation').textContent = sapId;
                         document.getElementById('employee_grade_relation').textContent = data.employee_grade;
 
                         // Update employee details in medical bill text
-                        document.getElementById('employee_name_text').textContent = "MRS/MS " + data.employee_name;
+                        document.getElementById('employee_name_text').textContent = data.employee_salutation + " " + data.employee_name;
                         document.getElementById('employee_sapID_text').textContent = sapId;
                         document.getElementById('employee_grade_text').textContent = data.employee_grade;
 
@@ -581,22 +596,34 @@ document.getElementById('hospital_advice_date_input').addEventListener('change',
 
 
 // Update employee signature details
-document.getElementById('form_type').addEventListener('change', function() {
-    const employeeDetails = document.getElementById('employee-details');
-    const selectedOption = this.options[this.selectedIndex];
-    
-    if (this.value) {
-        const employeeName = selectedOption.text.split(' (')[0];
-        const sapId = this.value;
-        
-        employeeDetails.innerHTML = `
-            <p class="mb-1">________________</p>
-            <p class="mb-1">${employeeName}</p>
-            <p>SAP ID: ${sapId}</p>
-        `;
-    } else {
-        employeeDetails.innerHTML = '';
-    }
+$(document).ready(function() {
+    $('#form_type').on('change', function() {
+        var sapId = $(this).val();
+        if (sapId) {
+            $.ajax({
+                url: "{% url 'reporting:get_employee_data' %}", 
+                data: {
+                    'sap_id': sapId
+                },
+                dataType: 'json',
+                success: function(data) {
+
+                    // Update the employee details section with retrieved data
+                    $('#employee-details').html(`
+                        <p>_________________________</p>
+                        <p class="font-semibold">${data.employee_name}</p>
+                        <p class="text-sm">${data.grade}/${data.designation}</p>
+                        <p class="text-sm">${data.wing} ${data.division} (${data.group})</p>
+                    `);
+                },
+                error: function() {
+                    $('#employee-details').html('<p class="text-red-500">Error loading data.</p>');
+                }
+            });
+        } else {
+            $('#employee-details').empty();
+        }
+    });
 });
 
 </script>

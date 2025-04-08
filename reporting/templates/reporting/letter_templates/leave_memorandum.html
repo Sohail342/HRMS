@@ -1,5 +1,6 @@
 {% extends "sidebar.html" %}
 {% load static %}
+{% load custom_filters %}
 
 {% block content %}
 <body class="p-8 bg-gray-100">
@@ -88,7 +89,7 @@
     </div>
 </div>
 
-    <div id="download_letter" class="max-w-screen-md mx-auto bg-white p-12 borde">
+    <div id="download_letter" class="max-w-screen-md mx-auto bg-white p-12" style="position: relative; min-height: 1123px; display: flex; flex-direction: column;">
         <!-- Header Section -->
         <div class="mb-4">
             <div class="flex justify-between items-center">
@@ -116,12 +117,12 @@
 
         <!-- Body Text -->
         <p class="mb-4" style="text-align: justify;">
-            With reference to his application dated <b><span id="application_date_text">______________</span></b> Mr. {{employee.name}}, OG-II/{{employee.employee_type}} SAP ID: {{employee.SAP_ID}}, 
+            With reference to his application dated <b><span id="application_date_text">______________</span></b> {{employee.employee_salutation | capitalize_words }} {{employee.name}}, OG-II/{{employee.employee_type}} SAP ID: {{employee.SAP_ID}}, 
             NBP, Regional Office, Faisalabad is advised that he has been granted <span id="granted_leaves_text">______________</span> <span id="leave_type_text">______________</span> <span id="purpose_text"></span>,
             with effect from <span id="effect_from_text">_____________</span>.
         </p>
         <p class="mb-4" style="text-align: justify;">
-            He/She will accordingly stand relieved to his duties as of close of office today i.e. <b>Jan 9, 2022</b> to avail sanctioned leave(s). <span id="extension_text"></span>
+            {{employee.employee_salutation | capitalize_words }} {{employee.name}} will accordingly stand relieved to his duties as of close of office today i.e. <b>Jan 9, 2022</b> to avail sanctioned leave(s). <span id="extension_text"></span>
         </p>
 
 
@@ -150,14 +151,14 @@
 
         <!-- Recipient Information Section -->
         <div class="mt-8">
-            <p class="font-semibold">Mr. {{employee.name}}</p>
+            <p class="font-semibold">{{employee.employee_salutation | capitalize_words}} {{employee.name}}</p>
             <p class="text-sm">OG-II/{{employee.employee_type}}</p>
             <p class="text-sm">SAP ID: {{employee.SAP_ID}}</p>
         </div>
 
         <!-- Footer Section -->
-        <div class="mt-36">
-            <hr class="border-t border-gray-400 mt-28 mb-2">
+        <div style="position: relative; margin-top: auto; left: 0; right: 0; width: 100%;" class="footer">
+            <hr class="border-t border-gray-400 mb-2">
             <div class="text-center text-xs text-gray-600">
                 <p class="font-semibold">National Bank of Pakistan</p>
                 <p>Head Office: I.I. Chundrigar Road, Karachi. Ph: 9212100 (50 lines)</p>
@@ -219,7 +220,9 @@
                 filename: '{{employee.name}}.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2 }, // For high-quality rendering
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
+                footer: { height: '28mm', contents: { } }
             };
     
             // Before generating PDF, ensure we're using the formatted values

@@ -29,7 +29,7 @@ class AdminEmployeeForm(forms.ModelForm):
             'date_current_assignment', 
             'mobile_number', 
             'admin_signature',  
-            'phone_no_emergency_contact', 
+            'employee_salutation', 
             'date_of_joining', 
             'grade_assignment',
             'pending_inquiry',

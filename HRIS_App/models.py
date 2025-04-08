@@ -235,7 +235,7 @@ class Employee(AbstractBaseUser):
     date_current_assignment = models.CharField(max_length=100, blank=True, null=True)
     mobile_number = models.CharField(max_length=15, blank=True, null=True, default="1111")
     admin_signature = models.BooleanField(default=False)
-    phone_no_emergency_contact = models.CharField(max_length=15, blank=True, null=True, default="1111")
+    employee_salutation = models.CharField(max_length=15, blank=True, null=True, default="MR.")
     date_of_joining = models.CharField(max_length=100, blank=True, null=True)
     user_group = models.CharField(max_length=200, default=None, blank=True, null=True)
     transferred_status = models.CharField(max_length=20, choices=TRANSFER_CHOICES, blank=True, null=True)
@@ -261,6 +261,7 @@ class Employee(AbstractBaseUser):
 
     # tracked employees if they are not an admin (is_admin=False) or an admin employee (is_admin_employee=False
     employee_user = models.BooleanField(default=True)
+
 
     # Upload PDF (BSC Form for employees on Cloudinary)
     pdf_file = CloudinaryField(
