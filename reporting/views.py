@@ -7,12 +7,56 @@ from django.http import JsonResponse
 from django.core.exceptions import ValidationError
 from django.contrib import messages
 import cloudinary
+import json
+import base64
 from .models import Signature, LetterTemplates, HospitalName
 from django.views.generic import DetailView, ListView
 from HRIS_App.models import Employee
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView
+from django.views.decorators.csrf import csrf_exempt
+from django.core.paginator import Paginator
 
+
+@csrf_exempt
+def save_pdf_to_cloudinary(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            pdf_data = data.get('pdf_data')
+            sap_id = data.get('sap_id')
+            file_name = data.get('file_name', 'document.pdf')
+            
+            # Validate the data
+            if not pdf_data or not sap_id:
+                return JsonResponse({'success': False, 'error': 'Missing required data'}, status=400)
+            
+            # Get the employee object
+            employee = get_object_or_404(Employee, SAP_ID=sap_id)
+            
+            # Convert base64 to file
+            pdf_data = pdf_data.split(',')[1] if ',' in pdf_data else pdf_data
+            pdf_bytes = base64.b64decode(pdf_data)
+            
+            # Upload PDF to Cloudinary
+            upload_result = cloudinary.uploader.upload(
+                pdf_bytes, 
+                resource_type="raw", 
+                public_id=file_name
+            )
+            
+            template_url = upload_result['secure_url']
+            
+            # Save template record
+            template_upload = LetterTemplates(employee=employee, template_url=template_url)
+            template_upload.save()
+            
+            return JsonResponse({'success': True, 'url': template_url})
+            
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=405)
 
 
 def get_employee(request):
@@ -98,7 +142,39 @@ class RequestForIssuanceOfficeMemorandum(MemorandumMixin, DetailView):
 
 
 
-@method_decorator(is_letter_template_admin_required, name='dispatch')
+
+@is_letter_template_admin_required
+def template_search(request):
+    search_performed = False
+    templates = None
+    
+    if 'sap_id' in request.GET and request.GET['sap_id']:
+        search_performed = True
+        sap_id = request.GET['sap_id']
+        
+        # Get the employee object
+        try:
+            employee = Employee.objects.get(SAP_ID=sap_id)
+            # Get all templates for this employee
+            template_list = LetterTemplates.objects.filter(employee=employee).order_by('-created_at')
+            
+            # Pagination
+            paginator = Paginator(template_list, 10)  # Show 10 templates per page
+            page = request.GET.get('page', 1)
+            templates = paginator.get_page(page)
+            
+        except Employee.DoesNotExist:
+            # No employee found with this SAP ID
+            templates = []
+    
+    context = {
+        'templates': templates,
+        'search_performed': search_performed
+    }
+    
+    return render(request, 'reporting/template_search.html', context)
+
+
 class LetterForm(LoginRequiredMixin, ListView):
     
     model = Employee
@@ -141,8 +217,8 @@ class LetterForm(LoginRequiredMixin, ListView):
             try:
                 # Upload PDF to Cloudinary
                 upload_result = cloudinary.uploader.upload(
-                    uploaded_file, resource_type="raw", format="pdf", folder="BSC Forms"
-                )
+                    uploaded_file, resource_type="raw", public_id=uploaded_file.name
+                )   
                 template_url = upload_result['secure_url']
 
                 # Save template record

@@ -15,5 +15,7 @@ urlpatterns = [
     path('letterform/', views.LetterForm.as_view(), name="lettername"),
     path('get_employee_data/', views.get_employee_data, name='get_employee_data'), 
     path('get_employee/', views.get_employee, name='get_employee'), 
+    path('save_pdf_to_cloudinary/', views.save_pdf_to_cloudinary, name='save_pdf_to_cloudinary'),
+    path('template_search/', views.template_search, name='template_search'),
 ]
 
