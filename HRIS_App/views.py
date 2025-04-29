@@ -131,6 +131,7 @@ def employees_view(request):
 
 
 # Download Dynamic Fields or column as a CSV file
+
 @admin_employee_required
 def download_employees_csv(request):
     # Get all employee data

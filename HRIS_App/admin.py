@@ -109,7 +109,7 @@ class EmployeeAdmin(ModelAdmin, ImportExportModelAdmin):
     resource_class = EmployeeResource
     form = AdminEmployeeForm
     list_display = ('SAP_ID', 'name', 'branch', 'region', 'designation', 'employee_grade', 'employee_type', 'date_of_joining', 'is_admin_employee')
-    list_filter = ('designation', 'branch__region', 'is_admin_employee', 'is_active', 'branch')
+    list_filter = ('designation', 'branch__region', 'is_admin_employee', 'is_active', 'branch', 'is_letter_template_admin')
     search_fields = ("SAP_ID", 'name', 'region__name', 'branch__branch_name')
 
     def get_form(self, request, obj=None, **kwargs):

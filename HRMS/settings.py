@@ -119,11 +119,15 @@ if DATABASE_NAME:
 else:
     # Fallback for local development
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        }
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'hrms',        
+        'USER': 'visionerz',           
+        'PASSWORD': '984-2022',   
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
+}
 
 
 # Custom Employee Model
@@ -192,19 +196,16 @@ cloudinary.config(
     secure=True  
 )
 
+
 # CACHES = {
-#     'default': {
-#         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-#         'LOCATION': os.getenv('REDIS_URL', 'rediss://related-alpaca-33827.upstash.io:6379'),
-#         'OPTIONS': {
-#             'password': os.getenv("password_redis"),
-#             'ssl_cert_reqs': True,
-#         },
+#     "default": {
+#         "BACKEND": "django_redis.cache.RedisCache",
+#         "LOCATION": "redis://127.0.0.1:6379/1",
+#         "OPTIONS": {
+#             "CLIENT_CLASS": "django_redis.client.DefaultClient",
+#         }
 #     }
 # }
-
-# CACHE_MIDDLEWARE_SECONDS = 120  # Cache for 2 minutes
-# CACHE_MIDDLEWARE_KEY_PREFIX = "my_site_cache"
 
 
 
