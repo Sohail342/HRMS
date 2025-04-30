@@ -2,8 +2,6 @@ from urllib.parse import urlparse
 from pathlib import Path
 import cloudinary
 import os
-import cloudinary.uploader
-import cloudinary.api
 from dotenv import load_dotenv
 load_dotenv()
 from django.urls import reverse_lazy
@@ -22,7 +20,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['*', '.vercel.app/', os.getenv("HOST")]
+ALLOWED_HOSTS = ["127.0.0.1",'.vercel.app/', os.getenv("ALLOW_HOST")]
 
 
 
@@ -107,13 +105,13 @@ DATABASE_NAME = os.getenv("DATABASE_NAME")
 # Parse the DATABASE_URL
 if DATABASE_NAME:
 
-    # FOR VERCEL DATABASE
+    # FOR VERCEL DATABASE (Testing)
     DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.getenv("DATABASE_NAME"),
         'USER': os.getenv("DATABASE_USER"),
-        'PASSWORD': os.getenv("DATABASE_PASSWORD_VERCEL"),
+        'PASSWORD': os.getenv("DATABASE_PASSWORD"),
         'HOST': os.getenv("DATABASE_HOST"),
         'OPTIONS': {'sslmode': 'require'},
     }
@@ -122,12 +120,12 @@ else:
     # Fallback for Production DATABASE (VPS)
     DATABASES = {
     'default': {
-        'ENGINE': os.getenv("DATABASE_ENGINE"),
-        'NAME': 'hrms',
-        'USER': 'postgres',
-        'PASSWORD': os.getenv("DATABASE_PASSWORD"),
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'ENGINE': os.getenv("PRO_DATABASE_ENGINE"),
+        'NAME': os.getenv("PRO_DATABASE_NAME"),
+        'USER': os.getenv("PRO_DATABASE_USER"),
+        'PASSWORD': os.getenv("PRO_DATABASE_PASSWORD"),
+        'HOST': os.getenv("PRO_DATABASE_HOST"),
+        'PORT': os.getenv("PRO_DATABASE_PORT"),
     }
 }
 
