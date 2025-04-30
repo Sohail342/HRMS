@@ -63,9 +63,12 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    
-    # Serve static files in Test with Whiteniose otherwise serve with Nginx
-    'whitenoise.middleware.WhiteNoiseMiddleware' if os.getenv("DATABASE_NAME") else '',
+]
+
+if os.getenv("DATABASE_NAME"):
+    MIDDLEWARE.append('whitenoise.middleware.WhiteNoiseMiddleware')
+
+MIDDLEWARE += [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
