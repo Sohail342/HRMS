@@ -25,7 +25,6 @@ def save_pdf_to_cloudinary(request):
             data = json.loads(request.body)
             pdf_data = data.get('pdf_data')
             sap_id = data.get('sap_id')
-            file_name = data.get('file_name', 'document.pdf')
             
             # Validate the data
             if not pdf_data or not sap_id:
@@ -42,13 +41,12 @@ def save_pdf_to_cloudinary(request):
             upload_result = cloudinary.uploader.upload(
                 pdf_bytes, 
                 resource_type="raw", 
-                public_id=file_name
             )
             
             template_url = upload_result['secure_url']
-            
+            print("Template URL:", template_url)
             # Save template record
-            template_upload = LetterTemplates(employee=employee, template_url=template_url)
+            template_upload = LetterTemplates(employee=employee, template_saved_url=template_url)
             template_upload.save()
             
             return JsonResponse({'success': True, 'url': template_url})
@@ -159,7 +157,7 @@ def template_search(request):
             template_list = LetterTemplates.objects.filter(employee=employee).order_by('-created_at')
             
             # Pagination
-            paginator = Paginator(template_list, 10)  # Show 10 templates per page
+            paginator = Paginator(template_list, 10)
             page = request.GET.get('page', 1)
             templates = paginator.get_page(page)
             
@@ -217,7 +215,7 @@ class LetterForm(LoginRequiredMixin, ListView):
             try:
                 # Upload PDF to Cloudinary
                 upload_result = cloudinary.uploader.upload(
-                    uploaded_file, resource_type="raw", public_id=uploaded_file.name
+                    uploaded_file, resource_type="raw"
                 )   
                 template_url = upload_result['secure_url']
 

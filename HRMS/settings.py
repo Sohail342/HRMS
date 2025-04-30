@@ -22,7 +22,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['*', '.vercel.app/']
+ALLOWED_HOSTS = ['*', '.vercel.app/', os.getenv("HOST")]
 
 
 
@@ -106,28 +106,31 @@ DATABASE_NAME = os.getenv("DATABASE_NAME")
 
 # Parse the DATABASE_URL
 if DATABASE_NAME:
+
+    # FOR VERCEL DATABASE
     DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.getenv("DATABASE_NAME"),
         'USER': os.getenv("DATABASE_USER"),
-        'PASSWORD': os.getenv("DATABASE_PASSWORD"),
+        'PASSWORD': os.getenv("DATABASE_PASSWORD_VERCEL"),
         'HOST': os.getenv("DATABASE_HOST"),
         'OPTIONS': {'sslmode': 'require'},
     }
 }
 else:
-    # Fallback for local development
+    # Fallback for Production DATABASE (VPS)
     DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'hrms',        
-        'USER': 'visionerz',           
-        'PASSWORD': '984-2022',   
+        'ENGINE': os.getenv("DATABASE_ENGINE"),
+        'NAME': 'hrms',
+        'USER': 'postgres',
+        'PASSWORD': os.getenv("DATABASE_PASSWORD"),
         'HOST': 'localhost',
         'PORT': '5432',
     }
 }
+
 
 
 # Custom Employee Model

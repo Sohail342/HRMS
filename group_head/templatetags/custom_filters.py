@@ -12,3 +12,10 @@ def get_item(dictionary, key):
 def capitalize_words(value):
     # Capitalize the first letter of each word
     return ' '.join([word.capitalize() for word in value.split()])
+
+
+@register.filter
+def add_pdf(url:str):
+    if not url.endswith('.pdf'):
+        return f'{url}.pdf'
+    return url
