@@ -9,7 +9,7 @@ from django.contrib import messages
 import cloudinary
 import json
 import base64
-from .models import Signature, LetterTemplates, HospitalName
+from .models import Signature, LetterTemplates, HospitalName, PermenantLetterTemplates
 from django.views.generic import DetailView, ListView
 from HRIS_App.models import Employee
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -44,7 +44,7 @@ def save_pdf_to_cloudinary(request):
             )
             
             template_url = upload_result['secure_url']
-            print("Template URL:", template_url)
+            
             # Save template record
             template_upload = LetterTemplates(employee=employee, template_saved_url=template_url)
             template_upload.save()
@@ -173,6 +173,38 @@ def template_search(request):
     return render(request, 'reporting/template_search.html', context)
 
 
+
+@is_letter_template_admin_required
+def search_permanent_saved_templates(request):
+    search_performed = False
+    templates = None
+    
+    if 'sap_id' in request.GET and request.GET['sap_id']:
+        search_performed = True
+        sap_id = request.GET['sap_id']
+        
+        # Get the employee object
+        try:
+            employee = Employee.objects.get(SAP_ID=sap_id)
+            # Get all templates for this employee
+            template_list = PermenantLetterTemplates.objects.filter(employee=employee).order_by('-created_at')
+            
+            # Pagination
+            paginator = Paginator(template_list, 10)
+            page = request.GET.get('page', 1)
+            templates = paginator.get_page(page)
+            
+        except Employee.DoesNotExist:
+            # No employee found with this SAP ID
+            templates = []
+    
+    context = {
+        'templates': templates,
+        'search_performed': search_performed
+    }
+    
+    return render(request, 'reporting/search_permanant.html', context)
+
 class LetterForm(LoginRequiredMixin, ListView):
     
     model = Employee
@@ -199,6 +231,7 @@ class LetterForm(LoginRequiredMixin, ListView):
     def post(self, request, *args, **kwargs):
         form_type = request.POST.get('form_type')
         sap_id = request.POST.get('sap_id')
+        description = request.POST.get('description')
         sap_id_for_template_upload = request.POST.get('sap_id_for_template_upload')
 
         if 'pdf_file' in request.FILES:
@@ -220,7 +253,7 @@ class LetterForm(LoginRequiredMixin, ListView):
                 template_url = upload_result['secure_url']
 
                 # Save template record
-                template_upload = LetterTemplates(employee=employee, template_url=template_url)
+                template_upload = PermenantLetterTemplates(employee=employee, template_saved_url=template_url, description=description)
                 template_upload.save()
 
                 messages.success(request, "Template uploaded successfully.")

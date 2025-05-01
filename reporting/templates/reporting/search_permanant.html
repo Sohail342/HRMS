@@ -7,13 +7,13 @@
         <div class="bg-white rounded-lg shadow-lg overflow-hidden">
             <!-- Header Section -->
             <div class="bg-blue-600 p-6">
-                <h1 class="text-2xl font-bold text-white">Template Search</h1>
-                <p class="text-blue-100 mt-2">Search for saved letter templates by SAP ID</p>
+                <h1 class="text-2xl font-bold text-white">Template Search for Permanent Saved Templates</h1>
+                <p class="text-blue-100 mt-2">Search for Permanent saved letter templates by SAP ID</p>
             </div>
             
             <!-- Search Form Section -->
             <div class="p-6 border-b">
-                <form method="GET" action="{% url 'reporting:template_search' %}" class="flex flex-col md:flex-row gap-4 items-end">
+                <form method="GET" action="{% url 'reporting:search_permanent_saved_templates' %}" class="flex flex-col md:flex-row gap-4 items-end">
                     <div class="flex-grow">
                         <label for="sap_id" class="block text-sm font-medium text-gray-700 mb-1">Employee SAP ID</label>
                         <input type="number" name="sap_id" id="sap_id" value="{{ request.GET.sap_id }}" 

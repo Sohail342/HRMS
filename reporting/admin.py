@@ -1,7 +1,7 @@
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 from unfold.contrib.import_export.forms import ExportForm, ImportForm
-from .models import Signature, LetterTemplates, HospitalName
+from .models import Signature, LetterTemplates, HospitalName, PermenantLetterTemplates
 from unfold.admin import ModelAdmin
 
 
@@ -23,5 +23,11 @@ class SignatureAdmin(ImportExportModelAdmin, ModelAdmin):
 @admin.register(LetterTemplates)
 class LetterTemplatesAdmin(ImportExportModelAdmin, ModelAdmin):
     list_display = ['employee']
+    
+    
+@admin.register(PermenantLetterTemplates)
+class PermenantLetterTemplatesAdmin(ImportExportModelAdmin, ModelAdmin):
+    list_display = ['employee', 'description']
+    search_fields = ['employee', 'description']
 
 
