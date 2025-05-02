@@ -9,6 +9,7 @@ from django.contrib import messages
 import cloudinary
 import json
 import base64
+from datetime import datetime
 from .models import Signature, LetterTemplates, HospitalName, PermenantLetterTemplates
 from django.views.generic import DetailView, ListView
 from HRIS_App.models import Employee
@@ -16,6 +17,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView
 from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator
+from employee_attendance.models import LeaveApplication
 
 
 @csrf_exempt
@@ -289,26 +291,32 @@ class LetterForm(LoginRequiredMixin, ListView):
 def application_leave(request, sap_id):
     if request.method == 'POST':
 
-        try:
-            leave_type = request.POST.get('leave_type_option')
-            leave_days = request.POST.get('granted_leaves')
-            print(f"Leave Days: {leave_days}")
-            from_date = request.POST.get('effect_from')
-            print(f"From Date: {from_date}")
-            reason = request.POST.get('purpose')
+        leave_type = request.POST.get('leave_type_option')
+        leave_days = request.POST.get('granted_leaves') 
+        from_date_str = request.POST.get('effect_from')
+        reason = request.POST.get('purpose')
 
-            to_date = from_date + timezone.timedelta(days=int(leave_days) - 1)
-            print(f"From Date: {from_date}, To Date: {to_date}")
+        # Convert string date to datetime object first
+        date_format = "%Y-%m-%d"
+        from_date = datetime.strptime(from_date_str, date_format).date()
+        
+        # Calculate to_date using the datetime object
+        to_date = from_date + timezone.timedelta(days=(int(leave_days) - 1) + 1 )
 
-            # Convert string dates to datetime objects
-            date_format = "%Y-%m-%d"
-            from_date = datetime.strptime(from_date, date_format).date()
-            to_date = datetime.strptime(to_date, date_format).date()
-            availed_leave = to_date - from_date
-            
-        except:
-            messages.error(request, "Invalid date format.")
-            return redirect('reporting:leave_memorandum', sap_id=sap_id)
+        # Calculate availed leave
+        availed_leave = (to_date - from_date).days + 1
+        
+        # Convert Leave type to Full form
+        if leave_type == 'CL':
+            leave_type = 'Casual'
+        elif leave_type == 'ML':
+            leave_type = 'Mandatory'
+        elif leave_type == 'SL':
+            leave_type = 'Sick'
+        elif leave_type == 'PL':
+            leave_type = 'Privilege'
+        elif leave_type == 'Ex-Pak':
+            leave_type = 'Ex-Pakistan'
 
 
         # Validate the data
@@ -322,11 +330,12 @@ def application_leave(request, sap_id):
         # Save the leave application
         leave_application = LeaveApplication(
             employee=employee,
-            leave_type=leave_type,
-            leave_date=leave_date,
+            application_type=leave_type,
+            leave_date=datetime.now().date(),
             from_date=from_date,
             to_date=to_date,
-            reason=reason
+            reason=reason,
+            availed_leaves=int(leave_days)
         )
         leave_application.save()
 

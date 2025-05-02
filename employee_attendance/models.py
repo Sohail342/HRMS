@@ -6,30 +6,6 @@ from datetime import date, timedelta
 from cloudinary.models import CloudinaryField
 from django.db.models import Sum
 from icecream import ic
-
-
-
-
-#--------------------------- Permenant Employee Leave Management --------------------------------------------
-class PermanentLeaveType(models.Model):
-    name = models.CharField(max_length=50, unique=True)  
-    total_leaves = models.PositiveIntegerField(default=0)  
-
-    def __str__(self):
-        return self.name
-
-
-class LeaveRecordPremanent(models.Model):
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name="leave_record_Premanent")
-    leave_type = models.ForeignKey(PermanentLeaveType, on_delete=models.CASCADE)
-    availed_leaves = models.PositiveIntegerField(default=0)  # Leaves taken by the employee
-
-    @property
-    def remaining_leaves(self):
-        return self.leave_type.total_leaves - self.availed_leaves
-
-    def __str__(self):
-        return f"{self.employee.username} - {self.leave_type.name}" 
  
 #--------------------------- Leave Management Pro --------------------------------------------
 class LeaveApplication(models.Model):
@@ -37,7 +13,7 @@ class LeaveApplication(models.Model):
         ('Casual', 'Casual Leave'),
         ('Privilege', 'Privilege Leave'),
         ('Sick', 'Sick Leave'),
-        ('Mandatory ', 'Mandatory Leave'),
+        ('Mandatory', 'Mandatory Leave'),
         ('Ex-Pakistan', 'Ex-Pakistan Leave'),
     ]
     STATUS_CHOICES = [
@@ -82,63 +58,6 @@ class LeaveApplication(models.Model):
 
         # Call the parent save method
         super().save(*args, **kwargs)
-    
-#--------------------------------------  
-
-    
-    
-    
-#--------------------------- Contractual Employee Leave Management --------------------------------------------
-
-class ContractualLeaveType(models.Model):
-    name = models.CharField(max_length=50, unique=True)
-    total_leaves = models.PositiveIntegerField(default=0)
-
-    def __str__(self):
-        return self.name
-
-
-class ContractualLeaveApplication(models.Model):
-    LEAVE_CHOICES = [
-        ('Casual', 'Casual Leave'),
-        ('Sick', 'Sick Leave'),
-    ]
-
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name="contractual_leave_applications")
-    leave_date = models.DateField()  
-    from_date = models.DateField()
-    to_date = models.DateField() 
-    reason = models.TextField()
-    application_type = models.CharField(max_length=100, choices=LEAVE_CHOICES)
-    supervisor_signature = models.CharField(max_length=100)
-
-    def __str__(self):
-        return f"Leave Request from {self.employee.name} for {self.leave_date}"
-    
-class ContractualLeaveRecord(models.Model):
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name="contractual_leave_record")
-    availed_leaves = models.PositiveIntegerField(default=0)
-    application_type = models.ForeignKey(ContractualLeaveApplication, on_delete=models.CASCADE, choices=ContractualLeaveApplication.LEAVE_CHOICES)
-
-    @property
-    def remaining_leaves(self):
-        return self.application_type.total_leaves - self.availed_leaves
-
-    def __str__(self):
-        return f"{self.employee.name} - {self.application_type.name}"
-
-
-
-class LeaveRecordContractual(models.Model):
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    leave_type = models.CharField(max_length=50, choices=[('Casual', 'Casual'), ('Sick', 'Sick'), ('Privilege', 'Privilege')])
-    days_taken = models.IntegerField()
-    leave_date = models.DateField()
-    status = models.CharField(max_length=20, choices=[('Approved', 'Approved'), ('Pending', 'Pending'), ('Rejected', 'Rejected')], default='Pending')
-
-    def __str__(self):
-        return f"{self.employee} - {self.leave_type} - {self.leave_date}"
-
 
 
 #--------------------------- Non-Involvement Certificate Request ------------------------------------

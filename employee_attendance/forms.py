@@ -1,6 +1,6 @@
 from django import forms
-from .models import ContractRenewal, ContractualLeaveType
-from .models import EducationalDocument , NonInvolvementCertificate, StationaryRequest , LeaveApplication, ContractualLeaveApplication
+from .models import ContractRenewal
+from .models import EducationalDocument , NonInvolvementCertificate, StationaryRequest , LeaveApplication
 
 class ContractRenewalForm(forms.ModelForm):
     class Meta:
@@ -61,50 +61,11 @@ class PermanentLeaveApplicationForm(forms.ModelForm):
                 raise forms.ValidationError("From Date cannot be later than To Date.")
         return cleaned_data
 
-# Form for Contractual Employee Leave Application
-class ContractualLeaveApplicationForm(forms.ModelForm):
-    class Meta:
-        model = ContractualLeaveApplication
-        fields = ['leave_date', 'from_date', 'to_date', 'reason', 'application_type', 'supervisor_signature']
-
-        widgets = {
-            'leave_date': forms.DateInput(attrs={'type': 'date'}),
-            'from_date': forms.DateInput(attrs={'type': 'date'}),
-            'to_date': forms.DateInput(attrs={'type': 'date'}),
-            'reason': forms.Textarea(attrs={'rows': 4}),
-        }
-
-    def clean(self):
-        cleaned_data = super().clean()
-        from_date = cleaned_data.get('from_date')
-        to_date = cleaned_data.get('to_date')
-
-        if from_date and to_date:
-            if from_date > to_date:
-                raise forms.ValidationError("From Date cannot be later than To Date.")
-        return cleaned_data
-
 
 class PermanentLeaveApplicationForm(forms.ModelForm):
     class Meta:
         model = LeaveApplication
         fields = ['application_type', 'from_date', 'to_date', 'reason', 'supervisor_signature']
-        widgets = {
-            'from_date': forms.DateInput(attrs={'type': 'date'}),
-            'to_date': forms.DateInput(attrs={'type': 'date'}),
-            'reason': forms.Textarea(attrs={'rows': 4}),
-        }
-
-class ContractualLeaveApplicationForm(forms.ModelForm):
-    leave_type = forms.ModelChoiceField(
-        queryset=ContractualLeaveType.objects.all(),
-        label="Leave Type",
-        empty_label="Select Leave Type",
-    )
-
-    class Meta:
-        model = ContractualLeaveApplication
-        fields = ['leave_type', 'from_date', 'to_date', 'reason', 'supervisor_signature']
         widgets = {
             'from_date': forms.DateInput(attrs={'type': 'date'}),
             'to_date': forms.DateInput(attrs={'type': 'date'}),

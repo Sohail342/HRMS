@@ -1,13 +1,13 @@
 from .models import LeaveApplication
 from django.shortcuts import render, redirect
 from group_head.decorators import employee_user_required 
-from .models import ContractualLeaveRecord, ContractRenewal, LeaveApplication, EducationalDocument
+from .models import ContractRenewal, LeaveApplication, EducationalDocument
 from django.contrib import messages
 import cloudinary
 from django.core.exceptions import ValidationError
 from django.http import Http404
-from .forms import EducationalDocumentForm, NonInvolvementCertificateForm, StationaryRequestForm, ContractualLeaveApplicationForm
-from .forms import PermanentLeaveApplicationForm, ContractualLeaveApplicationForm, PermanentLeaveApplicationForm
+from .forms import EducationalDocumentForm, NonInvolvementCertificateForm, StationaryRequestForm
+from .forms import PermanentLeaveApplicationForm, PermanentLeaveApplicationForm
 from django.shortcuts import get_object_or_404
 from datetime import datetime
 from HRIS_App.models import Employee
@@ -263,53 +263,5 @@ def apply_permanent_leave(request):
         messages.error(request, "Error: " + str(e))
     
     return render(request, 'employee_attendance/apply_permanent_leave.html', {'form': form, 'user_type': str(user_type)})
-
-
-
-def apply_contractual_leave(request):
-    if request.method == 'POST':
-        print("Not Valid")
-        from icecream import ic
-        
-        form = ContractualLeaveApplicationForm(request.POST)
-        ic(form.application_type.field.choices)
-        if form.is_valid():
-            from icecream import ic
-            print("Valid")
-            leave_application = form.save(commit=False)
-            
-            leave_application.employee = request.user 
-            ic(leave_application)
-
-            # Fetch the leave_type instance correctly from the form
-            leave_type = form.cleaned_data.get('leave_type')  # This will be the model instance
-
-            # Fetch or create the leave record
-            leave_record, created = ContractualLeaveRecord.objects.get_or_create(
-                employee=request.user,
-                leave_type=leave_type,
-                defaults={"availed_leaves": 0},
-            )
-
-            # Check leave balance
-            total_days = (leave_application.to_date - leave_application.from_date).days + 1
-            if leave_record.remaining_leaves >= total_days:
-                # Update leave balance
-                leave_record.availed_leaves += total_days
-                leave_record.save()
-
-                # Save the leave application
-                leave_application.save()
-                messages.success(request, "Leave application submitted successfully!")
-                return redirect('contractual_leave_dashboard')
-            else:
-                messages.error(request, "Insufficient leave balance!")
-    else:
-        form = ContractualLeaveApplicationForm()
-
-    return render(request, 'employee_attendance/apply_contractual_leave.html', {'form': form})
-
-
-
 
 
