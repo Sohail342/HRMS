@@ -18,5 +18,7 @@ urlpatterns = [
     path('save_pdf_to_cloudinary/', views.save_pdf_to_cloudinary, name='save_pdf_to_cloudinary'),
     path('template_search/', views.template_search, name='template_search'), 
     path('search_permanent_saved_templates', views.search_permanent_saved_templates, name='search_permanent_saved_templates'),
+
+    path('application_leave/<str:sap_id>/', views.application_leave, name="application_leave"),
 ]
 

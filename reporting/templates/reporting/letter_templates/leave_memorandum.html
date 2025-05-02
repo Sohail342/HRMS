@@ -6,88 +6,96 @@
 <body class="p-8 bg-gray-100">
 
     <!-- Leave Application Form -->
-<div class="max-w-screen-md mx-auto p-6 bg-white shadow-lg rounded-lg my-10">
-    <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Application Form</h2>
-    
-    <!-- Input Fields for User Data -->
-    <div class="space-y-6">
-        <div>
-            <label for="application_date" class="block text-sm font-medium text-gray-700">Application Date:</label>
-            <input type="date" id="application_date" class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required>
-        </div>
+    <form action="{% url 'reporting:application_leave' employee.SAP_ID %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="max-w-screen-md mx-auto p-6 bg-white shadow-lg rounded-lg my-10">
+            <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Application Form</h2>
+            
+            <!-- Input Fields for User Data -->
+            <div class="space-y-6">
+                <div>
+                    <label for="application_date" class="block text-sm font-medium text-gray-700">Application Date:</label>
+                    <input type="date" id="application_date" class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required>
+                </div>
 
-        <div>
-            <label for="granted_leaves" class="block text-sm font-medium text-gray-700">Granted Leaves:</label>
-            <input type="number" id="granted_leaves" class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required placeholder="e.g. 20 days">
-        </div>
+                <div>
+                    <label for="granted_leaves" class="block text-sm font-medium text-gray-700">Granted Leaves:</label>
+                    <input type="number" id="granted_leaves" class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required placeholder="e.g. 20 days">
+                </div>
 
-        <div>
-            <label for="effect_from" class="block text-sm font-medium text-gray-700">Effect From:</label>
-            <input type="date" id="effect_from" class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required>
-        </div>
+                <div>
+                    <label for="effect_from" class="block text-sm font-medium text-gray-700">Effect From:</label>
+                    <input type="date" id="effect_from" class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required>
+                </div>
 
-        <div>
-            <label for="leave_type_option" class="block text-sm font-medium text-gray-700">Leave Type:</label>
-            <select id="leave_type_option" name="leave_type_option" class="mt-1 p-3 w-full border border-blue-500 rounded-lg focus:outline-none focus:border-blue-700 transition-colors duration-300 shadow-md">
-                <option value="">Select Leave Type</option>
-                <option value="PL">Privilege Leave</option>
-                <option value="ML">Mandatory Leave</option>
-                <option value="CL">Casual Leave</option>
-                <option value="Ex-Pak">Ex-Pakistan</option>
-                <option value="SL">Sick Leave</option>
-            </select>
-        </div>
+                <div>
+                    <label for="leave_type_option" class="block text-sm font-medium text-gray-700">Leave Type:</label>
+                    <select id="leave_type_option" name="leave_type_option" class="mt-1 p-3 w-full border border-blue-500 rounded-lg focus:outline-none focus:border-blue-700 transition-colors duration-300 shadow-md" required>
+                        <option value="">Select Leave Type</option>
+                        <option value="PL">Privilege Leave</option>
+                        <option value="ML">Mandatory Leave</option>
+                        <option value="CL">Casual Leave</option>
+                        <option value="Ex-Pak">Ex-Pakistan</option>
+                        <option value="SL">Sick Leave</option>
+                    </select>
+                </div>
 
-        <div>
-            <label for="purpose" class="block text-sm font-medium text-gray-700">Leave Purpose:</label>
-            <input type="text" id="purpose" class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required placeholder="e.g. Study purpose">
-        </div>
+                <div>
+                    <label for="purpose" class="block text-sm font-medium text-gray-700">Leave Purpose:</label>
+                    <input type="text" id="purpose" class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required placeholder="e.g. Study purpose">
+                </div>
 
-        <div>
-            <label for="absence_employee" class="block text-sm font-medium text-gray-700">Employee Back-up SAP ID 1:</label>
-            <div class="flex space-x-2">
-                <input value="" type="number" id="absence_employee" class="mt-1 p-3 flex-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required placeholder="e.g. 83787">
-                <button id="fetch_employee_data" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    Fetch
+                <div>
+                    <label for="absence_employee" class="block text-sm font-medium text-gray-700">Employee Back-up SAP ID 1:</label>
+                    <div class="flex space-x-2">
+                        <input value="" type="number" id="absence_employee" class="mt-1 p-3 flex-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" placeholder="e.g. 83787">
+                        <button id="fetch_employee_data" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            Fetch
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="absence_employee2" class="block text-sm font-medium text-gray-700">Employee Back-up SAP ID 2:</label>
+                    <div class="flex space-x-2">
+                        <input value="" type="number" id="absence_employee2" class="mt-1 p-3 flex-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" placeholder="e.g. 83787">
+                        <button id="fetch_employee_data2" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            Fetch
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <p class="text-sm font-medium text-gray-700">Leave Extension Policy:</p>
+                    <div class="flex items-center space-x-6 mt-2">
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="extension" value="allowed" class="focus:ring-2 focus:ring-blue-500">
+                            <span>Allowed</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="extension" value="not_allowed" class="focus:ring-2 focus:ring-blue-500" checked>
+                            <span>Not Allowed</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-6 text-center">
+                <button type="submit" class="px-6 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    Submit Application
                 </button>
             </div>
+    </form>
+
+        <!-- Error Toast -->
+        <div id="errorToast" class="fixed bottom-5 right-5 hidden bg-red-500 text-white text-base px-6 py-3 rounded-xl shadow-lg transition-opacity duration-300">
+            Employee with this SAP ID not found!
         </div>
 
-        <div>
-            <label for="absence_employee2" class="block text-sm font-medium text-gray-700">Employee Back-up SAP ID 2:</label>
-            <div class="flex space-x-2">
-                <input value="" type="number" id="absence_employee2" class="mt-1 p-3 flex-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required placeholder="e.g. 83787">
-                <button id="fetch_employee_data2" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    Fetch
-                </button>
-            </div>
-        </div>
-
-        <div>
-            <p class="text-sm font-medium text-gray-700">Leave Extension Policy:</p>
-            <div class="flex items-center space-x-6 mt-2">
-                <label class="flex items-center space-x-2">
-                    <input type="radio" name="extension" value="allowed" class="focus:ring-2 focus:ring-blue-500">
-                    <span>Allowed</span>
-                </label>
-                <label class="flex items-center space-x-2">
-                    <input type="radio" name="extension" value="not_allowed" class="focus:ring-2 focus:ring-blue-500" checked>
-                    <span>Not Allowed</span>
-                </label>
-            </div>
+        <!-- Success Toast -->
+        <div id="sucessToast" class="fixed bottom-5 right-5 hidden bg-green-500 text-white text-base px-6 py-3 rounded-xl shadow-lg transition-opacity duration-300">
+            Employee found!
         </div>
     </div>
-
-    <!-- Error Toast -->
-    <div id="errorToast" class="fixed bottom-5 right-5 hidden bg-red-500 text-white text-base px-6 py-3 rounded-xl shadow-lg transition-opacity duration-300">
-        Employee with this SAP ID not found!
-    </div>
-
-    <!-- Success Toast -->
-    <div id="sucessToast" class="fixed bottom-5 right-5 hidden bg-green-500 text-white text-base px-6 py-3 rounded-xl shadow-lg transition-opacity duration-300">
-        Employee found!
-    </div>
-</div>
 
     <div id="download_letter" class="max-w-screen-md mx-auto bg-white p-12" style="position: relative; min-height: 1123px; display: flex; flex-direction: column;">
         <!-- Header Section -->

@@ -37,6 +37,8 @@ class LeaveApplication(models.Model):
         ('Casual', 'Casual Leave'),
         ('Privilege', 'Privilege Leave'),
         ('Sick', 'Sick Leave'),
+        ('Mandatory ', 'Mandatory Leave'),
+        ('Ex-Pakistan', 'Ex-Pakistan Leave'),
     ]
     STATUS_CHOICES = [
         ('pending', 'Pending'),
@@ -52,7 +54,7 @@ class LeaveApplication(models.Model):
     availed_leaves = models.IntegerField(default=0, blank=True, null=True)
     reason = models.TextField(default=None, blank=True, null=True)
     application_type = models.CharField(max_length=100, choices=LEAVE_CHOICES)
-    supervisor_signature = models.CharField(max_length=100)
+    supervisor_signature = models.CharField(max_length=100, default=None, blank=True, null=True)
     is_approved = models.BooleanField(default=False)
     leave_status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
 

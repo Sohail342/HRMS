@@ -205,6 +205,8 @@ def search_permanent_saved_templates(request):
     
     return render(request, 'reporting/search_permanant.html', context)
 
+
+
 class LetterForm(LoginRequiredMixin, ListView):
     
     model = Employee
@@ -280,6 +282,58 @@ class LetterForm(LoginRequiredMixin, ListView):
         # If no valid form type, render the same page with error
         errors = "Invalid form type."
         return render(request, self.template_name, {'errors': errors, 'employees': self.get_queryset()})
+
+
+
+@is_letter_template_admin_required
+def application_leave(request, sap_id):
+    if request.method == 'POST':
+
+        try:
+            leave_type = request.POST.get('leave_type_option')
+            leave_days = request.POST.get('granted_leaves')
+            print(f"Leave Days: {leave_days}")
+            from_date = request.POST.get('effect_from')
+            print(f"From Date: {from_date}")
+            reason = request.POST.get('purpose')
+
+            to_date = from_date + timezone.timedelta(days=int(leave_days) - 1)
+            print(f"From Date: {from_date}, To Date: {to_date}")
+
+            # Convert string dates to datetime objects
+            date_format = "%Y-%m-%d"
+            from_date = datetime.strptime(from_date, date_format).date()
+            to_date = datetime.strptime(to_date, date_format).date()
+            availed_leave = to_date - from_date
+            
+        except:
+            messages.error(request, "Invalid date format.")
+            return redirect('reporting:leave_memorandum', sap_id=sap_id)
+
+
+        # Validate the data
+        if not sap_id or not leave_type or not from_date or not reason:
+            messages.error(request, "All fields are required.")
+            return redirect('reporting:leave_memorandum', sap_id=sap_id)
+
+        # Get the employee object
+        employee = get_object_or_404(Employee, SAP_ID=sap_id)
+
+        # Save the leave application
+        leave_application = LeaveApplication(
+            employee=employee,
+            leave_type=leave_type,
+            leave_date=leave_date,
+            from_date=from_date,
+            to_date=to_date,
+            reason=reason
+        )
+        leave_application.save()
+
+        messages.success(request, "Leave application submitted successfully.")
+        return redirect('reporting:leave_memorandum', sap_id=sap_id)
+
+    return render(request, 'reporting/leave_memorandum.html', sap_id=sap_id)
     
 
 

@@ -1,3 +1,4 @@
+from .models import LeaveApplication
 from django.shortcuts import render, redirect
 from group_head.decorators import employee_user_required 
 from .models import ContractualLeaveRecord, ContractRenewal, LeaveApplication, EducationalDocument
@@ -113,7 +114,6 @@ def nicrequests(request):
 
 
 #  ------------- Educational Document Upload -------------
-from icecream import ic
 def upload_education_documents(request, sap_id):
     if request.method == "POST":
         try:
@@ -227,7 +227,6 @@ def stationaryrequests(request):
 
 
 
-from .models import LeaveApplication
 
 def apply_permanent_leave(request):
     user_type = request.user.employee_type
