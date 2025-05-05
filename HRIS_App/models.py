@@ -47,7 +47,7 @@ class Wing(models.Model):
 
 
 class Region(models.Model):
-    region_id = models.IntegerField(unique=True, default=None)
+    region_id = models.IntegerField(unique=True, default=None, blank=True, null=True)
     name = models.CharField(max_length=100, unique=True)
     region_category = models.CharField(max_length=100, blank=True, null=True)
     functional_group = models.ManyToManyField(FunctionalGroup, related_name='regions')
@@ -223,7 +223,7 @@ class Employee(AbstractBaseUser):
         'Branch', on_delete=models.CASCADE, null=True, blank=True, related_name='employees', to_field="branch_code"
     )
     qualifications = models.ManyToManyField(
-        'Qualification', related_name='employees', blank=True
+        'Qualification', related_name='employees', blank=True, 
     )
     region = models.ForeignKey(
         'Region', on_delete=models.CASCADE, null=True, to_field="name",  blank=True, related_name='employees'

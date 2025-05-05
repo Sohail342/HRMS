@@ -6,14 +6,15 @@ from .models import Employee, Designation, Cadre, EmployeeType, EmployeeGrade, B
 class BranchResource(resources.ModelResource):
     # Map the 'branch_region' to use the 'name' field of Region
     region = fields.Field(
-        column_name='region',  # CSV column name
-        attribute='region',   # Model field
-        widget=ForeignKeyWidget(Region, 'name')  # Match using Region's 'region_id' field
+        column_name='region',
+        attribute='region',   
+        widget=ForeignKeyWidget(Region, 'name')  
     )
 
     class Meta:
         model = Branch
-        fields = ('id', 'branch_code', 'branch_name', 'branch_Category', 'branch_address', 'region') 
+        fields = ('id', 'branch_code', 'branch_name', 'branch_Category', 'branch_address', 'region')
+        export_order = ('branch_code', 'branch_name', 'branch_Category', 'branch_address', 'region') 
 
 
 class FunctionalGroupResource(resources.ModelResource):
@@ -26,7 +27,7 @@ class FunctionalGroupResource(resources.ModelResource):
     class Meta:
         model = FunctionalGroup
         fields = ('id', 'name', 'allias', 'group') 
-        export_order = ('id', 'name', 'allias', 'group') 
+        export_order = ('name', 'allias', 'group') 
 
 
 class RegionResource(resources.ModelResource):
@@ -38,8 +39,8 @@ class RegionResource(resources.ModelResource):
 
     class Meta:
         model = Region
-        fields = ('id', 'name', 'region_category', 'functional_group') 
-        export_order = ('id', 'name', 'region_category', 'functional_group') 
+        fields = ('id', 'name', 'region_category', 'functional_group', 'region_id') 
+        export_order = ('name', 'region_category', 'functional_group', 'region_id') 
 
 
 class EmployeeResource(resources.ModelResource):
@@ -88,11 +89,11 @@ class EmployeeResource(resources.ModelResource):
             'employee_grade', 'branch', 'region', 'qualifications', 'date_of_joining',
             'mobile_number', 'date_of_last_promotion', 'remarks', 'grade_assignment', 'date_of_joining', 
             'date_of_retirement', 'birth_date', 'date_of_contract_expiry', 'date_current_posting', 
-            'date_current_assignment',
+            'date_current_assignment'
             
         )
         export_order = (
-            'id', 'SAP_ID', 'email', 'name', 'designation', 'cadre', 'employee_type',
+            'SAP_ID', 'email', 'name', 'designation', 'cadre', 'employee_type',
             'employee_grade', 'branch', 'region', 'qualifications',
             'mobile_number', 'date_of_last_promotion', 'remarks', 'grade_assignment',
             'is_active', 'is_admin', 'is_admin_employee', 'is_letter_template_admin', 
