@@ -1,6 +1,6 @@
 from django.contrib import admin
 from unfold.admin import ModelAdmin
-from .resources import FunctionalGroupResource, RegionResource, BranchResource, EmployeeResource
+from .resources import FunctionalGroupResource, BranchResource, EmployeeResource, WingResource
 from import_export.admin import ImportExportModelAdmin
 from unfold.contrib.import_export.forms import ExportForm, ImportForm
 from .forms import AdminEmployeeForm, NonAdminEmployeeForm
@@ -18,39 +18,39 @@ class GroupAdmin(ModelAdmin, ImportExportModelAdmin):
     search_fields = ('id', 'name')
     list_filter = ('name', )
 
-@admin.register(FunctionalGroup)
-class FunctionalGroupAdmin(ImportExportModelAdmin, ModelAdmin):
-    resource_class  = FunctionalGroupResource
-    export_form_class = ExportForm
-    import_form_class = ImportForm
-    list_display = ('id','name', 'group', 'allias')
-    search_fields = ('id', 'name', 'group__name', 'allias')
-    list_filter = ('name', 'allias')
+# @admin.register(FunctionalGroup)
+# class FunctionalGroupAdmin(ImportExportModelAdmin, ModelAdmin):
+#     resource_class  = FunctionalGroupResource
+#     export_form_class = ExportForm
+#     import_form_class = ImportForm
+#     list_display = ('id','name', 'group', 'allias')
+#     search_fields = ('id', 'name', 'group__name', 'allias')
+#     list_filter = ('name', 'allias')
 
 @admin.register(Division)
 class DivisionAdmin(ImportExportModelAdmin, ModelAdmin):
     export_form_class = ExportForm
     import_form_class = ImportForm
-    list_display = ('id', 'division_name', 'functional_group', 'description')
-    list_filter = ('division_name', 'functional_group__name')
-    search_fields = ('id', 'division_name', 'functional_group__name')
+    list_display = ('id', 'division_name', 'description')
+    list_filter = ('division_name',)
+    search_fields = ('id', 'division_name',)
 
 @admin.register(Wing)
 class WingAdmin(ImportExportModelAdmin, ModelAdmin):
+    resource_class = WingResource
     export_form_class = ExportForm
     import_form_class = ImportForm
-    list_display = ('id', 'name', 'division', 'description')
+    list_display = ('id', 'name', 'division_name', 'description')
     search_fields = ('id', 'name', 'division__division_name')
-    list_filter = ('name', 'division__division_name')
+    list_filter = ('name', 'division_name__division_name')
 
 @admin.register(Region)
 class RegionAdmin(ImportExportModelAdmin, ModelAdmin):
-    resource_class = RegionResource
     export_form_class = ExportForm
     import_form_class = ImportForm
-    list_display = ('region_id', 'name')
-    list_filter = ('name','functional_group__name')
-    search_fields = ('region_id', 'name', 'region_category','functional_group__name')
+    list_display = ('region_id', 'name', 'region_category')
+    list_filter = ('name',)
+    search_fields = ('region_id', 'name', 'region_category')
 
 
 @admin.register(Branch)

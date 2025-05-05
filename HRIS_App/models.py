@@ -25,9 +25,9 @@ class FunctionalGroup(models.Model):
 
 
 class Division(models.Model):
-    division_name = models.CharField(max_length=100, unique=True)
-    description = models.TextField(blank=True, null=True,default=None)
-    functional_group = models.ForeignKey(FunctionalGroup, on_delete=models.CASCADE, related_name='divisions')
+    division_name = models.CharField(max_length=100, unique=True, blank=True, null=True)
+    description = models.TextField(blank=True, null=True, default=None)
+    
 
     class Meta:
         verbose_name = "Division"
@@ -38,9 +38,9 @@ class Division(models.Model):
 
 
 class Wing(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True, null=True)
-    division = models.ForeignKey(Division, to_field='division_name', on_delete=models.CASCADE, related_name='wings')
+    division_name = models.ForeignKey(Division, to_field='division_name', on_delete=models.CASCADE, related_name='wings')
 
     def __str__(self):
         return self.name
@@ -50,7 +50,6 @@ class Region(models.Model):
     region_id = models.IntegerField(unique=True, default=None, blank=True, null=True)
     name = models.CharField(max_length=100, unique=True)
     region_category = models.CharField(max_length=100, blank=True, null=True)
-    functional_group = models.ManyToManyField(FunctionalGroup, related_name='regions')
     csv_file = CloudinaryField(
         blank=True, 
         null=True, 

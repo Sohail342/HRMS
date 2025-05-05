@@ -1,7 +1,33 @@
 from import_export import resources, fields
 from import_export.widgets import DateWidget
 from import_export.widgets import ForeignKeyWidget, ManyToManyWidget
-from .models import Employee, Designation, Cadre, EmployeeType, EmployeeGrade, Branch, Qualification, Region, FunctionalGroup, Group
+from .models import (
+Employee, 
+Designation, 
+Cadre, 
+EmployeeType, 
+EmployeeGrade, 
+Branch, 
+Qualification, 
+Wing, Region, 
+FunctionalGroup, 
+Group, Division
+)
+
+
+class WingResource(resources.ModelResource):
+    # Map the 'wing_name' to use the 'name' field of Wing
+    division_name = fields.Field(
+        column_name='division_name',
+        attribute='division_name',   
+        widget=ForeignKeyWidget(Division, 'division_name')  
+    )
+
+    class Meta:
+        model = Wing
+        fields = ('id', 'name', 'description', 'division_name') 
+        export_order = ('name', 'description', 'division_name')
+    
 
 class BranchResource(resources.ModelResource):
     # Map the 'branch_region' to use the 'name' field of Region
@@ -29,18 +55,6 @@ class FunctionalGroupResource(resources.ModelResource):
         fields = ('id', 'name', 'allias', 'group') 
         export_order = ('name', 'allias', 'group') 
 
-
-class RegionResource(resources.ModelResource):
-    functional_group = fields.Field(
-        column_name='functional_group',
-        attribute='functional_group',
-        widget=ManyToManyWidget(FunctionalGroup, separator=',', field='name') 
-    )
-
-    class Meta:
-        model = Region
-        fields = ('id', 'name', 'region_category', 'functional_group', 'region_id') 
-        export_order = ('name', 'region_category', 'functional_group', 'region_id') 
 
 
 class EmployeeResource(resources.ModelResource):
