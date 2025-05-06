@@ -328,16 +328,21 @@ def application_leave(request, sap_id):
         employee = get_object_or_404(Employee, SAP_ID=sap_id)
 
         # Save the leave application
-        leave_application = LeaveApplication(
-            employee=employee,
-            application_type=leave_type,
-            leave_date=datetime.now().date(),
-            from_date=from_date,
-            to_date=to_date,
-            reason=reason,
-            availed_leaves=int(leave_days)
-        )
-        leave_application.save()
+        try:
+            leave_application = LeaveApplication(
+                employee=employee,
+                application_type=leave_type,
+                leave_date=datetime.now().date(),
+                from_date=from_date,
+                to_date=to_date,
+                reason=reason,
+                availed_leaves=int(leave_days)
+            )
+            leave_application.save()
+
+        except Exception as e:
+            messages.error(request, f"Error saving leave application: {e}")
+            return redirect('reporting:leave_memorandum', sap_id=sap_id)
 
         messages.success(request, "Leave application submitted successfully.")
         return redirect('reporting:leave_memorandum', sap_id=sap_id)

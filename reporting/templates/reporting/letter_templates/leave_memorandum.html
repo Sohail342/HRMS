@@ -46,26 +46,6 @@
                 </div>
 
                 <div>
-                    <label for="absence_employee" class="block text-sm font-medium text-gray-700">Employee Back-up SAP ID 1:</label>
-                    <div class="flex space-x-2">
-                        <input value="" type="number" id="absence_employee" class="mt-1 p-3 flex-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" placeholder="e.g. 83787">
-                        <button id="fetch_employee_data" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            Fetch
-                        </button>
-                    </div>
-                </div>
-
-                <div>
-                    <label for="absence_employee2" class="block text-sm font-medium text-gray-700">Employee Back-up SAP ID 2:</label>
-                    <div class="flex space-x-2">
-                        <input value="" type="number" id="absence_employee2" class="mt-1 p-3 flex-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" placeholder="e.g. 83787">
-                        <button id="fetch_employee_data2" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            Fetch
-                        </button>
-                    </div>
-                </div>
-
-                <div>
                     <p class="text-sm font-medium text-gray-700">Leave Extension Policy:</p>
                     <div class="flex items-center space-x-6 mt-2">
                         <label class="flex items-center space-x-2">
@@ -85,6 +65,25 @@
                 </button>
             </div>
     </form>
+    <div>
+        <label for="absence_employee" class="block text-sm font-medium text-gray-700">Employee Back-up SAP ID 1:</label>
+        <div class="flex space-x-2">
+                <input value="" type="number" id="absence_employee" class="mt-1 p-3 flex-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" placeholder="e.g. 83787">
+                <button id="fetch_employee_data" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    Fetch
+                </button>
+            </div>
+        </div>
+
+        <div>
+            <label for="absence_employee2" class="block text-sm font-medium text-gray-700">Employee Back-up SAP ID 2:</label>
+            <div class="flex space-x-2">
+                <input value="" type="number" id="absence_employee2" class="mt-1 p-3 flex-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" placeholder="e.g. 83787">
+                <button id="fetch_employee_data2" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    Fetch
+                </button>
+            </div>
+        </div>
 
         <!-- Error Toast -->
         <div id="errorToast" class="fixed bottom-5 right-5 hidden bg-red-500 text-white text-base px-6 py-3 rounded-xl shadow-lg transition-opacity duration-300">
