@@ -193,7 +193,7 @@ def search_permanent_saved_templates(request):
             
             # Pagination
             paginator = Paginator(template_list, 10)
-            page = request.GET.get('page', 1)
+            page = request.GET.get('page', 10)
             templates = paginator.get_page(page)
             
         except Employee.DoesNotExist:
