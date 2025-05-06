@@ -182,31 +182,37 @@ def search_permanent_saved_templates(request):
     templates = None
     sap_id = request.GET.get('sap_id', '')
     
-    if sap_id:
+    print("SAP ID:", sap_id)  
+    if request.method == 'POST' and sap_id:
         search_performed = True
         
         # Get the employee object with select_related to optimize queries
         try:
-            employee = Employee.objects.get(SAP_ID=sap_id)
-            
-            # Get all templates for this employee with optimized query
-            template_list = PermenantLetterTemplates.objects.filter(
-                employee=employee
-            ).select_related('employee').order_by('-created_at')
-            
-            # Pagination with proper default page (1 instead of 10)
-            items_per_page = 10
-            paginator = Paginator(template_list, items_per_page)
-            page = request.GET.get('page', 1)
-            
-            try:
-                # Convert page to integer and handle invalid page numbers
-                page_number = int(page)
-                templates = paginator.get_page(page_number)
-            except ValueError:
-                # If page is not an integer, deliver first page
-                templates = paginator.get_page(1)
-            
+            # Force a fresh database query by using .all() and not caching the queryset
+            employee = Employee.objects.filter(SAP_ID=sap_id).first()
+            print("Employee:", employee)
+            if employee:
+                # Get all templates for this employee with optimized query
+                template_list = PermenantLetterTemplates.objects.filter(
+                    employee=employee
+                ).select_related('employee').order_by('-created_at').all()
+                
+                print("Template List:", template_list)  
+                # Pagination with proper default page (1 instead of 10)
+                items_per_page = 10
+                paginator = Paginator(template_list, items_per_page)
+                page = request.GET.get('page', 1)
+                
+                try:
+                    # Convert page to integer and handle invalid page numbers
+                    page_number = int(page)
+                    templates = paginator.get_page(page_number)
+                except ValueError:
+                    # If page is not an integer, deliver first page
+                    templates = paginator.get_page(1)
+            else:
+                templates = []
+                
         except Employee.DoesNotExist:
             # No employee found with this SAP ID
             templates = []

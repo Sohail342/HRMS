@@ -13,7 +13,8 @@
             
             <!-- Enhanced Search Form Section -->
             <div class="p-6 border-b bg-gray-50">
-                <form method="GET" action="{% url 'reporting:search_permanent_saved_templates' %}" class="flex flex-col md:flex-row gap-4 items-end" id="searchForm">
+                <form method="POST" action="{% url 'reporting:search_permanent_saved_templates' %}" class="flex flex-col md:flex-row gap-4 items-end" id="searchForm">
+                    {% csrf_token %}
                     <div class="flex-grow">
                         <label for="sap_id" class="block text-sm font-medium text-gray-700 mb-1">Employee SAP ID</label>
                         <div class="relative rounded-md shadow-sm">
@@ -33,7 +34,7 @@
                         </div>
                     </div>
                     <div>
-                        <button type="submit" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-md shadow-md transition duration-150 ease-in-out flex items-center justify-center">
+                        <button type="submit" id="searchButton" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-md shadow-md transition duration-150 ease-in-out flex items-center justify-center">
                             <i class="fas fa-search mr-2"></i>Search
                         </button>
                     </div>
@@ -178,4 +179,83 @@
         </div>
     </div>
 </div>
+
+<!-- Add JavaScript for AJAX functionality -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add event listener to the search form
+        const searchForm = document.getElementById('searchForm');
+        
+        if (searchForm) {
+            searchForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const sapId = document.getElementById('sap_id').value;
+                const url = `{% url 'reporting:search_permanent_saved_templates' %}?sap_id=${sapId}`;
+                
+                // Fetch the search results via AJAX
+                fetch(url)
+                    .then(response => response.text())
+                    .then(html => {
+                        // Create a temporary element to parse the HTML
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = html;
+                        
+                        // Extract the results section from the response
+                        const newResults = tempDiv.querySelector('.bg-white.rounded-lg.shadow-lg.overflow-hidden');
+                        
+                        // Replace the current results with the new ones
+                        if (newResults) {
+                            const currentResults = document.querySelector('.bg-white.rounded-lg.shadow-lg.overflow-hidden');
+                            if (currentResults) {
+                                currentResults.innerHTML = newResults.innerHTML;
+                            }
+                        }
+                        
+                        // Update the URL without reloading the page
+                        history.pushState({}, '', url);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching search results:', error);
+                    });
+            });
+        }
+        
+        // Add event delegation for pagination links
+        document.addEventListener('click', function(e) {
+            // Check if the clicked element is a pagination link
+            if (e.target.closest('nav[aria-label="Pagination"] a')) {
+                e.preventDefault();
+                const link = e.target.closest('a');
+                const url = link.href;
+                
+                // Fetch the paginated results via AJAX
+                fetch(url)
+                    .then(response => response.text())
+                    .then(html => {
+                        // Create a temporary element to parse the HTML
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = html;
+                        
+                        // Extract the results section from the response
+                        const newResults = tempDiv.querySelector('.bg-white.rounded-lg.shadow-lg.overflow-hidden');
+                        
+                        // Replace the current results with the new ones
+                        if (newResults) {
+                            const currentResults = document.querySelector('.bg-white.rounded-lg.shadow-lg.overflow-hidden');
+                            if (currentResults) {
+                                currentResults.innerHTML = newResults.innerHTML;
+                            }
+                        }
+                        
+                        // Update the URL without reloading the page
+                        history.pushState({}, '', url);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching paginated results:', error);
+                    });
+            }
+        });
+    });
+</script>
 {% endblock %}
