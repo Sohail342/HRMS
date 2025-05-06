@@ -180,29 +180,41 @@ def template_search(request):
 def search_permanent_saved_templates(request):
     search_performed = False
     templates = None
+    sap_id = request.GET.get('sap_id', '')
     
-    if 'sap_id' in request.GET and request.GET['sap_id']:
+    if sap_id:
         search_performed = True
-        sap_id = request.GET['sap_id']
         
-        # Get the employee object
+        # Get the employee object with select_related to optimize queries
         try:
             employee = Employee.objects.get(SAP_ID=sap_id)
-            # Get all templates for this employee
-            template_list = PermenantLetterTemplates.objects.filter(employee=employee).order_by('-created_at')
             
-            # Pagination
-            paginator = Paginator(template_list, 10)
-            page = request.GET.get('page', 10)
-            templates = paginator.get_page(page)
+            # Get all templates for this employee with optimized query
+            template_list = PermenantLetterTemplates.objects.filter(
+                employee=employee
+            ).select_related('employee').order_by('-created_at')
+            
+            # Pagination with proper default page (1 instead of 10)
+            items_per_page = 10
+            paginator = Paginator(template_list, items_per_page)
+            page = request.GET.get('page', 1)
+            
+            try:
+                # Convert page to integer and handle invalid page numbers
+                page_number = int(page)
+                templates = paginator.get_page(page_number)
+            except ValueError:
+                # If page is not an integer, deliver first page
+                templates = paginator.get_page(1)
             
         except Employee.DoesNotExist:
             # No employee found with this SAP ID
             templates = []
-    
+
     context = {
         'templates': templates,
-        'search_performed': search_performed
+        'search_performed': search_performed,
+        'current_sap_id': sap_id  # Keep the current SAP ID for form repopulation
     }
     
     return render(request, 'reporting/search_permanant.html', context)
