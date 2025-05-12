@@ -161,7 +161,7 @@ def template_search(request):
             page = request.GET.get('page', 1)
             templates = paginator.get_page(page)
             
-        except Employee.DoesNotExist:
+        except Exception as e:
             # No employee found with this SAP ID
             templates = []
     
@@ -205,7 +205,7 @@ def search_permanent_saved_templates(request):
             else:
                 templates = []
                 
-        except Employee.DoesNotExist:
+        except Exception as e:
             # No employee found with this SAP ID
             templates = []
 
