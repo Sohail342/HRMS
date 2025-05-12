@@ -12,16 +12,22 @@
             </div>
             
             <!-- Search Form Section -->
-            <div class="p-6 border-b">
-                <form method="GET" action="{% url 'reporting:template_search' %}" class="flex flex-col md:flex-row gap-4 items-end">
+            <div class="p-6 border-b bg-gray-50">
+                <form method="POST" action="{% url 'reporting:template_search' %}" class="flex flex-col md:flex-row gap-4 items-end">
+                    {% csrf_token %}
                     <div class="flex-grow">
                         <label for="sap_id" class="block text-sm font-medium text-gray-700 mb-1">Employee SAP ID</label>
-                        <input type="number" name="sap_id" id="sap_id" value="{{ request.GET.sap_id }}" 
-                            class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" 
-                            placeholder="Enter SAP ID">
+                        <div class="relative rounded-md shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-id-card text-gray-400"></i>
+                            </div>
+                            <input type="number" name="sap_id" 
+                                class="w-full pl-10 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors" 
+                                placeholder="Enter SAP ID" >
+                        </div>
                     </div>
                     <div>
-                        <button type="submit" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-md transition duration-150 ease-in-out">
+                        <button type="submit" id="searchButton" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-md shadow-md transition duration-150 ease-in-out flex items-center justify-center">
                             <i class="fas fa-search mr-2"></i>Search
                         </button>
                     </div>

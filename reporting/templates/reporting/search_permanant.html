@@ -13,7 +13,7 @@
             
             <!-- Enhanced Search Form Section -->
             <div class="p-6 border-b bg-gray-50">
-                <form method="POST" action="{% url 'reporting:search_permanent_saved_templates' %}" class="flex flex-col md:flex-row gap-4 items-end" id="searchForm">
+                <form method="POST" action="{% url 'reporting:search_permanent_saved_templates' %}" class="flex flex-col md:flex-row gap-4 items-end">
                     {% csrf_token %}
                     <div class="flex-grow">
                         <label for="sap_id" class="block text-sm font-medium text-gray-700 mb-1">Employee SAP ID</label>
@@ -21,16 +21,9 @@
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <i class="fas fa-id-card text-gray-400"></i>
                             </div>
-                            <input type="number" name="sap_id" id="sap_id" 
+                            <input type="number" name="sap_id" 
                                 class="w-full pl-10 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors" 
-                                placeholder="Enter SAP ID" value="{{ current_sap_id }}" autofocus>
-                            {% if current_sap_id %}
-                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                                <button type="button" onclick="document.getElementById('sap_id').value=''; document.getElementById('searchForm').submit();" class="text-gray-400 hover:text-gray-500 focus:outline-none">
-                                    <i class="fas fa-times-circle"></i>
-                                </button>
-                            </div>
-                            {% endif %}
+                                placeholder="Enter SAP ID" >
                         </div>
                     </div>
                     <div>

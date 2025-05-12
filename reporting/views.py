@@ -145,12 +145,10 @@ class RequestForIssuanceOfficeMemorandum(MemorandumMixin, DetailView):
 
 @is_letter_template_admin_required
 def template_search(request):
-    search_performed = False
     templates = None
     
-    if 'sap_id' in request.GET and request.GET['sap_id']:
-        search_performed = True
-        sap_id = request.GET['sap_id']
+    if request.method == 'POST':
+        sap_id = request.POST.get('sap_id', '')
         
         # Get the employee object
         try:
@@ -169,7 +167,6 @@ def template_search(request):
     
     context = {
         'templates': templates,
-        'search_performed': search_performed
     }
     
     return render(request, 'reporting/template_search.html', context)
@@ -178,26 +175,21 @@ def template_search(request):
 
 @is_letter_template_admin_required
 def search_permanent_saved_templates(request):
-    search_performed = False
     templates = None
-    sap_id = request.GET.get('sap_id', '')
-    
-    print("SAP ID:", sap_id)  
-    if request.method == 'POST' and sap_id:
-        search_performed = True
-        
+    if request.method == 'POST':
+        sap_id = request.POST.get('sap_id', '')
+         
         # Get the employee object with select_related to optimize queries
         try:
             # Force a fresh database query by using .all() and not caching the queryset
             employee = Employee.objects.filter(SAP_ID=sap_id).first()
-            print("Employee:", employee)
+            
             if employee:
                 # Get all templates for this employee with optimized query
                 template_list = PermenantLetterTemplates.objects.filter(
                     employee=employee
                 ).select_related('employee').order_by('-created_at').all()
                 
-                print("Template List:", template_list)  
                 # Pagination with proper default page (1 instead of 10)
                 items_per_page = 10
                 paginator = Paginator(template_list, items_per_page)
@@ -219,8 +211,6 @@ def search_permanent_saved_templates(request):
 
     context = {
         'templates': templates,
-        'search_performed': search_performed,
-        'current_sap_id': sap_id  # Keep the current SAP ID for form repopulation
     }
     
     return render(request, 'reporting/search_permanant.html', context)
