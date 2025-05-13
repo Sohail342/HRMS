@@ -33,17 +33,42 @@
 
         <div id="sidebar" class="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 w-1/4 p-4 shadow-xl shadow-blue-gray-900/5 transition-transform duration-300 ease-in-out border-r border-gray-100">
 
+            {% if request.user.is_authenticated %}
+            <!-- User Profile Section -->
+            <div class="mb-2 mt-12 p-2 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg shadow-sm border border-blue-200 flex items-center space-x-2 transition-all duration-300 hover:shadow-md">
+                <div class="flex-shrink-0">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-sm">
+                        {{ request.user.name|slice:":1"|upper }}
+                    </div>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-xs font-medium text-gray-800 truncate">{{ request.user.name }}</p>
+                    <p class="text-xs text-gray-500 truncate">
+                        {% if request.user.is_admin %}
+                            Administrator
+                        {% elif request.user.is_letter_template_admin %}
+                            Template Admin
+                        {% elif request.user.employee_user %}
+                            Employee
+                        {% else %}
+                            User
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+            {% endif %}
+            
             {% if not request.user.employee_user %}
                 <a href="{% url 'HRMS:home' %}">
-                    <div class="mb-2 p-4">
-                        <h5 class="text-gray-700 group-hover:text-blue-600 block antialiased tracking-normal text-center font-sans text-xl font-semibold leading-snug text-gray-900">
+                    <div class="mb-1 p-2">
+                        <h5 class="text-gray-700 group-hover:text-blue-600 block antialiased tracking-normal text-center font-sans text-lg font-semibold leading-snug text-gray-900">
                             HRIS</h5>
                     </div>
                 </a>
             {% else %}
                 <a href="{% url 'employee_user:dashboard' %}">
-                    <div class="mb-2 p-4">
-                        <h5 class="text-gray-700 group-hover:text-blue-600 block antialiased tracking-normal text-center font-sans text-xl font-semibold leading-snug text-gray-900">
+                    <div class="mb-1 p-2">
+                        <h5 class="text-gray-700 group-hover:text-blue-600 block antialiased tracking-normal text-center font-sans text-lg font-semibold leading-snug text-gray-900">
                             HRIS</h5>
                     </div>
                 </a>
@@ -53,13 +78,13 @@
             {% if not request.user.employee_user %} <!--Start Admin and Admin Employee Attributes-->
                 {% if request.user.is_authenticated %}
                 
-                <nav class="flex flex-col gap-1 min-w-[240px] p-2 font-sans text-base font-normal text-gray-700">
+                <nav class="flex flex-col gap-0.5 min-w-[240px] p-1 font-sans text-base font-normal text-gray-700">
                     {% if not request.user.is_admin %}
                         {% if request.user.is_letter_template_admin %}
 
                         <a href="{% url 'reporting:lettername' %}">
                             <div role="button" tabindex="0"
-                                class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-blue-100 focus:bg-blue-100 active:bg-gray-100 hover:text-blue-900 focus:text-blue-900 active:text-blue-900 outline-none">
+                                class="flex items-center w-full p-2 rounded-lg text-start leading-tight transition-all hover:bg-blue-100 focus:bg-blue-100 active:bg-gray-100 hover:text-blue-900 focus:text-blue-900 active:text-blue-900 outline-none">
                                 <div class="grid place-items-center mr-4">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="h-6 w-6 text-gray-700 hover:text-blue-600">
                                     <path d="M2 3v18h20V3H2zm18 2v14H4V5h16zm-2 2H6v10h12V7z"/>
@@ -73,7 +98,7 @@
                         
                         <a href="{% url 'reporting:template_search' %}">
                             <div role="button" tabindex="0"
-                                class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-blue-100 focus:bg-blue-100 active:bg-gray-100 hover:text-blue-900 focus:text-blue-900 active:text-blue-900 outline-none">
+                                class="flex items-center w-full p-2 rounded-lg text-start leading-tight transition-all hover:bg-blue-100 focus:bg-blue-100 active:bg-gray-100 hover:text-blue-900 focus:text-blue-900 active:text-blue-900 outline-none">
                                 <div class="grid place-items-center mr-4">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="h-6 w-6 text-gray-700 hover:text-blue-600">
                                     <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
