@@ -5,6 +5,8 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 from django.urls import reverse_lazy
+from django.templatetags.static import static
+from django.utils.translation import gettext_lazy as _
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -203,16 +205,223 @@ cloudinary.config(
 )
 
 
-# CACHES = {
-#     "default": {
-#         "BACKEND": "django_redis.cache.RedisCache",
-#         "LOCATION": "redis://127.0.0.1:6379/1",
-#         "OPTIONS": {
-#             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-#         }
-#     }
-# }
+# Unfold Admin Configuration
+UNFOLD = {
+    "SITE_TITLE": "HRMS - HR Management System",
+    "SITE_HEADER": "HRMS",
+    "SITE_SUBHEADER": "HR Management System",
+    "SITE_URL": "/",
+    "SITE_ICON": {
+        "light": lambda request: static("HRIS_App/images/icon-light.svg"),  # light mode
+        "dark": lambda request: static("HRIS_App/images/icon-dark.svg"),  # dark mode
+    },
+    "SITE_DROPDOWN": [
+        {
+            "icon": "diamond",
+            "title": _("My site"),
+            "link": "https://example.com",
+        },
+        {
+            "icon": "diamond",
+            "title": _("My site"),
+            "link": reverse_lazy("admin:index"),
+        },
+    ],
+    "SITE_LOGO": {
+        "light": lambda request: static("HRIS_App/images/logo-light.svg"),  # light mode
+        "dark": lambda request: static("HRIS_App/images/logo-dark.svg"),  # dark mode
+    },
+    "SITE_FAVICONS": [
+        {
+            "rel": "icon",
+            "sizes": "32x32",
+            "type": "image/png",
+            "href": lambda request: static("HRIS_App/images/favicon.png"),
+        },
+    ],
+    "STYLES": [
+        lambda request: static("HRIS_App/css/style.css"),
+        lambda request: static("HRIS_App/css/import-export-buttons.css"),
+        lambda request: static("HRIS_App/css/import-export-pages.css"),
+    ],
+    "SCRIPTS": [
+        lambda request: static("HRIS_App/JS/script.js"),
+        lambda request: static("HRIS_App/JS/import-form-enhancer.js"),
+    ],
+    "SHOW_HISTORY": True,
+    "SHOW_VIEW_ON_SITE": True,
+    "SHOW_BACK_BUTTON": True,
+    "BORDER_RADIUS": "6px",
+    "SIDEBAR": {
+        "show_search": True,
+        "show_all_applications": True,
+        "navigation": [
+            {
+                "title": _("Dashboard"),
+                "separator": True,
+                "collapsible": False,
+                "items": [
+                    {
+                        "title": _("Dashboard"),
+                        "icon": "dashboard",
+                        "link": reverse_lazy("admin:index"),
+                    },
+                ],
+            },
+        ],
+        "navigation": [
+            {
+                "title": _("Dashboard"),
+                "separator": True,
+                "collapsible": False,
+                "items": [
+                    {
+                        "title": _("Dashboard"),
+                        "icon": "dashboard",
+                        "link": reverse_lazy("admin:index"),
+                    },
+                ],
+            },
+            {
+                "title": _("HR Management System"),
+                "separator": True,
+                "collapsible": True,
+                "items": [
+                    {
+                        "title": _("Employees"),
+                        "icon": "people",
+                        "link": reverse_lazy("admin:HRIS_App_employee_changelist"),
+                    },
+                    {
+                        "title": _("Group"),
+                        "icon": "groups",
+                        "link": reverse_lazy("admin:HRIS_App_group_changelist"),
+                    },
+                    {
+                        "title": _("Division"),
+                        "icon": "apartment",
+                        "link": reverse_lazy("admin:HRIS_App_division_changelist"),
+                    },
+                    {
+                        "title": _("Wing"),
+                        "icon": "account_tree",
+                        "link": reverse_lazy("admin:HRIS_App_wing_changelist"),
+                    },
+                    {
+                        "title": _("Region"),
+                        "icon": "public",
+                        "link": reverse_lazy("admin:HRIS_App_region_changelist"),
+                    },
+                    {
+                        "title": _("Branch"),
+                        "icon": "fork_right",
+                        "link": reverse_lazy("admin:HRIS_App_branch_changelist"),
+                    },
+                    {
+                        "title": _("Designation"),
+                        "icon": "badge",
+                        "link": reverse_lazy("admin:HRIS_App_designation_changelist"),
+                    },
+                    {
+                        "title": _("Cadre"),
+                        "icon": "group_work",
+                        "link": reverse_lazy("admin:HRIS_App_cadre_changelist"),
+                    },
+                    {
+                        "title": _("EmployeeType"),
+                        "icon": "work_outline",
+                        "link": reverse_lazy("admin:HRIS_App_employeetype_changelist"),
+                    },
+                    {
+                        "title": _("EmployeeGrade"),
+                        "icon": "star_half",
+                        "link": reverse_lazy("admin:HRIS_App_employeegrade_changelist"),
+                    },
+                    {
+                        "title": _("Qualification"),
+                        "icon": "school",
+                        "link": reverse_lazy("admin:HRIS_App_qualification_changelist"),
+                    },
+                ],
+            },
+            {
+                "title": _("Employee Management"),
+                "separator": True,
+                "collapsible": True,
+                "items": [
+                    {
+                        "title": _("RICP Details"),
+                        "icon": "insights",
+                        "link": reverse_lazy("admin:employee_user_ricpdata_changelist"),
+                    },
+                    {
+                        "title": _("RICP KPI's"),
+                        "icon": "trending_up",
+                        "link": reverse_lazy("admin:employee_user_ricpkpi_changelist"),
+                    },
+                    {
+                        "title": _("Leave Application"),
+                        "icon": "event_note",
+                        "link": reverse_lazy("admin:employee_attendance_leaveapplication_changelist"),
+                    },
+                    {
+                        "title": _("Non-Involvement Certificate"),
+                        "icon": "verified_user",
+                        "link": reverse_lazy("admin:employee_attendance_noninvolvementcertificate_changelist"),
+                    },
+                    {
+                        "title": _("Educational Documents"),
+                        "icon": "school",
+                        "link": reverse_lazy("admin:employee_attendance_educationaldocument_changelist"),
+                    },
+                    {
+                        "title": _("Contract Renewal"),
+                        "icon": "autorenew",
+                        "link": reverse_lazy("admin:employee_attendance_contractrenewal_changelist"),
+                    },
+                    {
+                        "title": _("Stationary Request"),
+                        "icon": "edit_note",
+                        "link": reverse_lazy("admin:employee_attendance_stationaryrequest_changelist"),
+                    },
+                    {
+                        "title": _("Transfer Inquiry"),
+                        "icon": "swap_horiz",
+                        "link": reverse_lazy("admin:transfer_employees_inquiry_changelist"),
+                    },
+                ],
+            },
+            {
+                "title": _("Letter Templates"),
+                "separator": True,
+                "collapsible": True,
+                "items": [
+                    {
+                        "title": _("Hospital Names"),
+                        "icon": "local_hospital",
+                        "link": reverse_lazy("admin:reporting_hospitalname_changelist"),
+                    },
+                    {
+                        "title": _("Saved Templates"),
+                        "icon": "save",
+                        "link": reverse_lazy("admin:reporting_lettertemplates_changelist"),
+                    },
+                    {
+                        "title": _("Permanent Saved Letter Templates"),
+                        "icon": "drafts",
+                        "link": reverse_lazy("admin:reporting_permenantlettertemplates_changelist"),
+                    },
+                    {
+                        "title": _("Signature on Letter"),
+                        "icon": "draw",
+                        "link": reverse_lazy("admin:reporting_signature_changelist"),
+                    },
+                ],
+            },
+        ],
 
+    },
+}
 
 
 

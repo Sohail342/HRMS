@@ -190,6 +190,7 @@ class Employee(AbstractBaseUser):
     name = models.CharField(max_length=200)
     password = models.CharField(max_length=128, blank=True, null=True)
     is_active = models.BooleanField(default=True)
+    in_active_reason = models.TextField(blank=True, null=True)
     is_admin = models.BooleanField(default=False)
     is_admin_employee = models.BooleanField(default=False)
     is_letter_template_admin = models.BooleanField(default=False)
@@ -259,7 +260,7 @@ class Employee(AbstractBaseUser):
 
     grade_assignment = models.CharField(max_length=100, choices=GRADE_CHOICES, blank=True, null=True, default='Not Assigned')
 
-    # tracked employees if they are not an admin (is_admin=False) or an admin employee (is_admin_employee=False
+    # tracked employees if they are not an admin (is_admin=False) or an admin employee (is_admin_employee=False)
     employee_user = models.BooleanField(default=True)
 
 

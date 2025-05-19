@@ -1,0 +1,218 @@
+/* Custom CSS for Unfold Admin Panel */
+
+:root {
+    /* Enhanced Color Palette */
+    --primary-color: #3b82f6;
+    --primary-dark: #2563eb;
+    --primary-light: #93c5fd;
+    --secondary-color: #10b981;
+    --secondary-dark: #059669;
+    --secondary-light: #6ee7b7;
+    --accent-color: #8b5cf6;
+    --accent-dark: #7c3aed;
+    --accent-light: #c4b5fd;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+    --success-color: #10b981;
+    --info-color: #3b82f6;
+    --light-color: #f3f4f6;
+    --dark-color: #1f2937;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+}
+
+/* Admin Panel Enhancements */
+
+/* Header & Branding */
+.unfold-header {
+    background: linear-gradient(to right, var(--primary-dark), var(--primary-color));
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.unfold-header .unfold-header-brand img {
+    transition: transform 0.3s ease;
+}
+
+.unfold-header .unfold-header-brand:hover img {
+    transform: scale(1.05);
+}
+
+/* Sidebar Improvements */
+.unfold-sidebar {
+    background-color: var(--gray-800);
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.unfold-sidebar-item {
+    border-radius: 8px;
+    margin: 5px 10px;
+    transition: all 0.2s ease;
+}
+
+.unfold-sidebar-item:hover {
+    background-color: var(--gray-700);
+    transform: translateX(5px);
+}
+
+.unfold-sidebar-item.active {
+    background-color: var(--primary-color);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.unfold-sidebar-item .unfold-sidebar-item-icon {
+    transition: transform 0.3s ease;
+}
+
+.unfold-sidebar-item:hover .unfold-sidebar-item-icon {
+    transform: scale(1.2);
+}
+
+/* Button Enhancements */
+.button, .unfold-btn {
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.button:hover, .unfold-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.button:active, .unfold-btn:active {
+    transform: translateY(1px);
+}
+
+.button.primary, .unfold-btn-primary {
+    background: linear-gradient(to right, var(--primary-color), var(--primary-dark));
+    border: none;
+}
+
+.button.secondary, .unfold-btn-secondary {
+    background: linear-gradient(to right, var(--secondary-color), var(--secondary-dark));
+    border: none;
+}
+
+/* Form Controls */
+.unfold-form-control {
+    border-radius: 6px;
+    border: 1px solid var(--gray-300);
+    padding: 10px 12px;
+    transition: all 0.3s ease;
+}
+
+.unfold-form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.unfold-form-control:hover {
+    border-color: var(--gray-400);
+}
+
+/* Select2 Enhancements */
+.select2-container--default .select2-selection--single,
+.select2-container--default .select2-selection--multiple {
+    border-radius: 6px;
+    border: 1px solid var(--gray-300);
+    transition: all 0.3s ease;
+}
+
+.select2-container--default .select2-selection--single:hover,
+.select2-container--default .select2-selection--multiple:hover {
+    border-color: var(--gray-400);
+}
+
+.select2-container--default.select2-container--focus .select2-selection--single,
+.select2-container--default.select2-container--focus .select2-selection--multiple {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+/* Card Enhancements */
+.unfold-card {
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.unfold-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Table Enhancements */
+.unfold-table {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.unfold-table thead th {
+    background-color: var(--gray-100);
+    color: var(--gray-800);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+}
+
+.unfold-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.unfold-table tbody tr:hover {
+    background-color: var(--gray-100);
+}
+
+/* Pagination */
+.unfold-pagination .unfold-pagination-item {
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.unfold-pagination .unfold-pagination-item:hover {
+    background-color: var(--gray-200);
+    transform: translateY(-2px);
+}
+
+.unfold-pagination .unfold-pagination-item.active {
+    background-color: var(--primary-color);
+    color: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.unfold-fade-in {
+    animation: fadeIn 0.5s ease;
+}
+
+/* Responsive Improvements */
+@media (max-width: 768px) {
+    .unfold-sidebar {
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    .unfold-content {
+        margin-left: 0;
+    }
+    
+    .unfold-card {
+        margin-bottom: 1rem;
+    }
+}

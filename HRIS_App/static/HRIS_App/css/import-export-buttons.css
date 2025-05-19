@@ -1,0 +1,184 @@
+/* Import/Export Buttons Enhancement for HRMS Admin Interface */
+
+/* Container for import/export buttons */
+.import-export-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin: 15px 0;
+    padding: 10px 0;
+    background-color: #f9fafb;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Style for both import and export buttons */
+.import-btn,
+.export-btn,
+.import_link,
+.export_link,
+.import-button,
+.export-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    letter-spacing: 0.3px;
+}
+
+/* Import button specific styling */
+.import-btn,
+.import_link,
+.import-button {
+    background: linear-gradient(to right, #3b82f6, #2563eb);
+    color: white;
+}
+
+.import-btn:hover,
+.import_link:hover,
+.import-button:hover {
+    background: linear-gradient(to right, #2563eb, #1d4ed8);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Export button specific styling */
+.export-btn,
+.export_link,
+.export-button {
+    background: linear-gradient(to right, #10b981, #059669);
+    color: white;
+}
+
+.export-btn:hover,
+.export_link:hover,
+.export-button:hover {
+    background: linear-gradient(to right, #059669, #047857);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Fix for buttons in the admin action bar */
+.object-tools {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 120px 0 0 0;
+}
+
+.object-tools a {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+/* Specific styling for import/export buttons in the admin interface */
+.import_link,
+.export_link {
+    margin-right: 10px;
+    position: relative;
+    z-index: 1;
+}
+
+/* Import/Export Form Styling */
+.import-form,
+.export-form {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    max-width: 800px;
+    margin: 20px auto;
+}
+
+.import-form h1,
+.export-form h1 {
+    font-size: 24px;
+    color: #1f2937;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 10px;
+}
+
+.import-form label,
+.export-form label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #374151;
+}
+
+.import-form select,
+.export-form select,
+.import-form input[type="file"] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background-color: #f9fafb;
+    margin-bottom: 15px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.import-form select:focus,
+.export-form select:focus,
+.import-form input[type="file"]:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    outline: none;
+}
+
+.import-form .submit-row,
+.export-form .submit-row {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* File upload button styling */
+.import-form input[type="file"] {
+    border: 2px dashed #d1d5db;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    background-color: #f9fafb;
+    position: relative;
+}
+
+.import-form input[type="file"]:hover {
+    border-color: #3b82f6;
+    background-color: #f0f7ff;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .import-export-container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .object-tools {
+        flex-wrap: wrap;
+    }
+    
+    .import-form,
+    .export-form {
+        padding: 15px;
+        margin: 15px 10px;
+    }
+}
+}

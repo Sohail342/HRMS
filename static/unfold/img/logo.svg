@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="150" height="50" viewBox="0 0 150 50">
+  <style>
+    .text { font: bold 24px sans-serif; fill: #3699ff; }
+    .subtext { font: 12px sans-serif; fill: #9899ac; }
+    .icon-bg { fill: #3699ff; }
+    .icon-fg { fill: white; }
+  </style>
+  
+  <!-- Icon Background -->
+  <circle class="icon-bg" cx="25" cy="25" r="20"/>
+  
+  <!-- Icon - Stylized HR -->
+  <path class="icon-fg" d="M15,15 v20 h5 v-8 h5 v8 h5 v-20 h-5 v8 h-5 v-8 z"/>
+  
+  <!-- Text -->
+  <text x="55" y="28" class="text">HRMS</text>
+  <text x="55" y="42" class="subtext">HR Management System</text>
+</svg>

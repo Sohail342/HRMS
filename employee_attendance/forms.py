@@ -1,15 +1,16 @@
 from django import forms
 from .models import ContractRenewal
 from .models import EducationalDocument , NonInvolvementCertificate, StationaryRequest , LeaveApplication
+from HRIS_App.custom_forms import RequiredOptionalFieldsModelForm
 
-class ContractRenewalForm(forms.ModelForm):
+class ContractRenewalForm(RequiredOptionalFieldsModelForm):
     class Meta:
         model = ContractRenewal
         fields = ['position', 'contract_expiry_date', 'reason', 'renewal_document']
 
 
 
-class EducationalDocumentForm(forms.ModelForm):
+class EducationalDocumentForm(RequiredOptionalFieldsModelForm):
     class Meta:
         model = EducationalDocument
         fields = ['document_type', 'document']
@@ -19,7 +20,7 @@ class EducationalDocumentForm(forms.ModelForm):
         }
         
 
-class NonInvolvementCertificateForm(forms.ModelForm):
+class NonInvolvementCertificateForm(RequiredOptionalFieldsModelForm):
     class Meta:
         model = NonInvolvementCertificate
         fields = ['request_date', 'reason', 'supporting_docs']
@@ -28,7 +29,7 @@ class NonInvolvementCertificateForm(forms.ModelForm):
             'reason': forms.Textarea(attrs={'rows': 4}),
         }
         
-class StationaryRequestForm(forms.ModelForm):
+class StationaryRequestForm(RequiredOptionalFieldsModelForm):
     class Meta:
         model = StationaryRequest
         fields = ['item_name', 'quantity', 'reason_for_request', 'request_date']
@@ -39,7 +40,7 @@ class StationaryRequestForm(forms.ModelForm):
 
 #----------------------------- Leave Management -------------------------------------------
 
-class PermanentLeaveApplicationForm(forms.ModelForm):
+class PermanentLeaveApplicationForm(RequiredOptionalFieldsModelForm):
     class Meta:
         model = LeaveApplication
         fields = ['leave_date', 'from_date', 'to_date', 'reason', 'application_type', 'supervisor_signature']
@@ -62,7 +63,7 @@ class PermanentLeaveApplicationForm(forms.ModelForm):
         return cleaned_data
 
 
-class PermanentLeaveApplicationForm(forms.ModelForm):
+class PermanentLeaveApplicationForm(RequiredOptionalFieldsModelForm):
     class Meta:
         model = LeaveApplication
         fields = ['application_type', 'from_date', 'to_date', 'reason', 'supervisor_signature']

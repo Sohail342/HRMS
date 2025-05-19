@@ -2,8 +2,9 @@ from django import forms
 from django.db.models import Count
 from .models import Employee, Branch
 from django.core.exceptions import ValidationError
+from .custom_forms import RequiredOptionalFieldsModelForm
 
-class AdminEmployeeForm(forms.ModelForm):
+class AdminEmployeeForm(RequiredOptionalFieldsModelForm):
     password = forms.CharField(widget=forms.PasswordInput, required=False, help_text="Leave blank to keep the current password.")
     class Meta:
         model = Employee
@@ -13,6 +14,7 @@ class AdminEmployeeForm(forms.ModelForm):
             'is_letter_template_admin',
             'name', 
             'is_active', 
+            'in_active_reason',
             'is_admin', 
             'is_admin_employee', 
             'cnic_no', 
@@ -64,13 +66,40 @@ class AdminEmployeeForm(forms.ModelForm):
 
 
 
-class NonAdminEmployeeForm(forms.ModelForm):
+class NonAdminEmployeeForm(RequiredOptionalFieldsModelForm):
 
     class Meta:
         model = Employee
-        fields = ('SAP_ID', 'name', 'region', 'branch', 'designation', 'employee_type', 
-                  'employee_grade', 'email', 'date_of_joining', 'is_admin_employee', 'grade_assignment',
-                  'pending_inquiry', 'remarks', 'transfer_remarks', 'pdf_file')
+        fields = (
+            'email', 
+            'name', 
+            'is_active', 
+            'in_active_reason',
+            'is_admin_employee', 
+            'cnic_no', 
+            'husband_or_father_name', 
+            'SAP_ID', 
+            'designation', 
+            'cadre', 
+            'employee_type', 
+            'employee_grade', 
+            'region', 
+            'branch',
+            'qualifications', 
+            'date_of_retirement', 
+            'date_current_posting', 
+            'date_current_assignment', 
+            'mobile_number', 
+            'admin_signature',  
+            'employee_salutation', 
+            'date_of_joining', 
+            'grade_assignment',
+            'pending_inquiry',
+            'transferred_status',
+            'remarks',
+            'transfer_remarks',
+            'pdf_file',
+        )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -87,7 +116,7 @@ class NonAdminEmployeeForm(forms.ModelForm):
 
 
 
-class AssignGradeForm(forms.ModelForm):
+class AssignGradeForm(RequiredOptionalFieldsModelForm):
     class Meta:
         model = Employee
         fields = ['grade_assignment']
