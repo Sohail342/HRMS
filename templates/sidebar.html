@@ -79,8 +79,8 @@
                 {% if request.user.is_authenticated %}
                 
                 <nav class="flex flex-col gap-0.5 min-w-[240px] p-1 font-sans text-base font-normal text-gray-700">
-                    {% if not request.user.is_admin %}
-                        {% if request.user.is_letter_template_admin %}
+                    
+                    {% if request.user.is_letter_template_admin or request.user.is_admin %}
 
                         <a href="{% url 'reporting:lettername' %}">
                             <div role="button" tabindex="0"
@@ -124,7 +124,7 @@
                         </div>
                     </a>
                     {% endif %}
-                    {% endif %}
+                    
                     {% if request.user.is_admin %}
 
                     <a href="{% url 'admin:HRIS_App_employee_add' %}">
