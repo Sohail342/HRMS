@@ -25,7 +25,7 @@ class WingResource(resources.ModelResource):
 
     class Meta:
         model = Wing
-        fields = ('name', 'description', 'division_name') 
+        fields = ('id', 'name', 'description', 'division_name') 
         export_order = ('name', 'description', 'division_name')
     
 
@@ -39,7 +39,7 @@ class BranchResource(resources.ModelResource):
 
     class Meta:
         model = Branch
-        fields = ('branch_code', 'branch_name', 'branch_Category', 'branch_address', 'region')
+        fields = ('id', 'branch_code', 'branch_name', 'branch_Category', 'branch_address', 'region')
         export_order = ('branch_code', 'branch_name', 'branch_Category', 'branch_address', 'region') 
 
 
@@ -100,7 +100,7 @@ class EmployeeResource(resources.ModelResource):
     class Meta:
         model = Employee
         fields = (
-            'SAP_ID', 'email', 'password', 'name', 'designation', 'cadre', 'employee_type',
+            'id', 'SAP_ID', 'email', 'password', 'name', 'designation', 'cadre', 'employee_type',
             'employee_grade', 'branch', 'region', 'qualifications', 'date_of_joining',
             'mobile_number', 'date_of_last_promotion', 'remarks', 'grade_assignment', 'date_of_joining', 
             'date_of_retirement', 'birth_date', 'date_of_contract_expiry', 'date_current_posting', 
