@@ -84,7 +84,7 @@ class EmployeeResource(resources.ModelResource):
     branch = fields.Field(
         column_name='branch',
         attribute='branch',
-        widget=ForeignKeyWidget(Branch, field='branch_code')
+        widget=ForeignKeyWidget(Branch, field='branch_name')
     )
     region = fields.Field(
         column_name='region',

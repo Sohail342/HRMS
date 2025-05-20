@@ -75,7 +75,7 @@ class Region(models.Model):
 
 class Branch(models.Model):
     branch_code = models.IntegerField(unique=True)
-    branch_name = models.CharField(max_length=500)
+    branch_name = models.CharField(max_length=500, unique=True)
     branch_Category = models.CharField(max_length=100, default=None)
     branch_address = models.TextField(blank=True, null=True)
     region = models.ForeignKey(Region, on_delete=models.CASCADE, to_field="name", null=True,  blank=True)
@@ -220,7 +220,7 @@ class Employee(AbstractBaseUser):
         'EmployeeGrade', on_delete=models.SET_NULL, null=True, blank=True, to_field="grade_name"
     )
     branch = models.ForeignKey(
-        'Branch', on_delete=models.CASCADE, null=True, blank=True, related_name='employees', to_field="branch_code"
+        'Branch', on_delete=models.CASCADE, null=True, blank=True, related_name='employees', to_field="branch_name"
     )
     qualifications = models.ManyToManyField(
         'Qualification', related_name='employees', blank=True, 
