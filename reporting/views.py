@@ -254,10 +254,11 @@ class LetterForm(LoginRequiredMixin, ListView):
                 messages.error(request, "Only PDF files are allowed.")
                 return redirect('reporting:lettername')
 
-            # Get the employee object
-            employee = get_object_or_404(Employee, SAP_ID=sap_id_for_template_upload)
 
             try:
+                # Get the employee object
+                employee = get_object_or_404(Employee, SAP_ID=sap_id_for_template_upload)
+
                 # Upload PDF to Cloudinary
                 upload_result = cloudinary.uploader.upload(
                     uploaded_file, resource_type="raw"
@@ -273,6 +274,10 @@ class LetterForm(LoginRequiredMixin, ListView):
 
             except ValidationError as e:
                 messages.error(request, f"Error uploading file: {e}")
+
+            except Exception as e:
+                messages.error(request, f"An error occurred: {e}")
+                
 
                 return redirect('reporting:lettername')
 
