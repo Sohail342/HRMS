@@ -3,12 +3,27 @@ from django.db.models import Count
 from .models import Employee, Branch
 from django.core.exceptions import ValidationError
 from .custom_forms import RequiredOptionalFieldsModelForm
+from django.contrib.auth.models import Group, Permission
+from django.contrib.admin.widgets import FilteredSelectMultiple
 
 class AdminEmployeeForm(RequiredOptionalFieldsModelForm):
+    # Fields to manage groups and permissions
+    groups = forms.ModelMultipleChoiceField(
+        queryset=Group.objects.all(),
+        required=False,
+        widget=FilteredSelectMultiple("Groups", is_stacked=False)
+    )
+    user_permissions = forms.ModelMultipleChoiceField(
+        queryset=Permission.objects.all(),
+        required=False,
+        widget=FilteredSelectMultiple("User permissions", is_stacked=False)
+    )
+
     password = forms.CharField(widget=forms.PasswordInput, required=False, help_text="Leave blank to keep the current password.")
     class Meta:
         model = Employee
         fields = (
+            'is_superuser',
             'email', 
             'password',
             'is_letter_template_admin',
@@ -71,6 +86,7 @@ class NonAdminEmployeeForm(RequiredOptionalFieldsModelForm):
     class Meta:
         model = Employee
         fields = (
+            'is_superuser',
             'email', 
             'name', 
             'is_active', 
@@ -112,7 +128,6 @@ class NonAdminEmployeeForm(RequiredOptionalFieldsModelForm):
             if self.instance and self.instance.region:
                 self.fields['branch'].queryset = Branch.objects.filter(region=self.instance.region)
             self.fields['branch'].required = False  
-
 
 
 

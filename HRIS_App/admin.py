@@ -18,15 +18,6 @@ class GroupAdmin(ModelAdmin, ImportExportModelAdmin):
     search_fields = ('id', 'name')
     list_filter = ('name', )
 
-# @admin.register(FunctionalGroup)
-# class FunctionalGroupAdmin(ImportExportModelAdmin, ModelAdmin):
-#     resource_class  = FunctionalGroupResource
-#     export_form_class = ExportForm
-#     import_form_class = ImportForm
-#     list_display = ('id','name', 'group', 'allias')
-#     search_fields = ('id', 'name', 'group__name', 'allias')
-#     list_filter = ('name', 'allias')
-
 @admin.register(Division)
 class DivisionAdmin(ImportExportModelAdmin, ModelAdmin):
     export_form_class = ExportForm
@@ -108,6 +99,10 @@ class EmployeeAdmin(ModelAdmin, ImportExportModelAdmin):
     export_form_class = ExportForm
     resource_class = EmployeeResource
     form = AdminEmployeeForm
+    
+    # Explicitly include these if not using fieldsets
+    filter_horizontal = ("groups", "user_permissions")
+
     list_display = ('SAP_ID', 'name', 'branch', 'region', 'designation', 'employee_grade', 'employee_type', 'date_of_joining', 'is_admin_employee')
     list_filter = ('designation', 'branch__region', 'is_admin_employee', 'is_active', 'branch', 'is_letter_template_admin')
     search_fields = ("SAP_ID", 'name', 'region__name', 'branch__branch_name')

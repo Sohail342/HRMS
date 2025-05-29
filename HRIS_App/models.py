@@ -2,7 +2,7 @@ from django.db import models
 from cloudinary.models import CloudinaryField
 from django.contrib.auth.hashers import make_password, check_password
 from django.db import models
-from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
+from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 
 class Group(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -176,6 +176,8 @@ class MyUserManager(BaseUserManager):
             is_admin_employee=True,  # Superusers are admin employees
         )
         user.is_admin = True
+        user.is_staff = True      
+        user.is_superuser = True   
         user.is_active = True
         user.save(using=self._db)
         return user
@@ -183,7 +185,7 @@ class MyUserManager(BaseUserManager):
 
 
 
-class Employee(AbstractBaseUser):
+class Employee(AbstractBaseUser, PermissionsMixin):
     # Core user fields
     
     email = models.EmailField(verbose_name="Email", max_length=255, blank=True, null=True, unique=True)
@@ -341,17 +343,23 @@ class Employee(AbstractBaseUser):
         return self.name
 
     def has_perm(self, perm, obj=None):
-        "Does the user have a specific permission?"
-        return self.is_admin
+        # Superusers have all permissions
+        if self.is_superuser:
+            return True
+        # Otherwise, check if user has the specific permission
+        return super().has_perm(perm, obj)
+
 
     def has_module_perms(self, app_label):
-        "Does the user have permissions to view the app `app_label`?"
-        return True
+        if self.is_superuser:
+            return True
+        return super().has_module_perms(app_label)
+
 
     @property
     def is_staff(self):
         "Is the user a member of staff?"
-        return self.is_admin
+        return self.is_admin or self.is_superuser
     
     def set_password(self, raw_password):
         self.password = make_password(raw_password)  # Hash the password
