@@ -194,6 +194,7 @@ class Employee(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     in_active_reason = models.TextField(blank=True, null=True)
     is_admin = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=False)
     is_admin_employee = models.BooleanField(default=False)
     is_letter_template_admin = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -276,27 +277,17 @@ class Employee(AbstractBaseUser, PermissionsMixin):
    
 
     def validate_grades(self):
-        total_employees = 0
-        try:
-            # Get the total number of employees in the same region
-            total_employees = Employee.objects.filter(is_admin=False).filter(region=self.region).count()
-        except:
-            # Get all employees if admin login
-            total_employees = Employee.objects.filter().count()
-
-        # If there are no employees, no validation is necessary
-        if total_employees == 0:
+        # Skip validation if user is admin or doesn't have a region
+        if self.is_admin or self.region is None:
             return
 
+        try:
+            total_employees = Employee.objects.filter(is_admin=False, region=self.region).count()
+            if total_employees == 0:
+                return
 
-        if self.is_admin == False:
-            '''
-            Fetch the Region instance for employees or employees admin ( not admin itself) 
-            and calculate grading eligbility base on Region % ( define in region model for each region) 
-            '''
             region_instance = Region.objects.get(name=self.region)
 
-            # Define the number of employees allowed per grade based on percentage
             grade_limits = {
                 'Excellent': int(total_employees * region_instance.A_Grade_seats / 100),
                 'Very Good': int(total_employees * region_instance.B_Grade_seats / 100),
@@ -305,33 +296,26 @@ class Employee(AbstractBaseUser, PermissionsMixin):
                 'Unsatisfactory': int(total_employees * region_instance.E_Grade_seats / 100),
             }
 
-
-            # Convert to integers, with rounding to handle fractional employees
             grade_limits = {grade: int(limit) for grade, limit in grade_limits.items()}
 
-            # Calculate the remaining employees after applying the floor values
             assigned_employees = sum(grade_limits.values())
             remaining_employees = total_employees - assigned_employees
-
-            # Distribute the remaining employees (this could go to the grade with the smallest number)
             if remaining_employees > 0:
-                # Add remaining employees to the lowest grade
                 grade_limits['Unsatisfactory'] += remaining_employees
 
-            # Count how many employees currently have each grade
             current_grade_counts = Employee.objects.filter(region=self.region).values('grade_assignment').annotate(count=models.Count('id'))
 
-            # Subtract the current counts from the grade limits
             for entry in current_grade_counts:
                 grade = entry['grade_assignment']
                 count = entry['count']
                 if grade in grade_limits:
                     grade_limits[grade] -= count
 
-
-            # Check if the current instance's grade exceeds the remaining limit
             if self.grade_assignment in grade_limits and grade_limits[self.grade_assignment] <= 0:
                 raise ValueError(f"The grade '{self.grade_assignment}' has already reached its limit in the region.")
+        except Region.DoesNotExist:
+            # Skip if region not found — safe fail for superusers
+            return
 
 
     objects = MyUserManager()
@@ -360,6 +344,10 @@ class Employee(AbstractBaseUser, PermissionsMixin):
     def is_staff(self):
         "Is the user a member of staff?"
         return self.is_admin or self.is_superuser
+
+    @is_staff.setter
+    def is_staff(self, value):
+        self.is_admin = value 
     
     def set_password(self, raw_password):
         self.password = make_password(raw_password)  # Hash the password
@@ -371,6 +359,8 @@ class Employee(AbstractBaseUser, PermissionsMixin):
     
 
     def save(self, *args, **kwargs):
+
+        self.is_staff = self.is_admin or self.is_superuser
         # Ensure that only employees are tracked, excluding admins or admin employees
         if self.is_admin or self.is_admin_employee:
             self.employee_user = False 
