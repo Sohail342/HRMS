@@ -99,7 +99,74 @@ class EmployeeAdmin(ModelAdmin, ImportExportModelAdmin):
     export_form_class = ExportForm
     resource_class = EmployeeResource
     form = AdminEmployeeForm
-    
+
+    def get_readonly_fields(self, request, obj=None):
+        if request.user.is_admin and not request.user.is_superuser:
+            # Allow editing only these fields for staff users
+            return [field.name for field in self.model._meta.fields if field.name not in (
+                                                                                        
+            'email', 
+            'name', 
+            'is_active', 
+            'in_active_reason',
+            'cnic_no', 
+            'husband_or_father_name', 
+            'SAP_ID', 
+            'designation', 
+            'cadre', 
+            'employee_type', 
+            'employee_grade', 
+            'region', 
+            'branch',
+            'qualifications', 
+            'date_of_retirement', 
+            'date_current_posting', 
+            'date_current_assignment', 
+            'mobile_number',   
+            'employee_salutation', 
+            'date_of_joining', 
+            'grade_assignment',
+            'pending_inquiry',
+            'transferred_status',
+            'remarks',
+            'transfer_remarks',
+            'pdf_file',
+                                                                                        
+            )]
+        return []
+
+    def get_fields(self, request, obj=None):
+        if request.user.is_admin and not request.user.is_superuser:
+            return (
+                'email', 
+                'name', 
+                'is_active', 
+                'in_active_reason',
+                'cnic_no', 
+                'husband_or_father_name', 
+                'SAP_ID', 
+                'designation', 
+                'cadre', 
+                'employee_type', 
+                'employee_grade', 
+                'region', 
+                'branch',
+                'qualifications', 
+                'date_of_retirement', 
+                'date_current_posting', 
+                'date_current_assignment', 
+                'mobile_number',   
+                'employee_salutation', 
+                'date_of_joining', 
+                'grade_assignment',
+                'pending_inquiry',
+                'transferred_status',
+                'remarks',
+                'transfer_remarks',
+                'pdf_file',
+            )
+        return super().get_fields(request, obj)
+
     # Explicitly include these if not using fieldsets
     filter_horizontal = ("groups", "user_permissions")
 
