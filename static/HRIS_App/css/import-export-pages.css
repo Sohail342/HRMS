@@ -1,0 +1,313 @@
+/* Enhanced Import/Export Pages Styling for HRMS Admin */
+
+/* Page container */
+.import-page,
+.export-page {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Breadcrumbs styling */
+.breadcrumbs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.breadcrumbs a {
+    color: #3b82f6;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.breadcrumbs a:hover {
+    color: #2563eb;
+    text-decoration: underline;
+}
+
+.breadcrumbs .separator {
+    color: #9ca3af;
+}
+
+/* Format selector styling */
+.format-selector {
+    position: relative;
+}
+
+.format-selector select {
+    appearance: none;
+    padding-right: 30px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 16px;
+}
+
+/* Submit button enhancement */
+.submit-row input[type="submit"] {
+    background: linear-gradient(to right, #3b82f6, #2563eb);
+    color: white;
+    font-weight: 600;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.submit-row input[type="submit"]:hover {
+    background: linear-gradient(to right, #2563eb, #1d4ed8);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Field information */
+.field-info {
+    background-color: #f0f7ff;
+    border-left: 4px solid #3b82f6;
+    padding: 12px 15px;
+    margin: 15px 0;
+    border-radius: 0 6px 6px 0;
+    font-size: 14px;
+    color: #1f2937;
+}
+
+.field-info strong {
+    font-weight: 600;
+    color: #1e40af;
+}
+
+/* File upload area enhancement */
+.file-upload-area {
+    border: 2px dashed #d1d5db;
+    border-radius: 8px;
+    padding: 30px;
+    text-align: center;
+    background-color: #f9fafb;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+.file-upload-area:hover {
+    border-color: #3b82f6;
+    background-color: #f0f7ff;
+}
+
+.file-upload-area .upload-icon {
+    font-size: 40px;
+    color: #6b7280;
+    margin-bottom: 10px;
+}
+
+.file-upload-area .upload-text {
+    font-size: 16px;
+    color: #4b5563;
+    margin-bottom: 5px;
+}
+
+.file-upload-area .upload-hint {
+    font-size: 14px;
+    color: #9ca3af;
+}
+
+/* Success and error messages */
+.success-message,
+.error-message {
+    padding: 12px 15px;
+    border-radius: 6px;
+    margin: 15px 0;
+    font-weight: 500;
+}
+
+.success-message {
+    background-color: #ecfdf5;
+    border-left: 4px solid #10b981;
+    color: #065f46;
+}
+
+.error-message {
+    background-color: #fef2f2;
+    border-left: 4px solid #ef4444;
+    color: #b91c1c;
+}
+
+/* STYLES FOR REQUIRED/OPTIONAL FIELDS */
+
+/* Form field labels */
+.import-form .form-row label,
+.form-row label,
+.fieldBox label,
+.aligned label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: #374151;
+}
+
+/* Required field indicator and styling */
+.required-field label::after,
+.required-indicator,
+.required-field-label .required-indicator {
+    content: ' *';
+    color: #ef4444;
+    font-weight: 700;
+    margin-left: 2px;
+}
+
+/* Optional field indicator and styling */
+.optional-field label::after,
+.optional-indicator,
+.optional-field-label .optional-indicator {
+    content: ' (optional)';
+    color: #6b7280;
+    font-weight: normal;
+    font-size: 0.9em;
+    font-style: italic;
+    margin-left: 2px;
+}
+
+/* Background styling for required fields */
+.required-field,
+.required-field input,
+.required-field select,
+.required-field textarea {
+    border-left-color: #ef4444;
+}
+
+/* Background styling for optional fields */
+.optional-field,
+.optional-field input,
+.optional-field select,
+.optional-field textarea {
+    border-left-color: #e5e7eb;
+}
+
+/* Field description tooltips */
+.field-tooltip {
+    position: relative;
+    display: inline-block;
+    margin-left: 5px;
+    cursor: help;
+}
+
+.field-tooltip .tooltip-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background-color: #e5e7eb;
+    color: #4b5563;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.field-tooltip .tooltip-text {
+    visibility: hidden;
+    width: 200px;
+    background-color: #374151;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 8px 10px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -100px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 12px;
+    line-height: 1.4;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.field-tooltip:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Field legend for import forms */
+.import-field-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #f9fafb;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+}
+
+.legend-mandatory {
+    color: #ef4444;
+    font-weight: 600;
+}
+
+.legend-optional {
+    color: #6b7280;
+    font-style: italic;
+}
+
+/* Import form header with instructions */
+.import-instructions {
+    margin-bottom: 25px;
+    padding: 15px;
+    background-color: #f0f7ff;
+    border-radius: 8px;
+    border: 1px solid #bfdbfe;
+}
+
+.import-instructions h3 {
+    color: #1e40af;
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+.import-instructions ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.import-instructions li {
+    margin-bottom: 5px;
+    color: #374151;
+}
+
+/* Color coding for field types */
+.mandatory-field-bg {
+    background-color: #fff7ed !important;
+    border-left: 3px solid #f97316 !important;
+}
+
+.optional-field-bg {
+    background-color: #f8fafc !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .import-field-legend {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .field-tooltip .tooltip-text {
+        width: 150px;
+        margin-left: -75px;
+    }
+}

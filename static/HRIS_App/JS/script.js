@@ -96,7 +96,77 @@ function initFormEnhancements() {
                 control.classList.add('has-value');
             }
         }
+        
+        // Add required/optional field styling
+        if (control.required || control.getAttribute('data-required') === 'true') {
+            control.parentElement.classList.add('required-field');
+            control.parentElement.classList.add('mandatory-field-bg');
+        } else {
+            control.parentElement.classList.add('optional-field');
+            control.parentElement.classList.add('optional-field-bg');
+        }
+        
+        // Add tooltip for field description if available
+        const description = control.getAttribute('data-description');
+        if (description) {
+            const label = control.parentElement.querySelector('label');
+            if (label) {
+                addFieldTooltip(label, description);
+            }
+        }
     });
+    
+    // Add field legend to all forms
+    addFieldLegendToForms();
+}
+
+/**
+ * Add tooltip to field label
+ */
+function addFieldTooltip(element, description) {
+    // Check if tooltip already exists
+    if (element.querySelector('.field-tooltip')) return;
+    
+    const tooltip = document.createElement('span');
+    tooltip.className = 'field-tooltip';
+    tooltip.innerHTML = `
+        <span class="tooltip-icon">?</span>
+        <span class="tooltip-text">${description}</span>
+    `;
+    
+    element.appendChild(tooltip);
+}
+
+/**
+ * Add field legend to all forms
+ */
+function addFieldLegendToForms() {
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => {
+        // Skip if legend already exists or if it's a search form
+        if (form.querySelector('.field-legend') || form.classList.contains('search-form')) return;
+        
+        const legend = document.createElement('div');
+        legend.className = 'import-field-legend field-legend';
+        legend.innerHTML = `
+            <div class="legend-item">
+                <span class="legend-mandatory">*</span>
+                <span>Required field</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-optional">(optional)</span>
+                <span>Optional field</span>
+            </div>
+        `;
+        
+        // Insert at the beginning of the form
+        if (form.firstChild) {
+            form.insertBefore(legend, form.firstChild);
+        } else {
+            form.appendChild(legend);
+        }
+    });
+}
 }
 
 /**
