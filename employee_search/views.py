@@ -228,8 +228,38 @@ def export_csv(request):
     # Get visible columns from request
     visible_columns = request.GET.get('visible_columns', '')
     
+    # Map frontend column names to backend column names
+    column_name_mapping = {
+        'sap-id': 'SAP_ID',
+        'name': 'name',
+        'email': 'email',
+        'type': 'employee_type',
+        'designation': 'designation',
+        'grade': 'employee_grade',
+        'branch': 'branch',
+        'cnic': 'cnic',
+        'father-name': 'father_name',
+        'cadre': 'cadre',
+        'qualifications': 'qualifications',
+        'region': 'region',
+        'retirement': 'retirement',
+        'posting': 'posting',
+        'birth-date': 'birth_date',
+        'contract-expiry': 'contract_expiry',
+        'current-posting': 'current_posting',
+        'mobile': 'mobile',
+        'branch-code': 'branch_code',
+        'pending-inquiry': 'pending_inquiry',
+        'remarks': 'remarks',
+        'transfer-remarks': 'transfer_remarks',
+        'grade-assignment': 'grade_assignment'
+    }
+    
     if visible_columns:
-        visible_columns = visible_columns.split(',')
+        # Split the comma-separated string into a list
+        frontend_columns = visible_columns.split(',')
+        # Map frontend column names to backend column names
+        visible_columns = [column_name_mapping.get(col, col) for col in frontend_columns]
     else:
         # Default to all columns if none specified
         visible_columns = [
@@ -283,7 +313,17 @@ def export_csv(request):
         'pending_inquiry': {'header': 'Pending Inquiry', 'field': 'pending_inquiry'},
         'remarks': {'header': 'Remarks', 'field': 'remarks'},
         'transfer_remarks': {'header': 'Transfer Remarks', 'field': 'transfer_remarks'},
-        'grade_assignment': {'header': 'Grade Assignment', 'field': 'grade_assignment'}
+        'grade_assignment': {'header': 'Grade Assignment', 'field': 'grade_assignment'},
+        'cnic': {'header': 'CNIC', 'field': 'cnic_no'},
+        'father_name': {'header': 'Father/Husband Name', 'field': 'husband_or_father_name'},
+        'cadre': {'header': 'Cadre', 'field': 'cadre__name'},
+        'qualifications': {'header': 'Qualifications', 'field': 'qualifications'},
+        'retirement': {'header': 'Retirement Date', 'field': 'date_of_retirement'},
+        'posting': {'header': 'Place of Posting', 'field': 'place_of_posting'},
+        'birth_date': {'header': 'Birth Date', 'field': 'birth_date'},
+        'contract_expiry': {'header': 'Contract Expiry', 'field': 'date_of_contract_expiry'},
+        'current_posting': {'header': 'Current Posting Date', 'field': 'date_current_posting'},
+        'mobile': {'header': 'Mobile Number', 'field': 'mobile_number'}
     }
     
     # Write header row with only visible columns
@@ -305,6 +345,10 @@ def export_csv(request):
                     value = getattr(related_obj, attr) if related_obj else ''
                 elif field == 'pending_inquiry':
                     value = 'Yes' if getattr(employee, field) else 'No'
+                elif field == 'qualifications':
+                    # Handle ManyToMany relationship for qualifications
+                    qualifications = employee.qualifications.all()
+                    value = ', '.join([q.name for q in qualifications]) if qualifications else ''
                 else:
                     value = getattr(employee, field, '')
                 row.append(value)
