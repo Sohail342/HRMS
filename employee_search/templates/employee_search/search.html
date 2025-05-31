@@ -782,18 +782,17 @@
             const select = document.getElementById(selectId);
             if (!select) return;
             
+            // We're removing the counts from dropdown options
+            // but we'll still use this function to update the filter summary
+            
             // Skip the first option (All option)
             for (let i = 1; i < select.options.length; i++) {
                 const option = select.options[i];
                 const value = option.value;
-                const count = countsData[value] || 0;
                 
-                // Only update text if it doesn't already contain count
-                if (!option.textContent.includes('(')) {
-                    option.textContent = `${option.textContent} (${count})`;
-                } else {
-                    // If it already has a count, update it
-                    option.textContent = option.textContent.replace(/\(\d+\)$/, `(${count})`);
+                // Remove any existing count from the option text
+                if (option.textContent.includes('(')) {
+                    option.textContent = option.textContent.replace(/\s*\(\d+\)$/, '');
                 }
             }
         }
