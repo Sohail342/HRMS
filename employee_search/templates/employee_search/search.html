@@ -1,0 +1,1121 @@
+{% extends "sidebar.html" %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    .search-container {
+        transition: all 0.3s ease;
+    }
+    .filter-section {
+        transition: max-height 0.3s ease, opacity 0.3s ease;
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+    }
+    .filter-section.show {
+        max-height: 1000px;
+        opacity: 1;
+    }
+    .search-result-row:hover {
+        background-color: rgba(59, 130, 246, 0.1);
+    }
+    .pagination-btn {
+        transition: all 0.2s ease;
+    }
+    .pagination-btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+    }
+    .search-bar {
+        background-image: linear-gradient(to right, rgba(219, 234, 254, 0.5), rgba(191, 219, 254, 0.3));
+    }
+    .filter-badge {
+        animation: fadeIn 0.3s ease-in-out;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Filter Summary Styles */
+    #filterSummary {
+        transition: all 0.3s ease;
+    }
+    #filterSummary.hidden {
+        display: none;
+    }
+    #filterSummaryContent {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 10px;
+    }
+    #filterSummaryContent .col-span-full {
+        grid-column: 1 / -1;
+    }
+    #filterSummaryContent > div {
+        transition: all 0.3s ease;
+        animation: fadeIn 0.5s ease-in-out;
+    }
+
+    /* Column toggle animation styles */
+    #columnToggleMenu {
+        transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    
+    .column-toggle-transition {
+        transition: all 0.3s ease;
+    }
+    
+    /* Highlight recently toggled columns */
+    .column-highlight {
+        animation: highlight-column 2s ease;
+    }
+    
+    @keyframes highlight-column {
+        0% { background-color: rgba(59, 130, 246, 0.1); }
+        100% { background-color: transparent; }
+    }
+    
+    /* Toast notification styles */
+    body > div[class*="fixed bottom-4 right-4"] {
+        opacity: 0;
+        transform: translateY(10px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="py-6 px-4 sm:px-6 lg:px-8 fade-in">
+    <div class="mb-6">
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-2">Employee Search</h1>
+        <p class="text-gray-600">Advanced search tool for finding employees</p>
+    </div>
+
+    <!-- Search Container -->
+    <div class="search-container bg-white rounded-lg shadow-md p-4 mb-6">
+        <!-- Main Search Bar -->
+        <form method="get" action="{% url 'employee_search:advanced_search' %}" id="searchForm" class="mb-4">
+            <div class="relative">
+                <input type="text" name="search" value="{{ search_query }}" 
+                    class="search-bar w-full py-3 pl-12 pr-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 shadow-sm hover:shadow-md" 
+                    placeholder="Search by SAP ID, Name, or Email...">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg class="w-6 h-6 text-blue-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                    </svg>
+                </div>
+                <button type="button" id="toggleFilters" class="absolute inset-y-0 right-0 pr-3 flex items-center text-blue-500 hover:text-blue-700 transition-colors duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="ml-1">Filters</span>
+                </button>
+            </div>
+
+            <!-- Advanced Filters Section -->
+            <div id="filterSection" class="filter-section mt-4 bg-gray-50 rounded-lg p-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Employee Type Filter -->
+                    <div>
+                        <label for="employee_type" class="block text-sm font-medium text-gray-700 mb-1">Employee Type</label>
+                        <select name="employee_type" id="employee_type" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                            <option value="">All Types</option>
+                            {% for type in employee_types %}
+                            <option value="{{ type.name }}" {% if employee_type == type.name %}selected{% endif %}>{{ type.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Designation Filter -->
+                    <div>
+                        <label for="designation" class="block text-sm font-medium text-gray-700 mb-1">Designation</label>
+                        <select name="designation" id="designation" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                            <option value="">All Designations</option>
+                            {% for des in designations %}
+                            <option value="{{ des.title }}" {% if designation == des.title %}selected{% endif %}>{{ des.title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Employee Grade Filter -->
+                    <div>
+                        <label for="employee_grade" class="block text-sm font-medium text-gray-700 mb-1">Employee Grade</label>
+                        <select name="employee_grade" id="employee_grade" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                            <option value="">All Grades</option>
+                            {% for grade in employee_grades %}
+                            <option value="{{ grade.grade_name }}" {% if employee_grade == grade.grade_name %}selected{% endif %}>{{ grade.grade_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Branch Filter -->
+                    <div>
+                        <label for="branch" class="block text-sm font-medium text-gray-700 mb-1">Branch</label>
+                        <select name="branch" id="branch" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                            <option value="">All Branches</option>
+                            {% for br in branches %}
+                            <option value="{{ br.branch_name }}" {% if branch == br.branch_name %}selected{% endif %}>{{ br.branch_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Cadre Filter -->
+                    <div>
+                        <label for="cadre" class="block text-sm font-medium text-gray-700 mb-1">Cadre</label>
+                        <select name="cadre" id="cadre" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                            <option value="">All Cadres</option>
+                            {% for c in cadres %}
+                            <option value="{{ c.name }}" {% if cadre == c.name %}selected{% endif %}>{{ c.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Region Filter -->
+                    <div>
+                        <label for="region" class="block text-sm font-medium text-gray-700 mb-1">Region</label>
+                        <select name="region" id="region" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                            <option value="">All Regions</option>
+                            {% for r in regions %}
+                            <option value="{{ r.name }}" {% if region == r.name %}selected{% endif %}>{{ r.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                
+                </div>
+
+                <div class="mt-4 flex justify-between">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md shadow-sm hover:shadow-md transition-all duration-200 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                        </svg>
+                        Apply Filters
+                    </button>
+                    <button type="button" id="resetFilters" class="text-gray-600 hover:text-gray-800 py-2 px-4 rounded-md hover:bg-gray-100 transition-all duration-200 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+                        </svg>
+                        Reset
+                    </button>
+                </div>
+            </div>
+
+            <!-- Active Filters Display -->
+            <div id="activeFilters" class="mt-3 flex flex-wrap gap-2">
+                {% if search_query or employee_type or designation or employee_grade or branch or cadre or region or pending_inquiry %}
+                <div class="text-sm text-gray-600 mr-2 pt-1">Active filters:</div>
+                {% endif %}
+                
+                {% if search_query %}
+                <span class="filter-badge bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-1 rounded-full flex items-center">
+                    Search: {{ search_query }}
+                    <button type="button" class="ml-1 text-blue-600 hover:text-blue-800" onclick="removeFilter('search')">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </span>
+                {% endif %}
+                
+                {% if employee_type %}
+                <span class="filter-badge bg-green-100 text-green-800 text-xs font-medium px-2.5 py-1 rounded-full flex items-center">
+                    Type: {{ employee_type }}
+                    <button type="button" class="ml-1 text-green-600 hover:text-green-800" onclick="removeFilter('employee_type')">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </span>
+                {% endif %}
+                
+                {% if designation %}
+                <span class="filter-badge bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-1 rounded-full flex items-center">
+                    Designation: {{ designation }}
+                    <button type="button" class="ml-1 text-purple-600 hover:text-purple-800" onclick="removeFilter('designation')">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </span>
+                {% endif %}
+                
+                {% if employee_grade %}
+                <span class="filter-badge bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-1 rounded-full flex items-center">
+                    Grade: {{ employee_grade }}
+                    <button type="button" class="ml-1 text-yellow-600 hover:text-yellow-800" onclick="removeFilter('employee_grade')">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </span>
+                {% endif %}
+                
+                {% if branch %}
+                <span class="filter-badge bg-red-100 text-red-800 text-xs font-medium px-2.5 py-1 rounded-full flex items-center">
+                    Branch: {{ branch }}
+                    <button type="button" class="ml-1 text-red-600 hover:text-red-800" onclick="removeFilter('branch')">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </span>
+                {% endif %}
+                
+                {% if cadre %}
+                <span class="filter-badge bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-1 rounded-full flex items-center">
+                    Cadre: {{ cadre }}
+                    <button type="button" class="ml-1 text-indigo-600 hover:text-indigo-800" onclick="removeFilter('cadre')">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </span>
+                {% endif %}
+                
+                {% if region %}
+                <span class="filter-badge bg-teal-100 text-teal-800 text-xs font-medium px-2.5 py-1 rounded-full flex items-center">
+                    Region: {{ region }}
+                    <button type="button" class="ml-1 text-teal-600 hover:text-teal-800" onclick="removeFilter('region')">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </span>
+                {% endif %}
+                
+                {% if pending_inquiry %}
+                <span class="filter-badge bg-orange-100 text-orange-800 text-xs font-medium px-2.5 py-1 rounded-full flex items-center">
+                    Pending Inquiry: {{ pending_inquiry }}
+                    <button type="button" class="ml-1 text-orange-600 hover:text-orange-800" onclick="removeFilter('pending_inquiry')">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </span>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <!-- Filter Summary Section -->
+    <div id="filterSummary" class="mt-4 bg-white rounded-lg shadow-md p-4 mb-4 hidden">
+        <h3 class="text-md font-semibold text-gray-800 mb-2">Filter Summary</h3>
+        <div id="filterSummaryContent" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Filter summary content will be populated by JavaScript -->
+        </div>
+    </div>
+    
+    <!-- Results Section -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <!-- Results Header -->
+        <div class="p-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center results-header">
+            <h2 class="text-lg font-semibold text-gray-800">Search Results</h2>
+            <div class="flex items-center">
+                <button id="exportCsvBtn" class="flex items-center text-sm bg-green-50 hover:bg-green-100 text-green-600 hover:text-green-800 px-3 py-1.5 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 mr-2" type="button">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                    Export CSV
+                </button>
+                <div class="dropdown relative mr-4">
+                    <button id="columnToggleBtn" class="flex items-center text-sm bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-800 px-3 py-1.5 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50" type="button">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                            <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+                        </svg>
+                        Show/Hide Columns
+                    </button>
+                    <div id="columnToggleMenu" class="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg z-50 p-3 hidden border border-gray-200">  
+                        <h3 class="text-sm font-medium text-gray-700 mb-2 flex justify-between items-center">
+                            <span>Toggle Column Visibility</span>
+                            <button id="selectAllColumns" class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 py-1 px-2 rounded transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">Select All</button>
+                        </h3>
+                        <div class="border-t border-gray-200 pt-2 mb-2"></div>
+                        <div class="max-h-64 overflow-y-auto pr-1">
+                            <div class="grid grid-cols-1 gap-2">
+                                <label class="flex items-center text-sm hover:bg-gray-50 p-1 rounded transition-colors duration-150">
+                                    <input type="checkbox" class="column-toggle mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500" data-column="sap-id" checked>
+                                    SAP ID
+                                </label>
+                                <label class="flex items-center text-sm hover:bg-gray-50 p-1 rounded transition-colors duration-150">
+                                    <input type="checkbox" class="column-toggle mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500" data-column="name" checked>
+                                    Name
+                                </label>
+                                <label class="flex items-center text-sm hover:bg-gray-50 p-1 rounded transition-colors duration-150">
+                                    <input type="checkbox" class="column-toggle mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500" data-column="email" checked>
+                                    Email
+                                </label>
+                                <label class="flex items-center text-sm hover:bg-gray-50 p-1 rounded transition-colors duration-150">
+                                    <input type="checkbox" class="column-toggle mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500" data-column="type" checked>
+                                    Type
+                                </label>
+                                <label class="flex items-center text-sm hover:bg-gray-50 p-1 rounded transition-colors duration-150">
+                                    <input type="checkbox" class="column-toggle mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500" data-column="designation" checked>
+                                    Designation
+                                </label>
+                                <label class="flex items-center text-sm hover:bg-gray-50 p-1 rounded transition-colors duration-150">
+                                    <input type="checkbox" class="column-toggle mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500" data-column="grade" checked>
+                                    Grade
+                                </label>
+                                <label class="flex items-center text-sm hover:bg-gray-50 p-1 rounded transition-colors duration-150">
+                                    <input type="checkbox" class="column-toggle mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500" data-column="branch" checked>
+                                    Branch
+                                </label>
+                                <label class="flex items-center text-sm hover:bg-gray-50 p-1 rounded transition-colors duration-150">
+                                    <input type="checkbox" class="column-toggle mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500" data-column="cnic" checked>
+                                    CNIC
+                                </label>
+                                <label class="flex items-center text-sm hover:bg-gray-50 p-1 rounded transition-colors duration-150">
+                                    <input type="checkbox" class="column-toggle mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500" data-column="father-name" checked>
+                                    Father/Husband
+                                </label>
+                                <label class="flex items-center text-sm hover:bg-gray-50 p-1 rounded transition-colors duration-150">
+                                    <input type="checkbox" class="column-toggle mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500" data-column="cadre" checked>
+                                    Cadre
+                                </label>
+                                <label class="flex items-center text-sm hover:bg-gray-50 p-1 rounded transition-colors duration-150">
+                                    <input type="checkbox" class="column-toggle mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500" data-column="qualifications">
+                                    Qualifications
+                                </label>
+                                <label class="flex items-center text-sm hover:bg-gray-50 p-1 rounded transition-colors duration-150">
+                                    <input type="checkbox" class="column-toggle mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500" data-column="region" checked>
+                                    Region
+                                </label>
+                                <label class="flex items-center text-sm hover:bg-gray-50 p-1 rounded transition-colors duration-150">
+                                    <input type="checkbox" class="column-toggle mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500" data-column="retirement">
+                                    Retirement Date
+                                </label>
+                                <label class="flex items-center text-sm hover:bg-gray-50 p-1 rounded transition-colors duration-150">
+                                    <input type="checkbox" class="column-toggle mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500" data-column="posting">
+                                    Place of Posting
+                                </label>
+                                <label class="flex items-center text-sm hover:bg-gray-50 p-1 rounded transition-colors duration-150">
+                                    <input type="checkbox" class="column-toggle mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500" data-column="birth-date">
+                                    Birth Date
+                                </label>
+                                <label class="flex items-center text-sm hover:bg-gray-50 p-1 rounded transition-colors duration-150">
+                                    <input type="checkbox" class="column-toggle mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500" data-column="contract-expiry">
+                                    Contract Expiry
+                                </label>
+                                <label class="flex items-center text-sm hover:bg-gray-50 p-1 rounded transition-colors duration-150">
+                                    <input type="checkbox" class="column-toggle mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500" data-column="current-posting">
+                                    Current Posting Date
+                                </label>
+                                <label class="flex items-center text-sm hover:bg-gray-50 p-1 rounded transition-colors duration-150">
+                                    <input type="checkbox" class="column-toggle mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500" data-column="mobile" checked>
+                                    Mobile Number
+                                </label>
+                            </div>
+                        </div>
+                        <div class="border-t border-gray-200 mt-2 pt-2 flex justify-end">
+                            <button type="button" onclick="toggleColumnMenu()" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 py-1 px-2 rounded transition-colors duration-200 focus:outline-none">Close</button>
+                        </div>
+                    </div>
+                </div>
+                <span class="text-sm text-gray-600">{{ page_obj.paginator.count }} employees found</span>
+            </div>
+        </div>
+
+        <!-- Results Table -->
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider column-sap-id">SAP ID</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider column-name">Name</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider column-email">Email</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider column-type">Type</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider column-designation">Designation</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider column-grade">Grade</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider column-branch">Branch</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider column-cnic">CNIC</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider column-father-name">Father/Husband</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider column-cadre">Cadre</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider column-qualifications">Qualifications</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider column-region">Region</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider column-retirement">Retirement Date</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider column-posting">Place of Posting</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider column-birth-date">Birth Date</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider column-contract-expiry">Contract Expiry</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider column-current-posting">Current Posting Date</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider column-mobile">Mobile Number</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for employee in page_obj %}
+                    <tr class="search-result-row hover:bg-blue-50 transition-colors duration-150">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 column-sap-id">{{ employee.SAP_ID }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 column-name">{{ employee.name|default:"N/A" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 column-email">{{ employee.email|default:"N/A" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 column-type">{{ employee.employee_type.name|default:"N/A" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 column-designation">{{ employee.designation.title|default:"N/A" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 column-grade">{{ employee.employee_grade.grade_name|default:"N/A" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 column-branch">{{ employee.branch.branch_name|default:"N/A" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 column-cnic">{{ employee.cnic_no|default:"N/A" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 column-father-name">{{ employee.husband_or_father_name|default:"N/A" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 column-cadre">{{ employee.cadre.name|default:"N/A" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 column-qualifications">
+                            {% for qual in employee.qualifications.all %}
+                                {{ qual.name }}{% if not forloop.last %}, {% endif %}
+                            {% empty %}
+                                N/A
+                            {% endfor %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 column-region">{{ employee.region.name|default:"N/A" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 column-retirement">{{ employee.date_of_retirement|default:"N/A" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 column-posting">{{ employee.place_of_posting|default:"N/A" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 column-birth-date">{{ employee.birth_date|default:"N/A" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 column-contract-expiry">{{ employee.date_of_contract_expiry|default:"N/A" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 column-current-posting">{{ employee.date_current_posting|default:"N/A" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 column-mobile">{{ employee.mobile_number|default:"N/A" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            {% if employee.SAP_ID %}
+                            <a href="{% url 'HRMS:employee_detail' employee.SAP_ID %}" class="text-blue-600 hover:text-blue-900 transition-colors duration-150">View Details</a>
+                            {% else %}
+                            <span class="text-gray-400">No SAP ID</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="19" class="px-6 py-4 text-center text-sm text-gray-500">
+                            <div class="flex flex-col items-center justify-center py-6">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <p class="text-gray-600 text-lg">No employees found matching your criteria</p>
+                                <button type="button" onclick="document.getElementById('resetFilters').click()" class="mt-4 text-blue-600 hover:text-blue-800 font-medium flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+                                    </svg>
+                                    Reset Filters
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.paginator.num_pages > 1 %}
+        <div class="px-4 py-3 bg-gray-50 border-t border-gray-200 sm:px-6 flex items-center justify-between">
+            <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                <div>
+                    <p class="text-sm text-gray-700">
+                        Showing <span class="font-medium">{{ page_obj.start_index }}</span> to <span class="font-medium">{{ page_obj.end_index }}</span> of <span class="font-medium">{{ page_obj.paginator.count }}</span> results
+                    </p>
+                </div>
+                <div>
+                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                        {% if page_obj.has_previous %}
+                        <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if employee_type %}employee_type={{ employee_type }}&{% endif %}{% if designation %}designation={{ designation }}&{% endif %}{% if employee_grade %}employee_grade={{ employee_grade }}&{% endif %}{% if branch %}branch={{ branch }}&{% endif %}{% if cadre %}cadre={{ cadre }}&{% endif %}{% if pending_inquiry %}pending_inquiry={{ pending_inquiry }}&{% endif %}page={{ page_obj.previous_page_number }}" class="pagination-btn relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                            <span class="sr-only">Previous</span>
+                            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            </svg>
+                        </a>
+                        {% else %}
+                        <button disabled class="pagination-btn relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-gray-100 text-sm font-medium text-gray-400 cursor-not-allowed">
+                            <span class="sr-only">Previous</span>
+                            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                        {% endif %}
+                        
+                        <!-- Current Page -->
+                        <span class="pagination-btn relative inline-flex items-center px-4 py-2 border border-blue-500 bg-blue-50 text-sm font-medium text-blue-600">
+                            {{ page_obj.number }}
+                        </span>
+                        
+                        {% if page_obj.has_next %}
+                        <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if employee_type %}employee_type={{ employee_type }}&{% endif %}{% if designation %}designation={{ designation }}&{% endif %}{% if employee_grade %}employee_grade={{ employee_grade }}&{% endif %}{% if branch %}branch={{ branch }}&{% endif %}{% if cadre %}cadre={{ cadre }}&{% endif %}{% if pending_inquiry %}pending_inquiry={{ pending_inquiry }}&{% endif %}page={{ page_obj.next_page_number }}" class="pagination-btn relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                            <span class="sr-only">Next</span>
+                            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                            </svg>
+                        </a>
+                        {% else %}
+                        <button disabled class="pagination-btn relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-gray-100 text-sm font-medium text-gray-400 cursor-not-allowed">
+                            <span class="sr-only">Next</span>
+                            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                        {% endif %}
+                    </nav>
+                </div>
+            </div>
+            <div class="flex sm:hidden justify-between w-full">
+                {% if page_obj.has_previous %}
+                <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if employee_type %}employee_type={{ employee_type }}&{% endif %}{% if designation %}designation={{ designation }}&{% endif %}{% if employee_grade %}employee_grade={{ employee_grade }}&{% endif %}{% if branch %}branch={{ branch }}&{% endif %}{% if cadre %}cadre={{ cadre }}&{% endif %}{% if region %}region={{ region }}&{% endif %}{% if pending_inquiry %}pending_inquiry={{ pending_inquiry }}&{% endif %}page={{ page_obj.previous_page_number }}" class="pagination-btn relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    Previous
+                </a>
+                {% else %}
+                <button disabled class="pagination-btn relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-400 bg-gray-100 cursor-not-allowed">
+                    Previous
+                </button>
+                {% endif %}
+                
+                <span class="text-sm text-gray-700 py-2">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                </span>
+                
+                {% if page_obj.has_next %}
+                <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if employee_type %}employee_type={{ employee_type }}&{% endif %}{% if designation %}designation={{ designation }}&{% endif %}{% if employee_grade %}employee_grade={{ employee_grade }}&{% endif %}{% if branch %}branch={{ branch }}&{% endif %}{% if cadre %}cadre={{ cadre }}&{% endif %}{% if region %}region={{ region }}&{% endif %}{% if pending_inquiry %}pending_inquiry={{ pending_inquiry }}&{% endif %}page={{ page_obj.next_page_number }}" class="pagination-btn relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    Next
+                </a>
+                {% else %}
+                <button disabled class="pagination-btn relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-400 bg-gray-100 cursor-not-allowed">
+                    Next
+                </button>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle filter section
+        const filterSection = document.getElementById('filterSection');
+        const toggleFiltersBtn = document.getElementById('toggleFilters');
+        const activeFiltersCount = document.querySelectorAll('.filter-badge').length;
+        
+        if (activeFiltersCount > 0) {
+            filterSection.classList.remove('hidden');
+        }
+        
+        toggleFiltersBtn.addEventListener('click', function() {
+            filterSection.classList.toggle('hidden');
+        });
+        
+        // Reset filters
+        document.getElementById('resetFilters').addEventListener('click', function() {
+            // Reset the form
+            document.getElementById('searchForm').reset();
+            // Redirect to base URL
+            window.location.href = "{% url 'employee_search:advanced_search' %}";
+        });
+        
+        // Remove filter function
+        window.removeFilter = function(param) {
+            const url = new URL(window.location.href);
+            url.searchParams.delete(param);
+            window.location.href = url.toString();
+        };
+        
+        // Fetch and display filter counts
+        function fetchFilterCounts() {
+            const url = new URL("{% url 'employee_search:filter_counts' %}", window.location.origin);
+            
+            // Add current filter parameters to the request
+            const currentUrl = new URL(window.location.href);
+            currentUrl.searchParams.forEach((value, key) => {
+                if (key !== 'page') { // Don't include pagination parameter
+                    url.searchParams.append(key, value);
+                }
+            });
+            
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    updateFilterCounts(data);
+                })
+                .catch(error => {
+                    console.error('Error fetching filter counts:', error);
+                });
+        }
+        
+        // Update the filter dropdowns with counts
+        function updateFilterCounts(data) {
+            // Update total count
+            const resultsHeader = document.querySelector('.results-header h2');
+            if (resultsHeader) {
+                resultsHeader.textContent = `Search Results (${data.total_count})`;
+            }
+            
+            // Update employee type dropdown
+            updateDropdownWithCounts('employee_type', data.employee_type_counts);
+            
+            // Update designation dropdown
+            updateDropdownWithCounts('designation', data.designation_counts);
+            
+            // Update employee grade dropdown
+            updateDropdownWithCounts('employee_grade', data.employee_grade_counts);
+            
+            // Update branch dropdown
+            updateDropdownWithCounts('branch', data.branch_counts);
+            
+            // Update cadre dropdown
+            updateDropdownWithCounts('cadre', data.cadre_counts);
+            
+            // Update region dropdown
+            updateDropdownWithCounts('region', data.region_counts);
+            
+            // Update filter summary
+            updateFilterSummary(data);
+        }
+        
+        // Update the filter summary section
+        function updateFilterSummary(data) {
+            const filterSummary = document.getElementById('filterSummary');
+            const filterSummaryContent = document.getElementById('filterSummaryContent');
+            
+            if (!filterSummary || !filterSummaryContent) return;
+            
+            // Clear previous content
+            filterSummaryContent.innerHTML = '';
+            
+            // Get current filter values
+            const currentUrl = new URL(window.location.href);
+            const currentFilters = {
+                employee_type: currentUrl.searchParams.get('employee_type') || '',
+                designation: currentUrl.searchParams.get('designation') || '',
+                employee_grade: currentUrl.searchParams.get('employee_grade') || '',
+                branch: currentUrl.searchParams.get('branch') || '',
+                cadre: currentUrl.searchParams.get('cadre') || '',
+                region: currentUrl.searchParams.get('region') || ''
+            };
+            
+            // Check if any filters are active
+            const hasActiveFilters = Object.values(currentFilters).some(value => value !== '');
+            
+            if (!hasActiveFilters) {
+                filterSummary.classList.add('hidden');
+                return;
+            }
+            
+            // Create summary cards for each active filter
+            if (currentFilters.employee_type) {
+                createSummaryCard('Employee Type', currentFilters.employee_type, data.total_count);
+            }
+            
+            if (currentFilters.designation) {
+                createSummaryCard('Designation', currentFilters.designation, data.total_count);
+            }
+            
+            if (currentFilters.employee_grade) {
+                createSummaryCard('Grade', currentFilters.employee_grade, data.total_count);
+            }
+            
+            if (currentFilters.branch) {
+                createSummaryCard('Branch', currentFilters.branch, data.total_count);
+            }
+            
+            if (currentFilters.cadre) {
+                createSummaryCard('Cadre', currentFilters.cadre, data.total_count);
+            }
+            
+            if (currentFilters.region) {
+                createSummaryCard('Region', currentFilters.region, data.total_count);
+            }
+            
+            // If we have multiple filters, add a combined summary card
+            const activeFilterCount = Object.values(currentFilters).filter(value => value !== '').length;
+            if (activeFilterCount > 1) {
+                createCombinedSummaryCard(currentFilters, data.total_count);
+            }
+            
+            // Show the filter summary section
+            filterSummary.classList.remove('hidden');
+        }
+        
+        // Create a summary card for a single filter
+        function createSummaryCard(filterName, filterValue, count) {
+            const filterSummaryContent = document.getElementById('filterSummaryContent');
+            
+            const card = document.createElement('div');
+            card.className = 'bg-gray-50 rounded-lg p-3 border border-gray-200';
+            
+            card.innerHTML = `
+                <div class="text-sm font-medium text-gray-700">${filterName}: ${filterValue}</div>
+                <div class="text-lg font-semibold text-blue-600 mt-1">${count} Employees</div>
+            `;
+            
+            filterSummaryContent.appendChild(card);
+        }
+        
+        // Create a combined summary card for multiple filters
+        function createCombinedSummaryCard(filters, count) {
+            const filterSummaryContent = document.getElementById('filterSummaryContent');
+            
+            const card = document.createElement('div');
+            card.className = 'bg-blue-50 rounded-lg p-3 border border-blue-200 col-span-full';
+            
+            let filterText = '<div class="text-sm font-medium text-gray-700">Combined Filters:</div>';
+            filterText += '<div class="flex flex-wrap gap-2 mt-1">';
+            
+            if (filters.employee_type) {
+                filterText += `<span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-1 rounded-full">Type: ${filters.employee_type}</span>`;
+            }
+            if (filters.designation) {
+                filterText += `<span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-1 rounded-full">Designation: ${filters.designation}</span>`;
+            }
+            if (filters.employee_grade) {
+                filterText += `<span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-1 rounded-full">Grade: ${filters.employee_grade}</span>`;
+            }
+            if (filters.branch) {
+                filterText += `<span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-1 rounded-full">Branch: ${filters.branch}</span>`;
+            }
+            if (filters.cadre) {
+                filterText += `<span class="bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-1 rounded-full">Cadre: ${filters.cadre}</span>`;
+            }
+            if (filters.region) {
+                filterText += `<span class="bg-teal-100 text-teal-800 text-xs font-medium px-2.5 py-1 rounded-full">Region: ${filters.region}</span>`;
+            }
+            
+            filterText += '</div>';
+            filterText += `<div class="text-lg font-semibold text-blue-600 mt-2">${count} Employees match all criteria</div>`;
+            
+            card.innerHTML = filterText;
+            
+            filterSummaryContent.appendChild(card);
+        }
+        
+        // Helper function to update dropdown options with counts
+        function updateDropdownWithCounts(selectId, countsData) {
+            const select = document.getElementById(selectId);
+            if (!select) return;
+            
+            // Skip the first option (All option)
+            for (let i = 1; i < select.options.length; i++) {
+                const option = select.options[i];
+                const value = option.value;
+                const count = countsData[value] || 0;
+                
+                // Only update text if it doesn't already contain count
+                if (!option.textContent.includes('(')) {
+                    option.textContent = `${option.textContent} (${count})`;
+                } else {
+                    // If it already has a count, update it
+                    option.textContent = option.textContent.replace(/\(\d+\)$/, `(${count})`);
+                }
+            }
+        }
+        
+        // Fetch counts when page loads
+        fetchFilterCounts();
+        
+        // Add event listeners to filter dropdowns to update counts when changed
+        const filterDropdowns = ['employee_type', 'designation', 'employee_grade', 'branch', 'cadre', 'region'];
+        filterDropdowns.forEach(id => {
+            const dropdown = document.getElementById(id);
+            if (dropdown) {
+                dropdown.addEventListener('change', function() {
+                    // We'll update the counts after a short delay to allow the page to update
+                    setTimeout(fetchFilterCounts, 100);
+                });
+            }
+        });
+        
+        // Column visibility toggle functionality
+        const columnVisibilitySettings = JSON.parse(localStorage.getItem('employeeSearchColumnVisibility')) || {
+            'sap-id': true,
+            'name': true,
+            'email': true,
+            'type': true,
+            'designation': true,
+            'grade': true,
+            'branch': true,
+            'cnic': true,
+            'father-name': true,
+            'cadre': true,
+            'qualifications': true,
+            'region': true,
+            'retirement': true,
+            'posting': true,
+            'birth-date': true,
+            'contract-expiry': true,
+            'current-posting': true,
+            'mobile': true
+        };
+        
+        // Initialize column visibility checkboxes
+        Object.keys(columnVisibilitySettings).forEach(column => {
+            const checkbox = document.querySelector(`.column-toggle[data-column="${column}"]`);
+            if (checkbox) {
+                checkbox.checked = columnVisibilitySettings[column];
+                updateColumnVisibility(column, columnVisibilitySettings[column]);
+            }
+        });
+        
+        // Add event listeners to column visibility checkboxes
+        document.querySelectorAll('.column-toggle').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const column = this.getAttribute('data-column');
+                columnVisibilitySettings[column] = this.checked;
+                localStorage.setItem('employeeSearchColumnVisibility', JSON.stringify(columnVisibilitySettings));
+                updateColumnVisibility(column, this.checked);
+            });
+        });
+        
+        // Function to update column visibility with visual feedback
+        function updateColumnVisibility(column, isVisible) {
+            const columnCells = document.querySelectorAll(`.column-${column}`);
+            columnCells.forEach(cell => {
+                // Add transition class for smooth hiding/showing
+                cell.classList.add('column-toggle-transition');
+                
+                if (isVisible) {
+                    cell.classList.remove('hidden');
+                    // Add highlight effect when showing a column
+                    setTimeout(() => {
+                        cell.classList.add('column-highlight');
+                        // Remove highlight class after animation completes
+                        setTimeout(() => {
+                            cell.classList.remove('column-highlight');
+                        }, 2000);
+                    }, 10);
+                } else {
+                    cell.classList.add('hidden');
+                }
+            });
+            
+            // Update the checkbox state in the UI
+            const checkbox = document.querySelector(`.column-toggle[data-column="${column}"]`);
+            if (checkbox) {
+                checkbox.checked = isVisible;
+            }
+            
+            // Update the Select All button text
+            updateSelectAllButtonText();
+            
+            // Show a toast notification
+            showToastNotification(column, isVisible);
+        }
+        
+        // Function to show a toast notification when column visibility changes
+        function showToastNotification(column, isVisible) {
+            // Format the column name for display (replace hyphens with spaces and capitalize)
+            const columnName = column.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.className = `fixed bottom-4 right-4 ${isVisible ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'} px-4 py-2 rounded-md shadow-md z-50 flex items-center`;
+            toast.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    ${isVisible ? 
+                        '<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />' :
+                        '<path fill-rule="evenodd" d="M13.477 14.89A6 6 0 015.11 6.524l8.367 8.368zm1.414-1.414L6.524 5.11a6 6 0 018.367 8.367zM18 10a8 8 0 11-16 0 8 8 0 0116 0z" clip-rule="evenodd" />'
+                    }
+                </svg>
+                <span>${columnName} column ${isVisible ? 'shown' : 'hidden'}</span>
+            `;
+            
+            // Add to document
+            document.body.appendChild(toast);
+            
+            // Animate in
+            setTimeout(() => {
+                toast.style.opacity = '1';
+                toast.style.transform = 'translateY(0)';
+            }, 10);
+            
+            // Remove after 2 seconds
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(10px)';
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 2000);
+        }
+        
+        // Function to update the Select All button text based on current state
+        function updateSelectAllButtonText() {
+            const selectAllBtn = document.getElementById('selectAllColumns');
+            if (selectAllBtn) {
+                const allChecked = Object.values(columnVisibilitySettings).every(value => value === true);
+                selectAllBtn.textContent = allChecked ? 'Deselect All' : 'Select All';
+            }
+        }
+
+        // Apply initial column visibility
+        Object.keys(columnVisibilitySettings).forEach(column => {
+            updateColumnVisibility(column, columnVisibilitySettings[column]);
+        });
+        
+        // Function to toggle column visibility panel with animation
+        function toggleColumnMenu() {
+            const menu = document.getElementById('columnToggleMenu');
+            if (menu) {
+                if (menu.classList.contains('hidden')) {
+                    menu.classList.remove('hidden');
+                    menu.style.opacity = '0';
+                    menu.style.transform = 'translateY(-10px)';
+                    setTimeout(() => {
+                        menu.style.opacity = '1';
+                        menu.style.transform = 'translateY(0)';
+                    }, 10);
+                } else {
+                    menu.style.opacity = '0';
+                    menu.style.transform = 'translateY(-10px)';
+                    setTimeout(() => {
+                        menu.classList.add('hidden');
+                    }, 200);
+                }
+                console.log('Menu visibility toggled via toggleColumnMenu');
+            }
+        }
+        
+        // Make toggleColumnMenu function globally available
+        window.toggleColumnMenu = toggleColumnMenu;
+        
+        // Close the menu when clicking outside
+        document.addEventListener('click', function(e) {
+            const menu = document.getElementById('columnToggleMenu');
+            const btn = document.getElementById('columnToggleBtn');
+            
+            if (menu && btn && !btn.contains(e.target) && !menu.contains(e.target)) {
+                menu.style.opacity = '0';
+                menu.style.transform = 'translateY(-10px)';
+                setTimeout(() => {
+                    menu.classList.add('hidden');
+                }, 200);
+                console.log('Menu hidden by outside click');
+            }
+        });
+        
+        // Prevent the dropdown from closing when clicking inside it
+        document.getElementById('columnToggleMenu')?.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+        
+        // Add event listener to the column toggle button
+        const columnToggleBtn = document.getElementById('columnToggleBtn');
+        if (columnToggleBtn) {
+            columnToggleBtn.addEventListener('click', function(e) {
+                console.log('Column toggle button clicked');
+                toggleColumnMenu();
+                e.stopPropagation();
+            });
+        } else {
+            console.error('Column toggle button not found');
+        }
+        
+        // Select All functionality
+        const selectAllColumnsBtn = document.getElementById('selectAllColumns');
+        if (selectAllColumnsBtn) {
+            selectAllColumnsBtn.addEventListener('click', function() {
+                const allChecked = Object.values(columnVisibilitySettings).every(value => value === true);
+                const newState = !allChecked;
+                
+                // Update all checkboxes
+                document.querySelectorAll('.column-toggle').forEach(checkbox => {
+                    checkbox.checked = newState;
+                    const column = checkbox.getAttribute('data-column');
+                    columnVisibilitySettings[column] = newState;
+                    updateColumnVisibility(column, newState);
+                });
+                
+                // Save to localStorage
+                localStorage.setItem('employeeSearchColumnVisibility', JSON.stringify(columnVisibilitySettings));
+            });
+        }
+
+        // Debug check for menu element
+        const columnToggleMenu = document.getElementById('columnToggleMenu');
+        if (!columnToggleMenu) {
+            console.error('Column toggle menu not found');
+        }
+        
+        // Initialize the Select All button text on page load
+        updateSelectAllButtonText();
+    });
+    
+    // Presets functionality
+    
+    // CSV Export functionality
+    document.getElementById('exportCsvBtn').addEventListener('click', function() {
+        // Get all current filter parameters
+        const searchQuery = document.getElementById('search')?.value || '';
+        const employeeType = document.getElementById('employee_type')?.value || '';
+        const designation = document.getElementById('designation')?.value || '';
+        const employeeGrade = document.getElementById('employee_grade')?.value || '';
+        const branch = document.getElementById('branch')?.value || '';
+        const cadre = document.getElementById('cadre')?.value || '';
+        const region = document.getElementById('region')?.value || '';
+        const pendingInquiry = document.getElementById('pending_inquiry')?.value || '';
+        
+        // Get visible columns
+        const visibleColumns = [];
+        document.querySelectorAll('.column-toggle').forEach(checkbox => {
+            if (checkbox.checked) {
+                visibleColumns.push(checkbox.getAttribute('data-column'));
+            }
+        });
+        
+        // Build the URL with query parameters
+        let exportUrl = '{% url "employee_search:export_csv" %}?';
+        
+        // Add filter parameters if they exist
+        if (searchQuery) exportUrl += `search=${encodeURIComponent(searchQuery)}&`;
+        if (employeeType) exportUrl += `employee_type=${encodeURIComponent(employeeType)}&`;
+        if (designation) exportUrl += `designation=${encodeURIComponent(designation)}&`;
+        if (employeeGrade) exportUrl += `employee_grade=${encodeURIComponent(employeeGrade)}&`;
+        if (branch) exportUrl += `branch=${encodeURIComponent(branch)}&`;
+        if (cadre) exportUrl += `cadre=${encodeURIComponent(cadre)}&`;
+        if (region) exportUrl += `region=${encodeURIComponent(region)}&`;
+        if (pendingInquiry) exportUrl += `pending_inquiry=${encodeURIComponent(pendingInquiry)}&`;
+        
+        // Add visible columns
+        if (visibleColumns.length > 0) {
+            exportUrl += `visible_columns=${encodeURIComponent(visibleColumns.join(','))}`;
+        }
+        
+        // Show loading toast
+        const toast = document.createElement('div');
+        toast.className = 'fixed bottom-4 right-4 bg-blue-100 text-blue-800 px-4 py-2 rounded-md shadow-md z-50 flex items-center';
+        toast.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M12 6v6l4 2"></path>
+            </svg>
+            <span>Preparing CSV export...</span>
+        `;
+        document.body.appendChild(toast);
+        
+        // Redirect to the export URL
+        setTimeout(() => {
+            window.location.href = exportUrl;
+            
+            // Remove toast after a delay
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 2000);
+        }, 500);
+    });
+
+</script>
+
+</div>
+
+<style>
+    /* Column toggle transitions */
+    .column-toggle-transition {
+        transition: opacity 0.3s ease-in-out;
+    }
+    .column-highlight {
+        animation: highlight-pulse 2s ease-in-out;
+    }
+    @keyframes highlight-pulse {
+        0% { background-color: rgba(59, 130, 246, 0); }
+        25% { background-color: rgba(59, 130, 246, 0.1); }
+        75% { background-color: rgba(59, 130, 246, 0.1); }
+        100% { background-color: rgba(59, 130, 246, 0); }
+    }
+    
+    /* Toast notification animation */
+    .fixed.bottom-4.right-4 {
+        opacity: 0;
+        transform: translateY(10px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+</style>
+
+{% endblock %}

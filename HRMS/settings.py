@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'group_head',
     'employee_user',
     'employee_attendance',
+    'employee_search',
 ]
 
 
