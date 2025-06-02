@@ -58,63 +58,68 @@ class FunctionalGroupResource(resources.ModelResource):
 
 
 class EmployeeResource(resources.ModelResource):
-    
-    # Define fields with ForeignKeyWidget for `to_field` foreign key relationships
     designation = fields.Field(
         column_name='designation',
         attribute='designation',
-        widget=ForeignKeyWidget(Designation, field='title')
+        widget=ForeignKeyWidget(Designation, 'title')
     )
-    
     cadre = fields.Field(
         column_name='cadre',
         attribute='cadre',
-        widget=ForeignKeyWidget(Cadre, field='name')
+        widget=ForeignKeyWidget(Cadre, 'name')
     )
     employee_type = fields.Field(
         column_name='employee_type',
         attribute='employee_type',
-        widget=ForeignKeyWidget(EmployeeType, field='name')
+        widget=ForeignKeyWidget(EmployeeType, 'name')
     )
     employee_grade = fields.Field(
         column_name='employee_grade',
         attribute='employee_grade',
-        widget=ForeignKeyWidget(EmployeeGrade, field='grade_name')
+        widget=ForeignKeyWidget(EmployeeGrade, 'grade_name')
     )
     branch = fields.Field(
         column_name='branch',
         attribute='branch',
-        widget=ForeignKeyWidget(Branch, field='branch_name')
+        widget=ForeignKeyWidget(Branch, 'branch_name')
     )
     region = fields.Field(
         column_name='region',
         attribute='region',
-        widget=ForeignKeyWidget(Region, field='name')
+        widget=ForeignKeyWidget(Region, 'name')
     )
     qualifications = fields.Field(
         column_name='qualifications',
         attribute='qualifications',
         widget=ManyToManyWidget(Qualification, separator=',', field='name')
     )
+    date_of_joining = fields.Field(
+        column_name='date_of_joining',
+        attribute='date_of_joining',
+        widget=DateWidget(format='%Y-%m-%d')
+    )
+    birth_date = fields.Field(
+        column_name='birth_date',
+        attribute='birth_date',
+        widget=DateWidget(format='%Y-%m-%d')
+    )
+    # Add other date fields similarly...
 
     class Meta:
         model = Employee
+        import_id_fields = ('SAP_ID',)
         fields = (
             'id', 'SAP_ID', 'email', 'password', 'name', 'designation', 'cadre', 'employee_type',
             'employee_grade', 'branch', 'region', 'qualifications', 'date_of_joining',
-            'mobile_number', 'date_of_last_promotion', 'remarks', 'grade_assignment', 'date_of_joining', 
-            'date_of_retirement', 'birth_date', 'date_of_contract_expiry', 'date_current_posting', 
+            'mobile_number', 'date_of_last_promotion', 'remarks', 'grade_assignment',
+            'date_of_retirement', 'birth_date', 'date_of_contract_expiry', 'date_current_posting',
             'date_current_assignment'
-            
         )
         export_order = (
             'SAP_ID', 'email', 'name', 'designation', 'cadre', 'employee_type',
             'employee_grade', 'branch', 'region', 'qualifications',
             'mobile_number', 'date_of_last_promotion', 'remarks', 'grade_assignment',
-            'is_active', 'is_admin', 'is_admin_employee', 'is_letter_template_admin', 
-            'created_at', 'updated_at', 'date_of_joining', 'cnic_no', 'husband_or_father_name',
-            'date_of_contract_expiry', 'date_current_posting',
-            'date_current_assignment', 'date_of_retirement', 'birth_date', 'admin_signature',
-            'employee_user'
-            
+            'date_of_joining', 'date_of_contract_expiry', 'date_current_posting',
+            'date_current_assignment', 'date_of_retirement', 'birth_date'
         )
+
