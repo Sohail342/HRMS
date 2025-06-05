@@ -106,6 +106,7 @@ class EmployeeAdmin(ModelAdmin, ImportExportModelAdmin):
             return [field.name for field in self.model._meta.fields if field.name not in (
                                                                                         
             'email', 
+            'password',
             'name', 
             'is_active', 
             'in_active_reason',
@@ -138,7 +139,8 @@ class EmployeeAdmin(ModelAdmin, ImportExportModelAdmin):
     def get_fields(self, request, obj=None):
         if request.user.is_admin and not request.user.is_superuser:
             return (
-                'email', 
+                'email',
+                'password', 
                 'name', 
                 'is_active', 
                 'in_active_reason',
