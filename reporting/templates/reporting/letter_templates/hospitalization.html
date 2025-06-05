@@ -68,28 +68,28 @@
         <div id="family_details" class="mt-4 hidden">
             <label class="block text-sm font-medium text-gray-700">Family Member Details:</label>
             
-            <input type="text" id="family_member_name" placeholder="Enter Name" class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
-            
-            <input type="text" id="family_member_cnic" placeholder="Enter CNIC" maxlength="13" class="mt-3 p-3 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
-
             <select id="family_member_relation" class="mt-3 p-3 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
                 <option value="">Select Relationship</option>
                 {% if employee_type == "Regular" %}
-                    <option value="Father">Father</option>
-                    <option value="Mother">Mother</option>
-                    <option value="Son">Son</option>
-                    <option value="Daughter">Daughter</option>
-                    <option value="Wife">Wife</option>
-                    <option value="Husband">Husband</option> 
+                    <option value="Father of">Father of</option>
+                    <option value="Mother of">Mother of</option>
+                    <option value="Son of">Son of</option>
+                    <option value="Daughter of">Daughter of</option>
+                    <option value="Wife of">Wife of</option>
+                    <option value="Husband of">Husband of</option> 
                 {% elif  employee_type == "Contractual" %}
-                    <option value="Son">Son</option>
-                    <option value="Daughter">Daughter</option>
-                    <option value="Wife">Wife</option>
-                    <option value="Husband">Husband</option> 
+                    <option value="Son of">Son of</option>
+                    <option value="Daughter of">Daughter of</option>
+                    <option value="Wife of">Wife of</option>
+                    <option value="Husband of">Husband of</option> 
                 {% else %}
                     <option value="">Not Allowed</option>
                 {% endif %} 
             </select>
+
+            <input type="text" id="family_member_name" placeholder="Enter Only Name" class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+            
+            <input type="text" id="family_member_cnic" placeholder="Enter CNIC" maxlength="13" class="mt-3 p-3 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
 
             
               <!-- Purpose and Hospital Fields for Family -->
@@ -112,7 +112,7 @@
                 <label for="family_absence_employee" class="block text-sm font-medium text-gray-700">Employee SAP ID:</label>
                 <div class="flex space-x-2">
                     <input type="number" id="family_absence_employee" class="mt-1 p-3 flex-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required placeholder="e.g. 83787">
-                    <button class="fetch-employee-btn px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button class="fetch-employee-btn px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">
                         Fetch
                     </button>
                 </div>
@@ -626,30 +626,36 @@ document.getElementById('approval_type_option').addEventListener('change', funct
     const employeeGrade = document.getElementById('employee_grade').textContent;
     const employeeSapID = document.getElementById('employee_sapID').textContent;
 
-    if (this.value === "Post Facto Approval") {
-        hospitalAdviceDateField.classList.add('hidden');
-        doctorsAdviceText.style.display = 'none';
-        medicalBillText.style.display = 'none';
-    } else if (this.value === "Approval/Permission") {
+    // Show Hospital Advice Date field for both approval types
+    if (this.value === "Post Facto Approval" || this.value === "Approval/Permission") {
         hospitalAdviceDateField.classList.remove('hidden');
         doctorsAdviceText.innerHTML = 'Enclosed please find a self-explanatory Doctor\'s advice dated <span id="hospital_advice_date_text">_____________</span> on the captioned subject.';
-        doctorsAdviceText.style.display = 'block';
-        medicalBillText.style.display = 'none';
-        if (this.value === "Post Facto Approval" && categoryType === "Family/Dependents") {
-            familyApprovalText.style.display = 'block';
-        } else {
-            familyApprovalText.style.display = 'none';
-        }
-    } else if (this.value === "Post Facto Approval" && categoryType === "Self") {
+    } else {
         hospitalAdviceDateField.classList.add('hidden');
+    }
+    
+    // Handle specific display logic based on approval type and category
+    if (this.value === "Post Facto Approval" && categoryType === "Self") {
         doctorsAdviceText.style.display = 'none';
         medicalBillText.style.display = 'block';
         familyApprovalText.style.display = 'none';
         employeeNameText.textContent = employeeName;
         employeeGradeText.textContent = employeeGrade;
         employeeSapIDText.textContent = employeeSapID;
+    } else if (this.value === "Post Facto Approval" && categoryType === "Family/Dependents") {
+        doctorsAdviceText.style.display = 'block';
+        medicalBillText.style.display = 'none';
+        familyApprovalText.style.display = 'block';
+    } else if (this.value === "Approval/Permission") {
+        doctorsAdviceText.style.display = 'block';
+        medicalBillText.style.display = 'none';
+        
+        if (categoryType === "Family/Dependents") {
+            familyApprovalText.style.display = 'block';
+        } else {
+            familyApprovalText.style.display = 'none';
+        }
     } else {
-        hospitalAdviceDateField.classList.add('hidden');
         doctorsAdviceText.style.display = 'block';
         medicalBillText.style.display = 'none';
         familyApprovalText.style.display = 'none';
