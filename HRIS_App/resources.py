@@ -140,8 +140,9 @@ class EmployeeResource(resources.ModelResource):
             try:
                 existing_employee = Employee.objects.get(cnic_no=cnic_no)
                 # If found, use the existing instance instead of creating a new one
-                instance = existing_employee
-                row_result = self.import_obj(instance, row, dry_run=kwargs.get('dry_run', False))
+                row_result = super().import_row(row, instance_loader, **kwargs)
+                # Update the instance with the existing employee
+                row_result.instance = existing_employee
                 return row_result
             except Employee.DoesNotExist:
                 # If no existing employee found, proceed with normal import
