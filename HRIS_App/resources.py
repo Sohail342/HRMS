@@ -130,12 +130,25 @@ class EmployeeResource(resources.ModelResource):
         attribute='date_of_last_promotion'
     )
     
-    # Add a custom import_row method to handle existing CNIC numbers
+    # Add a custom import_row method to handle existing CNIC numbers and SAP_ID updates
     def import_row(self, row, instance_loader, **kwargs):
-        # Get the CNIC number from the row
-        cnic_no = row.get('cnic_no')
+        # First check if we have a SAP_ID in the row
+        sap_id = row.get('SAP_ID')
+        if sap_id:
+            try:
+                # Try to find an employee with this SAP_ID
+                existing_employee = Employee.objects.get(SAP_ID=sap_id)
+                # If found, use the existing instance for update
+                row_result = super().import_row(row, instance_loader, **kwargs)
+                # Update the instance with the existing employee
+                row_result.instance = existing_employee
+                return row_result
+            except Employee.DoesNotExist:
+                # If no employee with this SAP_ID exists, continue with CNIC check
+                pass
         
-        # Check if an employee with this CNIC already exists
+        # If no SAP_ID match, check for CNIC match
+        cnic_no = row.get('cnic_no')
         if cnic_no:
             try:
                 existing_employee = Employee.objects.get(cnic_no=cnic_no)
