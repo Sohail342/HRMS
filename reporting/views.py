@@ -65,6 +65,7 @@ def get_employee(request):
 
     data = {
         'employee_name': employee.name,
+        'employee_cnic':employee.cnic_no,
         'designation': employee.designation_id,
         'sap_id': str(employee.SAP_ID) if employee.SAP_ID else "", 
         'employee_grade': str(employee.employee_grade),

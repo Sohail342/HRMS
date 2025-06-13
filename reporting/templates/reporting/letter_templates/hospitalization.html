@@ -10,41 +10,22 @@
             <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Application Form</h2>
 
             <!-- Form Grid Layout -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Approval Type -->
-                <div>
-                    <label for="approval_type_option" class="block text-sm font-medium text-gray-700">Approval Type:</label>
-                    <select id="approval_type_option" name="approval_type_option" class="mt-1 p-1.5 w-11/12 border border-blue-500 rounded-md focus:outline-none focus:border-blue-700 transition-colors duration-300 shadow-sm text-sm">
-                        <option value="">Select Approval Type</option>
-                        <option value="Approval/Permission">Approval/Permission</option>
-                        <option value="Post Facto Approval">Post Facto Approval</option>
-                    </select>
-                </div>
-
-                <!-- Sub Category -->
-                <div>
-                    <label for="category_type_option" class="block text-sm font-medium text-gray-700">Sub Category</label>
-                    <select id="category_type_option" name="category_type_option" class="mt-1 p-1.5 w-11/12 border border-blue-500 rounded-md focus:outline-none focus:border-blue-700 transition-colors duration-300 shadow-sm text-sm">
-                        <option value="">Select Category</option>
-                        <option value="Self">Self</option>
-                        <option value="Family/Dependents">Family/Dependents</option>
-                    </select>
-                </div>
-
+            <div class="grid grid-cols-1 md:grid-cols-1 gap-4">
+               
                 <!-- Hidden Hospital Advice Date Field -->
                 <div id="hospital_advice_date" class="hidden">
                     <label for="hospital_advice_date_input" class="block text-sm font-medium text-gray-700">Hospital Advice Date:</label>
-                    <input type="date" id="hospital_advice_date_input" class="mt-1 p-1.5 w-11/12 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+                    <input type="date" id="hospital_advice_date_input" class="mt-1 p-1.5 w-10/12 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
                 </div>
             </div>
 
             <!-- Self Section (Hidden by Default) -->
             <div id="self_details" class="mt-4 hidden">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div class="grid grid-cols-1 gap-2">
                     <div>
                         <label for="self_absence_employee" class="block text-sm font-medium text-gray-700">Employee SAP ID:</label>
-                        <div class="flex space-x-2">
-                            <input type="number" id="self_absence_employee" class="mt-1 p-1.5 flex-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm sap-id-input" required placeholder="e.g. 83787">
+                        <div class="flex space-x-2 w-10/12">
+                            <input type="number" id="self_absence_employee" class="p-1.5 flex-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm sap-id-input" required placeholder="e.g. 83787">
                             <button class="fetch-employee-btn px-2 py-1 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
                                 Fetch
                             </button>
@@ -53,12 +34,12 @@
 
                     <div>
                         <label for="self_purpose" class="block text-sm font-medium text-gray-700">Purpose:</label>
-                        <input type="text" id="self_purpose" class="mt-1 p-1.5 w-11/12 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" placeholder="e.g. for hospitalization">
+                        <input type="text" id="self_purpose" class="p-1.5 w-10/12 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" placeholder="e.g. for hospitalization">
                     </div>
 
                     <div>
                         <label for="self_hospital" class="block text-sm font-medium text-gray-700">Hospital Name:</label>
-                        <select id="self_hospital" class="mt-1 p-1.5 w-11/12 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+                        <select id="self_hospital" class="p-1.5 w-10/12 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
                             <option value="">Select Hospital</option>
                             {% for hospital in hospital_name %}
                                 <option value="{{ hospital.hospital_name }}">{{ hospital.hospital_name }}</option>
@@ -72,50 +53,52 @@
             <div id="family_details" class="mt-4 hidden">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Family Member Details:</label>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div class="flex flex-col space-y-1 md:col-span-2">
-                        <div class="flex space-x-2">
-                            <div class="w-1/2">
-                                <label for="family_member_relation" class="block text-sm font-medium text-gray-700">Relationship:</label>
-                                <select id="family_member_relation" class="p-1.5 w-full border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
-                                    <option value="">Select Relationship</option>
-                                    {% if employee_type == "Regular" %}
-                                        <option value="Father of">Father of</option>
-                                        <option value="Mother of">Mother of</option>
-                                        <option value="Son of">Son of</option>
-                                        <option value="Daughter of">Daughter of</option>
-                                        <option value="Wife of">Wife of</option>
-                                        <option value="Husband of">Husband of</option> 
-                                    {% elif  employee_type == "Contractual" %}
-                                        <option value="Son of">Son of</option>
-                                        <option value="Daughter of">Daughter of</option>
-                                        <option value="Wife of">Wife of</option>
-                                        <option value="Husband of">Husband of</option> 
-                                    {% else %}
-                                        <option value="">Not Allowed</option>
-                                    {% endif %} 
-                                </select>
-                            </div>
-                            <div class="w-1/2">
-                                <label for="family_member_name" class="block text-sm font-medium text-gray-700">Family Member Name:</label>
-                                <input type="text" id="family_member_name" placeholder="Enter Only Name" class="p-1.5 w-full border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
-                            </div>
-                        </div>
+                <div class="grid grid-cols-1 gap-2">
+                    <!-- Relationship Field -->
+                    <div>
+                        <label for="family_member_relation" class="block text-sm font-medium text-gray-700">Relationship:</label>
+                        <select id="family_member_relation" class="p-1.5 w-10/12 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+                            <option value="">Select Relationship</option>
+                            {% if employee_type == "Regular" %}
+                                <option value="Father of">Father of</option>
+                                <option value="Mother of">Mother of</option>
+                                <option value="Son of">Son of</option>
+                                <option value="Daughter of">Daughter of</option>
+                                <option value="Wife of">Wife of</option>
+                                <option value="Husband of">Husband of</option> 
+                            {% elif  employee_type == "Contractual" %}
+                                <option value="Son of">Son of</option>
+                                <option value="Daughter of">Daughter of</option>
+                                <option value="Wife of">Wife of</option>
+                                <option value="Husband of">Husband of</option> 
+                            {% else %}
+                                <option value="">Not Allowed</option>
+                            {% endif %} 
+                        </select>
                     </div>
 
+                    <!-- Family Member Name Field -->
+                    <div>
+                        <label for="family_member_name" class="block text-sm font-medium text-gray-700">Family Member Name:</label>
+                        <input type="text" id="family_member_name" placeholder="Enter Only Name" class="p-1.5 w-10/12 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+                    </div>
+
+                    <!-- CNIC Field -->
                     <div>
                         <label for="family_member_cnic" class="block text-sm font-medium text-gray-700">CNIC:</label>
-                        <input type="text" id="family_member_cnic" placeholder="Enter CNIC" maxlength="13" class="p-1.5 w-full border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+                        <input type="text" id="family_member_cnic" placeholder="Enter CNIC" maxlength="13" class="p-1.5 w-10/12 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
                     </div>
 
+                    <!-- Purpose Field -->
                     <div>
                         <label for="family_purpose" class="block text-sm font-medium text-gray-700">Purpose:</label>
-                        <input type="text" id="family_purpose" class="mt-1 p-1.5 w-11/12 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" placeholder="e.g. for hospitalization">
+                        <input type="text" id="family_purpose" class="p-1.5 w-10/12 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" placeholder="e.g. for hospitalization">
                     </div>
 
+                    <!-- Hospital Name Field -->
                     <div>
                         <label for="family_hospital" class="block text-sm font-medium text-gray-700">Hospital Name:</label>
-                        <select id="family_hospital" class="mt-1 p-1.5 w-11/12 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+                        <select id="family_hospital" class="p-1.5 w-10/12 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
                             <option value="">Select Hospital</option>
                             {% for hospital in hospital_name %}
                                 <option value="{{ hospital.hospital_name }}">{{ hospital.hospital_name }}</option>
@@ -123,10 +106,11 @@
                         </select>
                     </div>
 
+                    <!-- Employee SAP ID Field -->
                     <div>
                         <label for="family_absence_employee" class="block text-sm font-medium text-gray-700">Employee SAP ID:</label>
-                        <div class="flex space-x-2">
-                            <input type="number" id="family_absence_employee" class="mt-1 p-1.5 flex-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm sap-id-input" required placeholder="e.g. 83787">
+                        <div class="flex space-x-2 w-10/12">
+                            <input type="number" id="family_absence_employee" class="p-1.5 flex-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm sap-id-input" required placeholder="e.g. 83787">
                             <button class="fetch-employee-btn px-2 py-1 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 text-sm">
                                 Fetch
                             </button>
@@ -135,10 +119,39 @@
                 </div>
             </div>
 
+            <!-- Form Grid Layout -->
+            <div class="grid grid-cols-1 gap-2 mt-4">
+                <!-- Approval Type -->
+                <div>
+                    <label for="approval_type_option" class="block text-sm font-medium text-gray-700">Approval Type:</label>
+                    <select id="approval_type_option" name="approval_type_option" class="p-1.5 w-10/12 border border-blue-500 rounded-md focus:outline-none focus:border-blue-700 transition-colors duration-300 shadow-sm text-sm">
+                        <option value="">Select Approval Type</option>
+                        <option value="Approval/Permission">Approval/Permission</option>
+                        <option value="Post Facto Approval">Post Facto Approval</option>
+                    </select>
+                </div>
+
+                <!-- Sub Category -->
+                <div>
+                    <label for="category_type_option" class="block text-sm font-medium text-gray-700">Sub Category</label>
+                    <select id="category_type_option" name="category_type_option" class="p-1.5 w-10/12 border border-blue-500 rounded-md focus:outline-none focus:border-blue-700 transition-colors duration-300 shadow-sm text-sm">
+                        <option value="">Select Category</option>
+                        <option value="Self">Self</option>
+                        <option value="Family/Dependents">Family/Dependents</option>
+                    </select>
+                </div>
+
+                <!-- Hidden Hospital Advice Date Field -->
+                <div id="hospital_advice_date" class="hidden">
+                    <label for="hospital_advice_date_input" class="block text-sm font-medium text-gray-700">Hospital Advice Date:</label>
+                    <input type="date" id="hospital_advice_date_input" class="p-1.5 w-10/12 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+                </div>
+            </div>
+
             <!-- Admin Signature Selection -->
-            <div class="mt-6">
+            <div class="mt-4">
                 <label for="form_type" class="block text-sm font-medium text-gray-700">Admin Signature:</label>
-                <select id="form_type" name="form_type" class="mt-1 p-1.5 w-11/12 border border-blue-500 rounded-md focus:outline-none focus:border-blue-700 transition-colors duration-300 shadow-sm text-sm">
+                <select id="form_type" name="form_type" class="p-1.5 w-10/12 border border-blue-500 rounded-md focus:outline-none focus:border-blue-700 transition-colors duration-300 shadow-sm text-sm">
                     <option value="">Select Admin Signature</option>
                     {% for employee in admin_signuture %}
                         <option value="{{ employee.SAP_ID }}">{{ employee.employee_name }} ({{ employee.SAP_ID }})</option>
@@ -206,7 +219,7 @@
                 </p>
                 <p class="mb-4" style="text-align: justify; text-transform: uppercase;">
                     <b><span id="approval_type_text">______________</span> FOR <span id="purpose_text">_____________</span> AT <span id="hospital_text">_____________</span> <span class="upper font-bold" id="family_member"></span>
-                        <span id="employee_name">_____________</span>, <span id="employee_grade">_____________</span>, SAP ID: <span id="employee_sapID">_____________</span>, OPERATIONS GROUP, NBP, HEAD-OFFICE, KARACHI.</b>
+                        <span id="employee_name">_____________</span> (CNIC: <span id="employee_cnic">_____________</span>) <span id="employee_grade">_____________</span>, SAP ID: <span id="employee_sapID">_____________</span>, OPERATIONS GROUP, NBP, HEAD-OFFICE, KARACHI.</b>
                 </p>
                
                 <p class="mb-4" style="text-align: justify;" id="doctors_advice_text">
@@ -216,7 +229,7 @@
                     We enclose herewith Medical bill of Mr./Mrs. <span id="employee_name_text"></span>, <span id="employee_grade_text"></span>, SAP ID: <span id="employee_sapID_text"></span>, along with its enclosure for issuance of Post Facto Approval for reimbursement of his medical bill to the above captioned executive as per bank policy.
                 </p>
                 <p class="mb-4" style="text-align: justify;" id="family_approval_text">
-                    Kindly accord necessary approval for <span id="family_member_name_text">_____________</span> (CNIC No. <span id="family_member_cnic_text">_____________</span>, <span id="family_member_relation_text">_____________</span> of <span id="employee_name_relation">_____________</span>, <span id="employee_grade_relation">_____________</span>, SAP ID: <span id="employee_sapid_relation">_____________</span>) as advised by Concerned Doctor. (Reference Letter Attached).
+                    Kindly accord necessary approval for <span id="family_member_name_text">_____________</span> (CNIC No. <span id="family_member_cnic_text">_____________</span>, <span id="family_member_relation_text">_____________</span> <span id="employee_name_relation">_____________</span>, <span id="employee_grade_relation">_____________</span>, SAP ID: <span id="employee_sapid_relation">_____________</span>) as advised by Concerned Doctor. (Reference Letter Attached).
                 </p>
                 <p class="mb-4" style="text-align: justify;">
                     Kindly arrange to issue necessary permission as per Bank rules.
@@ -540,6 +553,7 @@ document.getElementById('category_type_option').addEventListener('change', funct
                         document.getElementById('employee_name').textContent = data.employee_salutation + " " + data.employee_name;
                         document.getElementById('employee_sapID').textContent = sapId;
                         document.getElementById('employee_grade').textContent = data.employee_grade;
+                        document.getElementById('employee_cnic').textContent = data.employee_cnic;
 
                         // Update employee details in family approval text
                         document.getElementById('employee_name_relation').textContent = data.employee_salutation + " " + data.employee_name;
@@ -568,6 +582,7 @@ document.getElementById('category_type_option').addEventListener('change', funct
         document.getElementById('employee_name').textContent = "_____________";
         document.getElementById('employee_sapID').textContent = "_____________";
         document.getElementById('employee_grade').textContent = "_____________";
+        document.getElementById('employee_cnic').textContent = "_____________";
 
         // Reset employee details in family approval text
         document.getElementById('employee_name_relation').textContent = "_____________";
@@ -591,7 +606,7 @@ document.getElementById('category_type_option').addEventListener('change', funct
 
     // Show Success Toast
     function showSuccessToast(message) {
-        const toast = document.getElementById('successToast');  // Fixed typo
+        const toast = document.getElementById('successToast');
         toast.textContent = message;
         toast.classList.remove('hidden', 'opacity-0');
         toast.classList.add('opacity-100');
