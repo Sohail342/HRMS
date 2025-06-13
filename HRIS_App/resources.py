@@ -1,6 +1,8 @@
 from import_export import resources, fields
 from import_export.widgets import DateWidget
 from import_export.widgets import ForeignKeyWidget, ManyToManyWidget
+from import_export import resources
+from import_export.results import RowResult
 from .models import (
 Employee, 
 Designation, 
@@ -127,6 +129,26 @@ class EmployeeResource(resources.ModelResource):
         column_name='date_of_last_promotion',
         attribute='date_of_last_promotion'
     )
+    
+    # Add a custom import_row method to handle existing CNIC numbers
+    def import_row(self, row, instance_loader, **kwargs):
+        # Get the CNIC number from the row
+        cnic_no = row.get('cnic_no')
+        
+        # Check if an employee with this CNIC already exists
+        if cnic_no:
+            try:
+                existing_employee = Employee.objects.get(cnic_no=cnic_no)
+                # If found, use the existing instance instead of creating a new one
+                instance = existing_employee
+                row_result = self.import_obj(instance, row, dry_run=kwargs.get('dry_run', False))
+                return row_result
+            except Employee.DoesNotExist:
+                # If no existing employee found, proceed with normal import
+                pass
+        
+        # Default import behavior
+        return super().import_row(row, instance_loader, **kwargs)
 
     class Meta:
         model = Employee
