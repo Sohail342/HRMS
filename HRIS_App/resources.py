@@ -95,15 +95,38 @@ class EmployeeResource(resources.ModelResource):
     )
     date_of_joining = fields.Field(
         column_name='date_of_joining',
-        attribute='date_of_joining',
-        widget=DateWidget(format='%Y-%m-%d')
+        attribute='date_of_joining'
     )
+    
     birth_date = fields.Field(
         column_name='birth_date',
-        attribute='birth_date',
-        widget=DateWidget(format='%Y-%m-%d')
+        attribute='birth_date'
     )
-    # Add other date fields similarly...
+    # Check for other date fields and modify them similarly
+    date_of_retirement = fields.Field(
+        column_name='date_of_retirement',
+        attribute='date_of_retirement'
+    )
+    
+    date_of_contract_expiry = fields.Field(
+        column_name='date_of_contract_expiry',
+        attribute='date_of_contract_expiry'
+    )
+    
+    date_current_posting = fields.Field(
+        column_name='date_current_posting',
+        attribute='date_current_posting'
+    )
+    
+    date_current_assignment = fields.Field(
+        column_name='date_current_assignment',
+        attribute='date_current_assignment'
+    )
+    
+    date_of_last_promotion = fields.Field(
+        column_name='date_of_last_promotion',
+        attribute='date_of_last_promotion'
+    )
 
     class Meta:
         model = Employee
@@ -113,13 +136,13 @@ class EmployeeResource(resources.ModelResource):
             'employee_grade', 'branch', 'region', 'qualifications', 'date_of_joining',
             'mobile_number', 'date_of_last_promotion', 'remarks', 'grade_assignment',
             'date_of_retirement', 'birth_date', 'date_of_contract_expiry', 'date_current_posting',
-            'date_current_assignment'
+            'date_current_assignment', 'cnic_no'
         )
         export_order = (
             'SAP_ID', 'email', 'name', 'designation', 'cadre', 'employee_type',
             'employee_grade', 'branch', 'region', 'qualifications',
             'mobile_number', 'date_of_last_promotion', 'remarks', 'grade_assignment',
             'date_of_joining', 'date_of_contract_expiry', 'date_current_posting',
-            'date_current_assignment', 'date_of_retirement', 'birth_date'
+            'date_current_assignment', 'date_of_retirement', 'birth_date', 'cnic_no',
         )
 

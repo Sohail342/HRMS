@@ -3,225 +3,260 @@
 
 {% block content %}
 <body class="p-8 bg-gray-100">
-     <!-- Leave Application Form -->
-     <div class="max-w-screen-md mx-auto p-6 bg-white shadow-lg rounded-lg my-10">
-        <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Application Form</h2>
+    <!-- Main Container with Two-Column Layout -->
+    <div class="flex flex-col lg:flex-row gap-6 max-w-screen-xl mx-auto">
+        <!-- Left Column - Application Form -->
+        <div class="w-full lg:w-5/12 p-6 bg-white shadow-lg rounded-lg my-4">
+            <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Application Form</h2>
 
-        <!-- Approval Type -->
-        <div>
-            <label for="approval_type_option" class="block text-sm font-medium text-gray-700">Approval Type:</label>
-            <select id="approval_type_option" name="approval_type_option" class="mt-1 p-3 w-full border border-blue-500 rounded-lg focus:outline-none focus:border-blue-700 transition-colors duration-300 shadow-md">
-                <option value="">Select Approval Type</option>
-                <option value="Approval/Permission">Approval/Permission</option>
-                <option value="Post Facto Approval">Post Facto Approval</option>
-            </select>
-        </div>
-
-        <!-- Hidden Hospital Advice Date Field -->
-        <div id="hospital_advice_date" class="mt-4 hidden">
-            <label for="hospital_advice_date_input" class="block text-sm font-medium text-gray-700">Hospital Advice Date:</label>
-            <input type="date" id="hospital_advice_date_input" class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
-        </div>
-
-    
-        <!-- Sub Category -->
-        <div class="mt-4">
-            <label for="category_type_option" class="block text-sm font-medium text-gray-700">Sub Category</label>
-            <select id="category_type_option" name="category_type_option" class="mt-1 p-3 w-full border border-blue-500 rounded-lg focus:outline-none focus:border-blue-700 transition-colors duration-300 shadow-md">
-                <option value="">Select Category</option>
-                <option value="Self">Self</option>
-                <option value="Family/Dependents">Family/Dependents</option>
-            </select>
-        </div>
-
-        <!-- Self Section (Hidden by Default) -->
-        <div id="self_details" class="mt-4 hidden">
-            <div class="mt-4">
-                <label for="self_absence_employee" class="block text-sm font-medium text-gray-700">Employee SAP ID:</label>
-                <div class="flex space-x-2">
-                    <input type="number" id="self_absence_employee" class="mt-1 p-3 flex-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required placeholder="e.g. 83787">
-                    <button class="fetch-employee-btn px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        Fetch
-                    </button>
-                </div>
-            </div>
-
-             <!-- Purpose and Hospital Fields for Self -->
-             <div class="mt-4">
-                <label for="self_purpose" class="block text-sm font-medium text-gray-700">Purpose:</label>
-                <input type="text" id="self_purpose" class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" placeholder="e.g. for hospitalization">
-            </div>
-            <div class="mt-4">
-                <label for="self_hospital" class="block text-sm font-medium text-gray-700">Hospital Name:</label>
-                <select id="self_hospital" class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
-                    <option value="">Select Hospital</option>
-                    {% for hospital in hospital_name %}
-                        <option value="{{ hospital.hospital_name }}">{{ hospital.hospital_name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-        </div>
-
-
-
-        <!-- Family Details Section (Hidden by Default) -->
-        <div id="family_details" class="mt-4 hidden">
-            <label class="block text-sm font-medium text-gray-700">Family Member Details:</label>
-            
-            <select id="family_member_relation" class="mt-3 p-3 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
-                <option value="">Select Relationship</option>
-                {% if employee_type == "Regular" %}
-                    <option value="Father of">Father of</option>
-                    <option value="Mother of">Mother of</option>
-                    <option value="Son of">Son of</option>
-                    <option value="Daughter of">Daughter of</option>
-                    <option value="Wife of">Wife of</option>
-                    <option value="Husband of">Husband of</option> 
-                {% elif  employee_type == "Contractual" %}
-                    <option value="Son of">Son of</option>
-                    <option value="Daughter of">Daughter of</option>
-                    <option value="Wife of">Wife of</option>
-                    <option value="Husband of">Husband of</option> 
-                {% else %}
-                    <option value="">Not Allowed</option>
-                {% endif %} 
-            </select>
-
-            <input type="text" id="family_member_name" placeholder="Enter Only Name" class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
-            
-            <input type="text" id="family_member_cnic" placeholder="Enter CNIC" maxlength="13" class="mt-3 p-3 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
-
-            
-              <!-- Purpose and Hospital Fields for Family -->
-            <div class="mt-4">
-                <label for="family_purpose" class="block text-sm font-medium text-gray-700">Purpose:</label>
-                <input type="text" id="family_purpose" class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" placeholder="e.g. for hospitalization">
-            </div>
-            <div class="mt-4">
-                <label for="family_hospital" class="block text-sm font-medium text-gray-700">Hospital Name:</label>
-                <select id="family_hospital" class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
-                    <option value="">Select Hospital</option>
-                    {% for hospital in hospital_name %}
-                        <option value="{{ hospital.hospital_name }}">{{ hospital.hospital_name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <!-- Employee Backup SAP ID -->
-            <div class="mt-4">
-                <label for="family_absence_employee" class="block text-sm font-medium text-gray-700">Employee SAP ID:</label>
-                <div class="flex space-x-2">
-                    <input type="number" id="family_absence_employee" class="mt-1 p-3 flex-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required placeholder="e.g. 83787">
-                    <button class="fetch-employee-btn px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">
-                        Fetch
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Toast Messages -->
-        <div id="errorToast" class="fixed bottom-5 right-5 hidden bg-red-500 text-white text-base px-6 py-3 rounded-xl shadow-lg transition-opacity duration-300">
-            Employee with this SAP ID not found!
-        </div>
-
-        <div id="successToast" class="fixed bottom-5 right-5 hidden bg-green-500 text-white text-base px-6 py-3 rounded-xl shadow-lg transition-opacity duration-300">
-            Employee found!
-        </div>
-    
-    </div>
-    
-
-    <div id="download_letter" class="max-w-screen-md mx-auto bg-white p-10" style="position: relative; min-height: 1123px; display: flex; flex-direction: column; page-break-inside: avoid;">
-        <!-- Header Section -->
-        <div class="mb-4">
-            <div class="flex justify-between items-center">
+            <!-- Form Grid Layout -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Approval Type -->
                 <div>
-                    <img src="{% static 'reporting/images/NBP.png' %}" alt="NBP Logo" class="h-21">
+                    <label for="approval_type_option" class="block text-sm font-medium text-gray-700">Approval Type:</label>
+                    <select id="approval_type_option" name="approval_type_option" class="mt-1 p-1.5 w-11/12 border border-blue-500 rounded-md focus:outline-none focus:border-blue-700 transition-colors duration-300 shadow-sm text-sm">
+                        <option value="">Select Approval Type</option>
+                        <option value="Approval/Permission">Approval/Permission</option>
+                        <option value="Post Facto Approval">Post Facto Approval</option>
+                    </select>
                 </div>
-                <div class="text-right mt-9">
-                    <p class="font-semibold pr-6">Operations Group</p>
+
+                <!-- Sub Category -->
+                <div>
+                    <label for="category_type_option" class="block text-sm font-medium text-gray-700">Sub Category</label>
+                    <select id="category_type_option" name="category_type_option" class="mt-1 p-1.5 w-11/12 border border-blue-500 rounded-md focus:outline-none focus:border-blue-700 transition-colors duration-300 shadow-sm text-sm">
+                        <option value="">Select Category</option>
+                        <option value="Self">Self</option>
+                        <option value="Family/Dependents">Family/Dependents</option>
+                    </select>
+                </div>
+
+                <!-- Hidden Hospital Advice Date Field -->
+                <div id="hospital_advice_date" class="hidden">
+                    <label for="hospital_advice_date_input" class="block text-sm font-medium text-gray-700">Hospital Advice Date:</label>
+                    <input type="date" id="hospital_advice_date_input" class="mt-1 p-1.5 w-11/12 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
                 </div>
             </div>
-            <!-- Full-width border under the header section -->
-            <hr class="border-t border-gray-400">
-            <div class="text-sm mt-0 flex justify-between items-center">
-                <p class="font-semibold">National Bank of Pakistan</p>
-                <p class="font-semibold pr-3">Administration Division</p>
-            </div>
-            <div class="text-sm mt-4 mb-8">
-                <p class="mt-6">No.OPG/ADMN/2024/{{employee.SAP_ID}}</p>
-                <p class="font-semibold">Date: {{current_time |date:"F j, Y" }}</p> 
-                <div class="mt-4">
-                    <p>The Senior Welfare Officer</p>
-                    <p>Staff Loan & Welfare Wing</p>
-                    <p>HR Management Group</p>
-                    <p>National Bank of Pakistan</p>
-                    <p>Head Office Karachi</p>
+
+            <!-- Self Section (Hidden by Default) -->
+            <div id="self_details" class="mt-4 hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                        <label for="self_absence_employee" class="block text-sm font-medium text-gray-700">Employee SAP ID:</label>
+                        <div class="flex space-x-2">
+                            <input type="number" id="self_absence_employee" class="mt-1 p-1.5 flex-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm sap-id-input" required placeholder="e.g. 83787">
+                            <button class="fetch-employee-btn px-2 py-1 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                                Fetch
+                            </button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="self_purpose" class="block text-sm font-medium text-gray-700">Purpose:</label>
+                        <input type="text" id="self_purpose" class="mt-1 p-1.5 w-11/12 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" placeholder="e.g. for hospitalization">
+                    </div>
+
+                    <div>
+                        <label for="self_hospital" class="block text-sm font-medium text-gray-700">Hospital Name:</label>
+                        <select id="self_hospital" class="mt-1 p-1.5 w-11/12 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+                            <option value="">Select Hospital</option>
+                            {% for hospital in hospital_name %}
+                                <option value="{{ hospital.hospital_name }}">{{ hospital.hospital_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
             </div>
+
+            <!-- Family Details Section (Hidden by Default) -->
+            <div id="family_details" class="mt-4 hidden">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Family Member Details:</label>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="flex flex-col space-y-1 md:col-span-2">
+                        <div class="flex space-x-2">
+                            <div class="w-1/2">
+                                <label for="family_member_relation" class="block text-sm font-medium text-gray-700">Relationship:</label>
+                                <select id="family_member_relation" class="p-1.5 w-full border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+                                    <option value="">Select Relationship</option>
+                                    {% if employee_type == "Regular" %}
+                                        <option value="Father of">Father of</option>
+                                        <option value="Mother of">Mother of</option>
+                                        <option value="Son of">Son of</option>
+                                        <option value="Daughter of">Daughter of</option>
+                                        <option value="Wife of">Wife of</option>
+                                        <option value="Husband of">Husband of</option> 
+                                    {% elif  employee_type == "Contractual" %}
+                                        <option value="Son of">Son of</option>
+                                        <option value="Daughter of">Daughter of</option>
+                                        <option value="Wife of">Wife of</option>
+                                        <option value="Husband of">Husband of</option> 
+                                    {% else %}
+                                        <option value="">Not Allowed</option>
+                                    {% endif %} 
+                                </select>
+                            </div>
+                            <div class="w-1/2">
+                                <label for="family_member_name" class="block text-sm font-medium text-gray-700">Family Member Name:</label>
+                                <input type="text" id="family_member_name" placeholder="Enter Only Name" class="p-1.5 w-full border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="family_member_cnic" class="block text-sm font-medium text-gray-700">CNIC:</label>
+                        <input type="text" id="family_member_cnic" placeholder="Enter CNIC" maxlength="13" class="p-1.5 w-full border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+                    </div>
+
+                    <div>
+                        <label for="family_purpose" class="block text-sm font-medium text-gray-700">Purpose:</label>
+                        <input type="text" id="family_purpose" class="mt-1 p-1.5 w-11/12 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" placeholder="e.g. for hospitalization">
+                    </div>
+
+                    <div>
+                        <label for="family_hospital" class="block text-sm font-medium text-gray-700">Hospital Name:</label>
+                        <select id="family_hospital" class="mt-1 p-1.5 w-11/12 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+                            <option value="">Select Hospital</option>
+                            {% for hospital in hospital_name %}
+                                <option value="{{ hospital.hospital_name }}">{{ hospital.hospital_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="family_absence_employee" class="block text-sm font-medium text-gray-700">Employee SAP ID:</label>
+                        <div class="flex space-x-2">
+                            <input type="number" id="family_absence_employee" class="mt-1 p-1.5 flex-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm sap-id-input" required placeholder="e.g. 83787">
+                            <button class="fetch-employee-btn px-2 py-1 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 text-sm">
+                                Fetch
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Signature Selection -->
+            <div class="mt-6">
+                <label for="form_type" class="block text-sm font-medium text-gray-700">Admin Signature:</label>
+                <select id="form_type" name="form_type" class="mt-1 p-1.5 w-11/12 border border-blue-500 rounded-md focus:outline-none focus:border-blue-700 transition-colors duration-300 shadow-sm text-sm">
+                    <option value="">Select Admin Signature</option>
+                    {% for employee in admin_signuture %}
+                        <option value="{{ employee.SAP_ID }}">{{ employee.employee_name }} ({{ employee.SAP_ID }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="mt-6 flex justify-center space-x-4">
+                <button type="button" id="download" class="bg-blue-500 text-white px-4 py-1.5 rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 text-sm font-medium transition-colors duration-300">
+                    <span class="flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Download as PDF
+                    </span>
+                </button>
+                <button type="button" id="save_to_cloudinary" class="bg-green-500 text-white px-4 py-1.5 rounded-md shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300 text-sm font-medium transition-colors duration-300">
+                    <span class="flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                        </svg>
+                        Save
+                    </span>
+                </button>
+            </div>
         </div>
 
+        <!-- Right Column - Dynamic Letter Preview -->
+        <div class="w-full lg:w-7/12 bg-white shadow-lg rounded-lg my-4 overflow-auto">
+            <div id="download_letter" class="p-10" style="position: relative; min-height: 1123px; display: flex; flex-direction: column; page-break-inside: avoid;">
+                <!-- Header Section -->
+                <div class="mb-4">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <img src="{% static 'reporting/images/NBP.png' %}" alt="NBP Logo" class="h-21">
+                        </div>
+                        <div class="text-right mt-9">
+                            <p class="font-semibold pr-6">Operations Group</p>
+                        </div>
+                    </div>
+                    <!-- Full-width border under the header section -->
+                    <hr class="border-t border-gray-400">
+                    <div class="text-sm mt-0 flex justify-between items-center">
+                        <p class="font-semibold">National Bank of Pakistan</p>
+                        <p class="font-semibold pr-3">Administration Division</p>
+                    </div>
+                    <div class="text-sm mt-4 mb-8">
+                        <p class="mt-6">No.OPG/ADMN/{{employee.SAP_ID}}</p>
+                        <p class="font-semibold">Date: {{current_time |date:"F j, Y" }}</p> 
+                        <div class="mt-4">
+                            <p>The Senior Welfare Officer</p>
+                            <p>Staff Loan & Welfare Wing</p>
+                            <p>HR Management Group</p>
+                            <p>National Bank of Pakistan</p>
+                            <p>Head Office Karachi</p>
+                        </div>
+                    </div>
+                </div>
 
-        <!-- Body Text -->
-        <p class="mb-1" style="text-align: justify;">
-            Dear Sir,
-        </p>
-        <p class="mb-4" style="text-align: justify; text-transform: uppercase;">
-            <b><span id="approval_type_text">______________</span> FOR <span id="purpose_text">_____________</span> AT <span id="hospital_text">_____________</span> <span class="upper font-bold" id="family_member"></span>
-                <span id="employee_name">_____________</span>, <span id="employee_grade">_____________</span>, SAP ID: <span id="employee_sapID">_____________</span>, OPERATIONS GROUP, NBP, HEAD-OFFICE, KARACHI.</b>
-        </p>
-       
-        <p class="mb-4" style="text-align: justify;" id="doctors_advice_text">
-            <span id="doctors_advice_with_date">Enclosed please find a self-explanatory Doctor's advice dated <span id="hospital_advice_date_text">_____________</span> on the captioned subject.</span>
-        </p>
-        <p class="mb-4" style="text-align: justify;" id="medical_bill_text">
-            We enclose herewith Medical bill of Mr./Mrs. <span id="employee_name_text"></span>, <span id="employee_grade_text"></span>, SAP ID: <span id="employee_sapID_text"></span>, along with its enclosure for issuance of Post Facto Approval for reimbursement of his medical bill to the above captioned executive as per bank policy.
-        </p>
-        <p class="mb-4" style="text-align: justify;" id="family_approval_text">
-            Kindly accord necessary approval for <span id="family_member_name_text">_____________</span> (CNIC No. <span id="family_member_cnic_text">_____________</span>, <span id="family_member_relation_text">_____________</span> of <span id="employee_name_relation">_____________</span>, <span id="employee_grade_relation">_____________</span>, SAP ID: <span id="employee_sapid_relation">_____________</span>) as advised by Concerned Doctor. (Reference Letter Attached).
-        </p>
-        <p class="mb-4" style="text-align: justify;">
-            Kindly arrange to issue necessary permission as per Bank rules.
-        </p>
-        <p class="mb-4 mt-8" style="text-align: justify;">
-            Yours faithfully,
-        </p>
 
-        <!-- Signature Section -->
-        <div id="employee-details" class="w-full mt-12">
-            <!-- Data will be inserted here dynamically-->
-        </div>
+                <!-- Body Text -->
+                <p class="mb-1" style="text-align: justify;">
+                    Dear Sir,
+                </p>
+                <p class="mb-4" style="text-align: justify; text-transform: uppercase;">
+                    <b><span id="approval_type_text">______________</span> FOR <span id="purpose_text">_____________</span> AT <span id="hospital_text">_____________</span> <span class="upper font-bold" id="family_member"></span>
+                        <span id="employee_name">_____________</span>, <span id="employee_grade">_____________</span>, SAP ID: <span id="employee_sapID">_____________</span>, OPERATIONS GROUP, NBP, HEAD-OFFICE, KARACHI.</b>
+                </p>
+               
+                <p class="mb-4" style="text-align: justify;" id="doctors_advice_text">
+                    <span id="doctors_advice_with_date">Enclosed please find a self-explanatory Doctor's advice dated <span id="hospital_advice_date_text">_____________</span> on the captioned subject.</span>
+                </p>
+                <p class="mb-4" style="text-align: justify;" id="medical_bill_text">
+                    We enclose herewith Medical bill of Mr./Mrs. <span id="employee_name_text"></span>, <span id="employee_grade_text"></span>, SAP ID: <span id="employee_sapID_text"></span>, along with its enclosure for issuance of Post Facto Approval for reimbursement of his medical bill to the above captioned executive as per bank policy.
+                </p>
+                <p class="mb-4" style="text-align: justify;" id="family_approval_text">
+                    Kindly accord necessary approval for <span id="family_member_name_text">_____________</span> (CNIC No. <span id="family_member_cnic_text">_____________</span>, <span id="family_member_relation_text">_____________</span> of <span id="employee_name_relation">_____________</span>, <span id="employee_grade_relation">_____________</span>, SAP ID: <span id="employee_sapid_relation">_____________</span>) as advised by Concerned Doctor. (Reference Letter Attached).
+                </p>
+                <p class="mb-4" style="text-align: justify;">
+                    Kindly arrange to issue necessary permission as per Bank rules.
+                </p>
+                <p class="mb-4 mt-8" style="text-align: justify;">
+                    Yours faithfully,
+                </p>
 
-        <div class="mt-6">
-            <p>Encl: a.a</p>
-        </div>
+                <!-- Signature Section -->
+                <div id="employee-details" class="w-full mt-12">
+                    <!-- Data will be inserted here dynamically-->
+                </div>
 
-        <div class="mt-10 text-right mb-4">
-            <select id="form_type" name="form_type" class="w-1/4 bg-white border border-blue-500 py-2 px-4 rounded-lg focus:outline-none focus:border-blue-700 transition-colors duration-300 shadow-md">
-                <option value="">Admin Signature</option>
-                {% for employee in admin_signuture %}
-                    <option value="{{ employee.SAP_ID }}">{{ employee.employee_name }} ({{ employee.SAP_ID }})</option>
-                {% endfor %}
-            </select>
-        </div>
+                <div class="mt-6">
+                    <p>Encl: a.a</p>
+                </div>
 
-        <!-- Footer Section -->
-        <div style="position: relative; margin-top: auto; left: 0; right: 0; width: 100%;" class="footer">
-            <hr class="border-t border-gray-400 mb-2">
-            <div class="text-center text-xs text-gray-600">
-                <p class="font-semibold">National Bank of Pakistan</p>
-                <p>Head Office: I.I. Chundrigar Road, Karachi. Ph: 9212100 (50 lines)</p>
-                <p>Website: www.nbp.com.pk</p>
+                <!-- Footer Section -->
+                <div style="position: relative; margin-top: auto; left: 0; right: 0; width: 100%;" class="footer">
+                    <hr class="border-t border-gray-400 mb-2">
+                    <div class="text-center text-xs text-gray-600">
+                        <p class="font-semibold">National Bank of Pakistan</p>
+                        <p>Head Office: I.I. Chundrigar Road, Karachi. Ph: 9212100 (50 lines)</p>
+                        <p>Website: www.nbp.com.pk</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- Toast Messages -->
+    <div id="errorToast" class="fixed bottom-5 right-5 hidden bg-red-500 text-white text-base px-4 py-2 rounded-lg shadow-lg transition-opacity duration-300 z-50">
+        Employee with this SAP ID not found!
+    </div>
 
-    <div class="mt-3 mb-5 text-center space-x-4">
-        <button type="button" id="download" class="bg-blue-500 text-white px-6 py-2 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">Download as a PDF</button>
-        <button type="button" id="save_to_cloudinary" class="bg-green-500 text-white px-6 py-2 rounded-lg shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300">Save</button>
+    <div id="successToast" class="fixed bottom-5 right-5 hidden bg-green-500 text-white text-base px-4 py-2 rounded-lg shadow-lg transition-opacity duration-300 z-50">
+        Employee found!
     </div>
 </body>
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
     // Function to prepare the document for PDF generation
@@ -267,7 +302,7 @@
         
         // Show loading indicator
         const loadingToast = document.createElement('div');
-        loadingToast.className = 'fixed bottom-5 right-5 bg-blue-500 text-white text-base px-6 py-3 rounded-xl shadow-lg transition-opacity duration-300';
+        loadingToast.className = 'fixed bottom-5 right-5 bg-blue-500 text-white text-base px-4 py-2 rounded-lg shadow-lg transition-opacity duration-300 z-50';
         loadingToast.textContent = 'Saving to Cloudinary...';
         document.body.appendChild(loadingToast);
         
@@ -278,7 +313,7 @@
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
             pagebreak: { mode: ['avoid-all', 'css', 'legacy'], before: '.page-break-before', after: '.page-break-after', avoid: '.footer' }
         };
-
+    
         // Generate the PDF as blob
         html2pdf().from(docState.element).set(options).outputPdf('datauristring').then(pdfDataUri => {
             // Send the PDF data to the server
@@ -301,10 +336,10 @@
                 // Show success or error toast
                 const toast = document.createElement('div');
                 if (data.success) {
-                    toast.className = 'fixed bottom-5 right-5 bg-green-500 text-white text-base px-6 py-3 rounded-xl shadow-lg transition-opacity duration-300';
+                    toast.className = 'fixed bottom-5 right-5 bg-green-500 text-white text-base px-4 py-2 rounded-lg shadow-lg transition-opacity duration-300 z-50';
                     toast.textContent = 'Successfully saved to Cloudinary!';
                 } else {
-                    toast.className = 'fixed bottom-5 right-5 bg-red-500 text-white text-base px-6 py-3 rounded-xl shadow-lg transition-opacity duration-300';
+                    toast.className = 'fixed bottom-5 right-5 bg-red-500 text-white text-base px-4 py-2 rounded-lg shadow-lg transition-opacity duration-300 z-50';
                     toast.textContent = 'Error: ' + (data.error || 'Failed to save to Cloudinary');
                 }
                 document.body.appendChild(toast);
@@ -320,7 +355,7 @@
                 
                 // Show error toast
                 const toast = document.createElement('div');
-                toast.className = 'fixed bottom-5 right-5 bg-red-500 text-white text-base px-6 py-3 rounded-xl shadow-lg transition-opacity duration-300';
+                toast.className = 'fixed bottom-5 right-5 bg-red-500 text-white text-base px-4 py-2 rounded-lg shadow-lg transition-opacity duration-300 z-50';
                 toast.textContent = 'Error: ' + error.message;
                 document.body.appendChild(toast);
                 
@@ -691,6 +726,7 @@ document.getElementById('hospital_advice_date_input').addEventListener('change',
 
 
 // Update employee signature details
+// Update employee signature details
 $(document).ready(function() {
     $('#form_type').on('change', function() {
         var sapId = $(this).val();
@@ -719,6 +755,57 @@ $(document).ready(function() {
             $('#employee-details').empty();
         }
     });
+});
+
+// Add event listener to family_member_relation dropdown to auto-populate CNIC
+document.getElementById('family_member_relation').addEventListener('change', function() {
+    const relation = this.value;
+    const sapId = document.querySelector('.sap-id-input').value.trim();
+    
+    if (relation && sapId) {
+        // Get the family member CNIC based on the selected relation and SAP ID
+        fetch(`/get_employee/?sap_id=${sapId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.employee_name) {
+                    // Auto-populate family member name field based on relation
+                    let familyMemberName = '';
+                    if (relation === 'Father of') {
+                        familyMemberName = data.employee_salutation === 'MR.' ? 'Mr. ' + data.employee_name.split(' ')[0] + '\'s Father' : '';
+                    } else if (relation === 'Mother of') {
+                        familyMemberName = data.employee_salutation === 'MR.' ? 'Mrs. ' + data.employee_name.split(' ')[0] + '\'s Mother' : '';
+                    } else if (relation === 'Son of') {
+                        familyMemberName = 'Son of ' + data.employee_salutation + ' ' + data.employee_name;
+                    } else if (relation === 'Daughter of') {
+                        familyMemberName = 'Daughter of ' + data.employee_salutation + ' ' + data.employee_name;
+                    } else if (relation === 'Wife of') {
+                        familyMemberName = 'Mrs. ' + data.employee_name.split(' ')[0];
+                    } else if (relation === 'Husband of') {
+                        familyMemberName = 'Mr. ' + data.employee_name.split(' ')[0];
+                    }
+                    
+                    // Set the family member name if we generated one
+                    if (familyMemberName) {
+                        document.getElementById('family_member_name').value = familyMemberName;
+                    }
+                    
+                    // For now, we'll use a placeholder CNIC format since we don't have actual data
+                    // In a real implementation, you would fetch this from a database
+                    // This is just a demonstration of the auto-population feature
+                    const placeholderCNIC = '1234567890123';
+                    document.getElementById('family_member_cnic').value = placeholderCNIC;
+                    
+                    // Update the display text
+                    updateFamilyMemberDetails();
+                    updateFamilyApprovalText();
+                    
+                    showSuccessToast('Family member details auto-populated!');
+                }
+            })
+            .catch(error => {
+                showErrorToast('Failed to auto-populate family member details.');
+            });
+    }
 });
 
 </script>

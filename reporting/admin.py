@@ -1,8 +1,16 @@
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 from unfold.contrib.import_export.forms import ExportForm, ImportForm
-from .models import Signature, LetterTemplates, HospitalName, PermenantLetterTemplates
+from .models import Signature, LetterTemplates, HospitalName, PermenantLetterTemplates, FamilyMember
 from unfold.admin import ModelAdmin
+
+
+@admin.register(FamilyMember)
+class FamilyMemberAdmin(ImportExportModelAdmin, ModelAdmin):
+    list_display = ['employee__name', 'relation', 'name']
+    search_fields = ['employee__name', 'relation', 'name']
+    list_filter = ['employee__name','relation', 'name']
+
 
 
 @admin.register(HospitalName)
