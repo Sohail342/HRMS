@@ -207,7 +207,7 @@ class Employee(AbstractBaseUser, PermissionsMixin):
         ('outside_group', 'Transferred outside Group'),
     ]
 
-    cnic_no = models.CharField(max_length=13, unique=True, blank=True, null=True)
+    cnic_no = models.CharField(max_length=13, blank=True, null=True)
     husband_or_father_name = models.CharField(max_length=100, blank=True, null=True)
     SAP_ID = models.IntegerField(default=None, unique=True, blank=True, null=True,)
     designation = models.ForeignKey(
