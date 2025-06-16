@@ -4,99 +4,141 @@
 
 {% block content %}
 <body class="p-8 bg-gray-100">
-
-    <!-- Leave Application Form -->
-    <form action="{% url 'reporting:application_leave' employee.SAP_ID %}" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <div class="max-w-screen-md mx-auto p-6 bg-white shadow-lg rounded-lg my-10">
+    <!-- Main Container with Two-Column Layout -->
+    <div class="flex flex-col lg:flex-row gap-6 max-w-screen-xl mx-auto">
+        <!-- Left Column - Application Form -->
+        <div class="w-full lg:w-5/12 p-6 bg-white shadow-lg rounded-lg my-4">
             <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Application Form</h2>
             
-            <!-- Input Fields for User Data -->
-            <div class="space-y-6">
-                <div>
-                    <label for="application_date" class="block text-sm font-medium text-gray-700">Application Date:</label>
-                    <input type="date" id="application_date" name="application_date" class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required>
-                </div>
+            <!-- Leave Application Form -->
+            <form action="{% url 'reporting:application_leave' employee.SAP_ID %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <!-- Input Fields for User Data -->
+                <div class="space-y-4">
+                    <div>
+                        <label for="application_date" class="block text-sm font-medium text-gray-700">Application Date:</label>
+                        <input type="date" id="application_date" name="application_date" class="mt-1 p-2 w-10/12 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required>
+                    </div>
 
-                <div>
-                    <label for="granted_leaves" class="block text-sm font-medium text-gray-700">Granted Leaves:</label>
-                    <input type="number" id="granted_leaves" name="granted_leaves" class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required placeholder="e.g. 20 days">
-                </div>
+                    <div>
+                        <label for="granted_leaves" class="block text-sm font-medium text-gray-700">Granted Leaves:</label>
+                        <input type="number" id="granted_leaves" name="granted_leaves" class="mt-1 p-2 w-10/12 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required placeholder="e.g. 20 days">
+                    </div>
 
-                <div>
-                    <label for="effect_from" class="block text-sm font-medium text-gray-700">Effect From:</label>
-                    <input type="date" id="effect_from" name="effect_from" class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required>
-                </div>
 
-                <div>
-                    <label for="leave_type_option" class="block text-sm font-medium text-gray-700">Leave Type:</label>
-                    <select id="leave_type_option" name="leave_type_option" class="mt-1 p-3 w-full border border-blue-500 rounded-lg focus:outline-none focus:border-blue-700 transition-colors duration-300 shadow-md" required>
-                        <option value="">Select Leave Type</option>
-                        <option value="PL">Privilege Leave</option>
-                        <option value="ML">Mandatory Leave</option>
-                        <option value="CL">Casual Leave</option>
-                        <option value="Ex-Pak">Ex-Pakistan</option>
-                        <option value="SL">Sick Leave</option>
-                    </select>
-                </div>
+                    <div>
+                        <label for="leave_type_option" class="block text-sm font-medium text-gray-700">Leave Type:</label>
+                        <select id="leave_type_option" name="leave_type_option" class="mt-1 p-2 w-10/12 border border-blue-500 rounded-md focus:outline-none focus:border-blue-700 transition-colors duration-300 shadow-sm text-sm" required>
+                            <option value="">Select Leave Type</option>
+                            <option value="PL">Privilege Leave</option>
+                            <option value="ML">Mandatory Leave</option>
+                            <option value="CL">Casual Leave</option>
+                            <option value="Ex-Pak">Ex-Pakistan</option>
+                            <option value="SL">Sick Leave</option>
+                        </select>
+                    </div>
 
-                <div>
-                    <label for="purpose" class="block text-sm font-medium text-gray-700">Leave Purpose:</label>
-                    <input type="text" id="purpose" name="purpose" class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required placeholder="e.g. Study purpose">
-                </div>
+                    <div id="extension_policy_section">
+                        <p class="text-sm font-medium text-gray-700">Leave Extension Policy:</p>
+                        <div class="flex items-center space-x-6 mt-2">
+                            <label class="flex items-center space-x-2">
+                                <input type="radio" name="extension" value="allowed" class="focus:ring-2 focus:ring-blue-500">
+                                <span>Allowed</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="radio" name="extension" value="not_allowed" class="focus:ring-2 focus:ring-blue-500" checked>
+                                <span>Not Allowed</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div id="station_permission_section" style="display: none;">
+                        <p class="text-sm font-medium text-gray-700">With permission to leave the station?</p>
+                        <div class="flex items-center space-x-6 mt-2">
+                            <label class="flex items-center space-x-2">
+                                <input type="radio" name="station_permission" value="yes" class="focus:ring-2 focus:ring-blue-500">
+                                <span>Yes</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="radio" name="station_permission" value="no" class="focus:ring-2 focus:ring-blue-500" checked>
+                                <span>No</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <label for="absence_employee" class="block text-sm font-medium text-gray-700">Employee Back-up SAP ID 1:</label>
+                        <div class="flex space-x-2 w-10/12">
+                            <input value="" type="number" id="absence_employee" class="p-2 flex-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" placeholder="e.g. 83787">
+                            <button type="button" id="fetch_employee_data" class="px-2 py-1 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                                Fetch
+                            </button>
+                        </div>
+                    </div>
 
-                <div>
-                    <p class="text-sm font-medium text-gray-700">Leave Extension Policy:</p>
-                    <div class="flex items-center space-x-6 mt-2">
-                        <label class="flex items-center space-x-2">
-                            <input type="radio" name="extension" value="allowed" class="focus:ring-2 focus:ring-blue-500">
-                            <span>Allowed</span>
-                        </label>
-                        <label class="flex items-center space-x-2">
-                            <input type="radio" name="extension" value="not_allowed" class="focus:ring-2 focus:ring-blue-500" checked>
-                            <span>Not Allowed</span>
-                        </label>
+                    <div>
+                        <label for="absence_employee2" class="block text-sm font-medium text-gray-700">Employee Back-up SAP ID 2:</label>
+                        <div class="flex space-x-2 w-10/12">
+                            <input value="" type="number" id="absence_employee2" class="p-2 flex-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" placeholder="e.g. 83787">
+                            <button type="button" id="fetch_employee_data2" class="px-2 py-1 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                                Fetch
+                            </button>
+                        </div>
                     </div>
                 </div>
+                
+                <div class="mt-6 text-center">
+                    <button type="submit" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                        Submit Application
+                    </button>
+                </div>
+            </form>
+
+            <!-- Admin Signature Selection -->
+            <div class="mt-4">
+                <label for="form_type" class="block text-sm font-medium text-gray-700">Admin Signature:</label>
+                <select id="form_type" name="form_type" class="p-2 w-10/12 border border-blue-500 rounded-md focus:outline-none focus:border-blue-700 transition-colors duration-300 shadow-sm text-sm">
+                    <option value="">Select Admin Signature</option>
+                    {% for employee in admin_signuture %}
+                        <option value="{{ employee.SAP_ID }}">{{ employee.employee_name }} ({{ employee.SAP_ID }})</option>
+                    {% endfor %}
+                </select>
             </div>
-            <div class="mt-6 text-center">
-                <button type="submit" class="px-6 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    Submit Application
+
+            <!-- Action Buttons -->
+            <div class="mt-6 flex justify-center space-x-4">
+                <button type="button" id="download" class="bg-blue-500 text-white px-4 py-1.5 rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 text-sm font-medium transition-colors duration-300">
+                    <span class="flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Download as PDF
+                    </span>
+                </button>
+                <button type="button" id="save_to_cloudinary" class="bg-green-500 text-white px-4 py-1.5 rounded-md shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300 text-sm font-medium transition-colors duration-300">
+                    <span class="flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                        </svg>
+                        Save
+                    </span>
                 </button>
             </div>
-    </form>
-    <div>
-        <label for="absence_employee" class="block text-sm font-medium text-gray-700">Employee Back-up SAP ID 1:</label>
-        <div class="flex space-x-2">
-                <input value="" type="number" id="absence_employee" class="mt-1 p-3 flex-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" placeholder="e.g. 83787">
-                <button id="fetch_employee_data" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    Fetch
-                </button>
+
+            <!-- Error Toast -->
+            <div id="errorToast" class="fixed bottom-5 right-5 hidden bg-red-500 text-white text-base px-6 py-3 rounded-xl shadow-lg transition-opacity duration-300">
+                Employee with this SAP ID not found!
+            </div>
+
+            <!-- Success Toast -->
+            <div id="sucessToast" class="fixed bottom-5 right-5 hidden bg-green-500 text-white text-base px-6 py-3 rounded-xl shadow-lg transition-opacity duration-300">
+                Employee found!
             </div>
         </div>
 
-        <div>
-            <label for="absence_employee2" class="block text-sm font-medium text-gray-700">Employee Back-up SAP ID 2:</label>
-            <div class="flex space-x-2">
-                <input value="" type="number" id="absence_employee2" class="mt-1 p-3 flex-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" placeholder="e.g. 83787">
-                <button id="fetch_employee_data2" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    Fetch
-                </button>
-            </div>
-        </div>
-
-        <!-- Error Toast -->
-        <div id="errorToast" class="fixed bottom-5 right-5 hidden bg-red-500 text-white text-base px-6 py-3 rounded-xl shadow-lg transition-opacity duration-300">
-            Employee with this SAP ID not found!
-        </div>
-
-        <!-- Success Toast -->
-        <div id="sucessToast" class="fixed bottom-5 right-5 hidden bg-green-500 text-white text-base px-6 py-3 rounded-xl shadow-lg transition-opacity duration-300">
-            Employee found!
-        </div>
-    </div>
-
-    <div id="download_letter" class="max-w-screen-md mx-auto bg-white p-12" style="position: relative; min-height: 1123px; display: flex; flex-direction: column;">
+        <!-- Right Column - Dynamic Letter Preview -->
+        <div class="w-full lg:w-7/12 bg-white shadow-lg rounded-lg my-4 overflow-auto">
+            <div id="download_letter" class="p-10" style="position: relative; min-height: 1123px; display: flex; flex-direction: column; page-break-inside: avoid;">
         <!-- Header Section -->
         <div class="mb-4">
             <div class="flex justify-between items-center">
@@ -114,7 +156,7 @@
                 <p class="font-semibold pr-3">Administration Division</p>
             </div>
             <div class="text-sm mt-3 mb-12">
-                <p>No. OPG/<span id="leave_type_text"></span>/ADMN/{{current_time |date:"Y" }}/{{employee.SAP_ID}}/</p>
+                <p>No. OPG/<span id="leave_type_text"></span>/ADMN/{{employee.SAP_ID}}/{{current_time |date:"Y" }}/</p>
                 <p class="font-semibold">{{current_time |date:"F j, Y" }}</p>  
             </div>
         </div>
@@ -125,11 +167,11 @@
         <!-- Body Text -->
         <p class="mb-4" style="text-align: justify;">
             With reference to his application dated <b><span id="application_date_text">______________</span></b> {{employee.employee_salutation | capitalize_words }} {{employee.name}}, {{employee.employee_grade}}/{{employee.employee_type}} SAP ID: {{employee.SAP_ID}}, 
-            NBP, Regional Office, {{employee.region}} is advised that he has been granted <span id="granted_leaves_text">______________</span> <span id="leave_type_text">______________</span> <span id="purpose_text"></span>,
-            with effect from <span id="effect_from_text">_____________</span>.
+            NBP, Regional Office, {{employee.region}} is advised that he has been granted <span id="granted_leaves_text">______________</span> <span id="leave_type_text">______________</span> leave.
         </p>
         <p class="mb-4" style="text-align: justify;">
-            {{employee.employee_salutation | capitalize_words }} {{employee.name}} will accordingly stand relieved to his duties as of close of office today i.e. <b>Jan 9, 2022</b> to avail sanctioned leave(s). <span id="extension_text"></span>
+            {{employee.employee_salutation | capitalize_words }} {{employee.name}} will accordingly stand relieved to his duties as of close of office today i.e. <b>{{current_time | date:"F j, Y" }}</b> to avail sanctioned leave(s). <span id="extension_text"></span> {% if is_friday == True %}Accordingly {{employee.employee_salutation | capitalize_words }} {{employee.name}} is hereby relieved of his duties by the close of office hours today i.e.
+            Friday, {{current_time | date:"F j, Y"}}. ({{next_day | date:"F, Y"}} & {{next_next_day | date:"F, Y"}} i.e. Saturday and Sunday being public holidays){% endif %}
         </p>
 
 
@@ -140,14 +182,14 @@
         
 
         
-        <div class="mt-10 text-right mb-4">
+        {% comment %} <div class="mt-10 text-right mb-4">
             <select id="form_type" name="form_type" class="w-1/4 bg-white border border-blue-500 py-2 px-4 rounded-lg focus:outline-none focus:border-blue-700 transition-colors duration-300 shadow-md">
                 <option value="">Admin Signature</option>
                 {% for employee in admin_signuture %}
                     <option value="{{ employee.SAP_ID }}">{{ employee.employee_name }} ({{ employee.SAP_ID }})</option>
                 {% endfor %}
             </select>
-        </div>
+        </div> {% endcomment %}
         
 
         <!-- Signature Section -->
@@ -159,7 +201,7 @@
         <!-- Recipient Information Section -->
         <div class="mt-8">
             <p class="font-semibold">{{employee.employee_salutation | capitalize_words}} {{employee.name}}</p>
-            <p class="text-sm">OG-II/{{employee.employee_type}}</p>
+            <p class="text-sm">{{employee.employee_grade}}/ {{employee.employee_type}}</p>
             <p class="text-sm">SAP ID: {{employee.SAP_ID}}</p>
         </div>
 
@@ -174,20 +216,26 @@
         </div>
     </div>
 
-    <div class="mt-3 mb-5 text-center space-x-4">
-        <button type="button" id="download" class="bg-blue-500 text-white px-6 py-2 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">Download as a PDF</button>
-        <button type="button" id="save_to_cloudinary" class="bg-green-500 text-white px-6 py-2 rounded-lg shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300">Save</button>
+            </div>
+        </div>
     </div>
 </body>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
     // Function to prepare the document for PDF generation
     function prepareDocumentForPDF() {
-        const application_date = document.getElementById('application_date').value;
-        const granted_leaves = document.getElementById('granted_leaves').value;
-        const effect_from = document.getElementById('effect_from').value;
-        const sapId = document.getElementById('absence_employee').value;
-        const sapId2 = document.getElementById('absence_employee2').value;
+        const application_date_elem = document.getElementById('application_date');
+        const granted_leaves_elem = document.getElementById('granted_leaves');
+        const effect_from_elem = document.getElementById('effect_from');
+        const sapId_elem = document.getElementById('absence_employee');
+        const sapId2_elem = document.getElementById('absence_employee2');
+        
+        // Safely get values, using empty string as fallback if element doesn't exist
+        const application_date = application_date_elem ? application_date_elem.value : '';
+        const granted_leaves = granted_leaves_elem ? granted_leaves_elem.value : '';
+        const effect_from = effect_from_elem ? effect_from_elem.value : '';
+        const sapId = sapId_elem ? sapId_elem.value : '';
+        const sapId2 = sapId2_elem ? sapId2_elem.value : '';
     
         const form = document.getElementById('form_type');
         form.style.visibility = 'hidden'; // Make the select element invisible but keep its position
@@ -210,38 +258,41 @@
             secondBackupSection.style.display = 'inline';
         }
         
-        if (!(application_date && granted_leaves && effect_from)) {
+        // Only validate fields that exist and are required
+        if (!(application_date && granted_leaves)) {
             // Show an alert if required fields are empty
-            alert("Please fill out the fields");
+            alert("Please fill out the required fields");
             return false;
         }
         
-        // Store the formatted values before PDF generation
-        const applicationDateFormatted = document.getElementById('application_date_text').textContent;
-        const grantedLeavesFormatted = document.getElementById('granted_leaves_text').textContent;
-        const effectFromFormatted = document.getElementById('effect_from_text').textContent;
-        
-        // Temporarily set the formatted values
-        document.getElementById('application_date_text').textContent = applicationDateFormatted;
-        document.getElementById('granted_leaves_text').textContent = grantedLeavesFormatted;
-        document.getElementById('effect_from_text').textContent = effectFromFormatted;
-
-        // Before generating PDF, ensure we're using the formatted values
+        // Get elements safely
         const applicationDateElement = document.getElementById('application_date_text');
         const grantedLeavesElement = document.getElementById('granted_leaves_text');
         const effectFromElement = document.getElementById('effect_from_text');
 
-        // Store original values
+        // Store original values (safely)
         const originalValues = {
-            applicationDate: applicationDateElement.textContent,
-            grantedLeaves: grantedLeavesElement.textContent,
-            effectFrom: effectFromElement.textContent
+            applicationDate: applicationDateElement ? applicationDateElement.textContent : '',
+            grantedLeaves: grantedLeavesElement ? grantedLeavesElement.textContent : ''
         };
+        
+        // Add effect_from to originalValues only if the element exists
+        if (effectFromElement) {
+            originalValues.effectFrom = effectFromElement.textContent;
+        }
 
-        // Set formatted values for PDF
-        applicationDateElement.textContent = applicationDateElement.getAttribute('data-formatted-date') || originalValues.applicationDate;
-        grantedLeavesElement.textContent = grantedLeavesElement.getAttribute('data-formatted-value') || originalValues.grantedLeaves;
-        effectFromElement.textContent = effectFromElement.getAttribute('data-formatted-date') || originalValues.effectFrom;
+        // Set formatted values for PDF (safely)
+        if (applicationDateElement) {
+            applicationDateElement.textContent = applicationDateElement.getAttribute('data-formatted-date') || originalValues.applicationDate;
+        }
+        
+        if (grantedLeavesElement) {
+            grantedLeavesElement.textContent = grantedLeavesElement.getAttribute('data-formatted-value') || originalValues.grantedLeaves;
+        }
+        
+        if (effectFromElement) {
+            effectFromElement.textContent = effectFromElement.getAttribute('data-formatted-date') || originalValues.effectFrom;
+        }
         
         return {
             element: document.getElementById('download_letter'),
@@ -257,13 +308,29 @@
         
         const { originalValues, absenceParagraph, secondBackupSection } = docState;
         
-        // After PDF is processed, restore original values and display
-        document.getElementById('application_date_text').textContent = originalValues.applicationDate;
-        document.getElementById('granted_leaves_text').textContent = originalValues.grantedLeaves;
-        document.getElementById('effect_from_text').textContent = originalValues.effectFrom;
-        absenceParagraph.style.display = 'block';
-        secondBackupSection.style.display = 'inline';
-        document.getElementById('form_type').style.visibility = 'visible';
+        // After PDF is processed, restore original values and display (safely)
+        const applicationDateElement = document.getElementById('application_date_text');
+        const grantedLeavesElement = document.getElementById('granted_leaves_text');
+        const effectFromElement = document.getElementById('effect_from_text');
+        const formElement = document.getElementById('form_type');
+        
+        // Safely restore original values
+        if (applicationDateElement && originalValues.applicationDate !== undefined) {
+            applicationDateElement.textContent = originalValues.applicationDate;
+        }
+        
+        if (grantedLeavesElement && originalValues.grantedLeaves !== undefined) {
+            grantedLeavesElement.textContent = originalValues.grantedLeaves;
+        }
+        
+        if (effectFromElement && originalValues.effectFrom !== undefined) {
+            effectFromElement.textContent = originalValues.effectFrom;
+        }
+        
+        // Restore display properties
+        if (absenceParagraph) absenceParagraph.style.display = 'block';
+        if (secondBackupSection) secondBackupSection.style.display = 'inline';
+        if (formElement) formElement.style.visibility = 'visible';
     }
     
     // Download PDF button click handler
@@ -367,6 +434,12 @@
     function formatDate(inputId, outputId) {
         const inputField = document.getElementById(inputId);
         const outputField = document.getElementById(outputId);
+        
+        // Check if both elements exist before proceeding
+        if (!inputField || !outputField) {
+            console.warn(`formatDate: Element with ID ${!inputField ? inputId : outputId} not found`);
+            return; // Exit the function if either element doesn't exist
+        }
     
         function updateDate() {
             const inputDate = new Date(inputField.value);
@@ -404,10 +477,18 @@
         leaveTypeTextElements.forEach(element => {
             element.textContent = this.value || "______________";
         });
-    });
-
-    document.getElementById('purpose').addEventListener('input', function() {
-        document.getElementById('purpose_text').textContent = this.value || "______________";
+        
+        // Toggle between extension policy and station permission based on leave type
+        const extensionPolicySection = document.getElementById('extension_policy_section');
+        const stationPermissionSection = document.getElementById('station_permission_section');
+        
+        if (this.value === 'Ex-Pak') {
+            extensionPolicySection.style.display = 'block';
+            stationPermissionSection.style.display = 'none';
+        } else {
+            extensionPolicySection.style.display = 'none';
+            stationPermissionSection.style.display = 'block';
+        }
     });
 
     // numbers to Aplhabets
@@ -448,7 +529,10 @@
 
 
     // Event listener for the first backup employee's "Fetch" button
-    document.getElementById('fetch_employee_data').addEventListener('click', function() {
+    document.getElementById('fetch_employee_data').addEventListener('click', function(event) {
+        // Prevent form submission
+        event.preventDefault();
+        
         const sapId = document.getElementById('absence_employee').value;
 
         if (sapId) {
@@ -473,7 +557,10 @@
     });
 
     // Event listener for the second backup employee's "Fetch" button
-    document.getElementById('fetch_employee_data2').addEventListener('click', function() {
+    document.getElementById('fetch_employee_data2').addEventListener('click', function(event) {
+        // Prevent form submission
+        event.preventDefault();
+        
         const sapId2 = document.getElementById('absence_employee2').value;
 
         if (sapId2) {
@@ -570,6 +657,19 @@
             if (this.value === "allowed") {
                 document.getElementById("extension_text").textContent = 
                     "It is further advised that no extension in leave will be allowed to him/her under any circumstances.";
+            } else {
+                document.getElementById("extension_text").textContent = 
+                    "";
+            }
+        });
+    });
+    
+    // Handle station permission radio buttons
+    document.querySelectorAll('input[name="station_permission"]').forEach((radio) => {
+        radio.addEventListener("change", function () {
+            if (this.value === "yes") {
+                document.getElementById("extension_text").textContent = 
+                    "with permission to leave the station";
             } else {
                 document.getElementById("extension_text").textContent = 
                     "";

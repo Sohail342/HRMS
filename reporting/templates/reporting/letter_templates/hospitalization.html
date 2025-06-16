@@ -34,7 +34,12 @@
 
                     <div>
                         <label for="self_purpose" class="block text-sm font-medium text-gray-700">Purpose:</label>
-                        <input type="text" id="self_purpose" class="p-1.5 w-10/12 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" placeholder="e.g. for hospitalization">
+                        <select id="self_purpose" class="p-1.5 w-10/12 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+                            <option value="">Select Purpose</option>
+                            {% for purpose in purposes %}
+                                <option value="{{ purpose.purpose_name }}">{{ purpose.purpose_name }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
 
                     <div>
@@ -92,7 +97,12 @@
                     <!-- Purpose Field -->
                     <div>
                         <label for="family_purpose" class="block text-sm font-medium text-gray-700">Purpose:</label>
-                        <input type="text" id="family_purpose" class="p-1.5 w-10/12 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" placeholder="e.g. for hospitalization">
+                        <select id="family_purpose" class="p-1.5 w-10/12 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+                            <option value="">Select Purpose</option>
+                            {% for purpose in purposes %}
+                                <option value="{{ purpose.purpose_name }}">{{ purpose.purpose_name }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
 
                     <!-- Hospital Name Field -->
@@ -200,7 +210,7 @@
                         <p class="font-semibold pr-3">Administration Division</p>
                     </div>
                     <div class="text-sm mt-4 mb-8">
-                        <p class="mt-6">No.OPG/ADMN/{{employee.SAP_ID}}</p>
+                        <p class="mt-6">No.OPG/ADMN/{{employee.SAP_ID}}/{{current_time | date:"Y"}}/</p>
                         <p class="font-semibold">Date: {{current_time |date:"F j, Y" }}</p> 
                         <div class="mt-4">
                             <p>The Senior Welfare Officer</p>
@@ -226,7 +236,7 @@
                     <span id="doctors_advice_with_date">Enclosed please find a self-explanatory Doctor's advice dated <span id="hospital_advice_date_text">_____________</span> on the captioned subject.</span>
                 </p>
                 <p class="mb-4" style="text-align: justify;" id="medical_bill_text">
-                    We enclose herewith Medical bill of Mr./Mrs. <span id="employee_name_text"></span>, <span id="employee_grade_text"></span>, SAP ID: <span id="employee_sapID_text"></span>, along with its enclosure for issuance of Post Facto Approval for reimbursement of his medical bill to the above captioned executive as per bank policy.
+                    We enclose herewith Medical bill of  <span id="employee_name_text"></span>, <span id="employee_grade_text"></span>, SAP ID: <span id="employee_sapID_text"></span>, along with its enclosure for issuance of Post Facto Approval for reimbursement of his medical bill to the above captioned executive as per bank policy.
                 </p>
                 <p class="mb-4" style="text-align: justify;" id="family_approval_text">
                     Kindly accord necessary approval for <span id="family_member_name_text">_____________</span> (CNIC No. <span id="family_member_cnic_text">_____________</span>, <span id="family_member_relation_text">_____________</span> <span id="employee_name_relation">_____________</span>, <span id="employee_grade_relation">_____________</span>, SAP ID: <span id="employee_sapid_relation">_____________</span>) as advised by Concerned Doctor. (Reference Letter Attached).
@@ -515,10 +525,22 @@ document.getElementById('category_type_option').addEventListener('change', funct
         const name = document.getElementById('family_member_name').value.trim();
         const cnic = document.getElementById('family_member_cnic').value.trim();
         const relation = document.getElementById('family_member_relation').value;
+        
+        // Determine salutation based on relationship
+        let salutation = "";
+        if (relation === "Wife of") {
+            salutation = "MRS";
+        } else if (relation === "Mother of") {
+            salutation = "MRS";
+        } else if (relation === "Daughter of") {
+            salutation = "Ms";
+        } else if (relation === "Father of" || relation === "Son of" || relation === "Husband of") {
+            salutation = "MR";
+        }
     
-        // Format: "MS/MRS Family Member Name, CNIC NO: 9898239823822, M/O (Relationship)"
+        // Format with appropriate salutation
         const formattedText = name && cnic && relation 
-            ? `MS/MRS ${name}, CNIC NO: ${cnic}, (${relation})` 
+            ? `${salutation} ${name}, CNIC NO: ${cnic}, (${relation})` 
             : ""; 
     
         familyMemberSpan.textContent = formattedText;
@@ -548,20 +570,38 @@ document.getElementById('category_type_option').addEventListener('change', funct
                 .then(response => response.json())
                 .then(data => {
                     if (data.employee_name && data.designation) {
+                        // Determine appropriate salutation based on gender for self
+                        let salutation = data.employee_salutation;
+                        const categoryType = document.getElementById('category_type_option').value;
+                        
+                        if (categoryType === "Self") {
+                            // For self, use gender-appropriate salutation
+                            if (data.employee_cnic) {
+                                const lastDigit = data.employee_cnic.slice(-1);
+                                if (parseInt(lastDigit) % 2 === 0){
+
+                                    salutation = "Ms.";
+                                }
+                                else if (parseInt(lastDigit) % 2 !== 0) {
+                                    salutation = "Mr.";
+                                }
+                            } 
+                        }
+                        
                         // Update employee details in approval header
-                        // Update employee details in approval header
-                        document.getElementById('employee_name').textContent = data.employee_salutation + " " + data.employee_name;
+                        document.getElementById('employee_name').textContent = salutation + " " + data.employee_name;
                         document.getElementById('employee_sapID').textContent = sapId;
                         document.getElementById('employee_grade').textContent = data.employee_grade;
                         document.getElementById('employee_cnic').textContent = data.employee_cnic;
 
                         // Update employee details in family approval text
-                        document.getElementById('employee_name_relation').textContent = data.employee_salutation + " " + data.employee_name;
+                        document.getElementById('employee_name_relation').textContent = salutation + " " + data.employee_name;
                         document.getElementById('employee_sapid_relation').textContent = sapId;
                         document.getElementById('employee_grade_relation').textContent = data.employee_grade;
 
+                        let formattedSalutation = (salutation === "MR") ? "Mr" : salutation;
                         // Update employee details in medical bill text
-                        document.getElementById('employee_name_text').textContent = data.employee_salutation + " " + data.employee_name;
+                        document.getElementById('employee_name_text').textContent = formattedSalutation  + " " + data.employee_name;
                         document.getElementById('employee_sapID_text').textContent = sapId;
                         document.getElementById('employee_grade_text').textContent = data.employee_grade;
 
@@ -652,6 +692,15 @@ document.getElementById('category_type_option').addEventListener('change', funct
             doctorsAdviceText.style.display = 'block';
             medicalBillText.style.display = 'none';
             familyApprovalText.style.display = 'none';
+        }
+        
+        // Trigger employee data refresh to update salutation if employee data is already loaded
+        const sapId = document.getElementById('employee_sap_id').value.trim();
+        if (sapId) {
+            const fetchButton = document.querySelector('.fetch-employee-btn');
+            if (fetchButton) {
+                fetchButton.click();
+            }
         }
     });
 

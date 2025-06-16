@@ -9,8 +9,8 @@ from django.contrib import messages
 import cloudinary
 import json
 import base64
-from datetime import datetime
-from .models import Signature, LetterTemplates, HospitalName, PermenantLetterTemplates
+from datetime import datetime, timedelta
+from .models import Signature, LetterTemplates, HospitalName, PermenantLetterTemplates, Purpose, PulicHolidays
 from django.views.generic import DetailView, ListView
 from HRIS_App.models import Employee
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -62,6 +62,7 @@ def save_pdf_to_cloudinary(request):
 def get_employee(request):
     sap_id = request.GET.get('sap_id')
     employee = get_object_or_404(Employee, SAP_ID=sap_id)
+    print(f"Employee found: {employee.name} with SAP ID: {sap_id}")
 
     data = {
         'employee_name': employee.name,
@@ -113,10 +114,21 @@ class MemorandumMixin:
 class LeaveMemorandum(MemorandumMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        current_time = timezone.now()
+        weekday = current_time.strftime('%A')
+
         context['employees'] = Employee.objects.all()
         context['current_time'] = timezone.now()
         context['admin_signuture'] = Signature.objects.all()
+        context['current_time'] = current_time
+        context['next_day'] = current_time + timedelta(days=1)
+        context['next_next_day'] = current_time + timedelta(days=2)
+        context['holidays'] = PulicHolidays.objects.all()
+        context['is_friday'] = weekday == 'Friday',
+
         context['hospital_name'] = HospitalName.objects.all()
+    
         return context
     template_name = 'reporting/letter_templates/leave_memorandum.html' 
 
@@ -129,6 +141,7 @@ class Hospitilization(MemorandumMixin, DetailView):
         context['current_time'] = timezone.now()
         context['admin_signuture'] = Signature.objects.all()
         context['hospital_name'] = HospitalName.objects.all()
+        context['purposes'] = Purpose.objects.all()
 
         employee_type = str(context['employee'].employee_type)
         context['employee_type'] = employee_type

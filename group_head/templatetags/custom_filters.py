@@ -11,6 +11,8 @@ def get_item(dictionary, key):
 @register.filter
 def capitalize_words(value):
     # Capitalize the first letter of each word
+    if value is None:
+        return ''
     return ' '.join([word.capitalize() for word in value.split()])
 
 

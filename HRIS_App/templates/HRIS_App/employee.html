@@ -81,12 +81,18 @@
         <form method="get" action="{% url 'HRMS:employees_view' %}"> 
             <div class="w-full flex justify-center p-1 mb-4">
                 <div class="relative w-full max-w-xl mx-auto">
-                    <input type="text" name="search" class="search-bar w-full backdrop-blur-sm bg-blue-50 dark:bg-gray-800 border border-blue-300 dark:border-gray-700 py-3 pl-12 pr-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 shadow-md hover:shadow-lg" placeholder="Search by SAP ID...">
+                    <input type="text" name="search" class="search-bar w-full backdrop-blur-sm bg-blue-50 dark:bg-gray-800 border border-blue-300 dark:border-gray-700 py-3 pl-12 pr-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 shadow-md hover:shadow-lg" placeholder="Search by SAP ID, Name, or Designation...">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <svg class="w-6 h-6 text-blue-500 dark:text-blue-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
                         </svg>
                     </div>
+                    <button type="submit" class="absolute inset-y-0 right-0 flex items-center px-4 text-blue-600 hover:text-blue-800">
+                        <span class="sr-only">Search</span>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </button>
                 </div>
             </div>
         </form>
@@ -114,9 +120,9 @@
         <div class="overflow-x-auto mt-4 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
             <table class="min-w-full border-collapse">
                 <thead>
-                    <tr class="text-white">
-                        <th class="border border-gray-300 px-10 py-8 text-left text-sm md:text-base">Branch Code</th>
-                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Branch
+                    <tr class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
+                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base font-medium">Branch Code</th>
+                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base font-medium">Branch
                             <select id="branchFilter" name="branch" class="w-24 border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out text-gray-700 bg-white hover:bg-gray-50" onchange="filterEmployees()">
                                 <option value="">All</option>
                                 {% for branch in branches %}
@@ -126,12 +132,12 @@
                                 {% endfor %}
                             </select>
                         </th>
-                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">SAP ID</th>
-                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Name</th>
-                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">	
+                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base font-medium">SAP ID</th>
+                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base font-medium">Name</th>
+                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base font-medium">	
                             Employee type
                             <select id="employeeTypeFilter" name="employee_type"
-                                class="border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ease-in-out max-h-32 overflow-y-auto"
+                                class="border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ease-in-out max-h-32 overflow-y-auto text-gray-700 bg-white hover:bg-gray-50"
                                 onchange="filterEmployees()">
                                 <option value="">All</option>
                                 {% for employee_type in employee_types %}
@@ -141,7 +147,7 @@
                                 {% endfor %}
                             </select>
                         </th>
-                        <th class="border border-gray-300 px-10 py-3 text-left text-sm md:text-base">Designation
+                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base font-medium">Designation
                             <select id="designationFilter" name="designation" class="w-24 border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out text-gray-700 bg-white hover:bg-gray-50" onchange="filterEmployees()">
                                 <option value="">All</option>
                                 {% for designation in designations %}
@@ -151,7 +157,7 @@
                                 {% endfor %}
                             </select>
                         </th>
-                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Employee Grade
+                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base font-medium">Employee Grade
                             <select id="employeeGradeFilter" name="employeeGrade" class="w-24 border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out text-gray-700 bg-white hover:bg-gray-50" onchange="filterEmployees()">
                                 <option value="">All</option>
                                 {% for grade in employeeGrade %}
@@ -161,67 +167,90 @@
                                 {% endfor %}
                             </select>
                         </th>
-                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Pending Inquiry</th>
-                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Remarks</th>
-                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Update Pending Remarks</th>
-                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Transfer</th>
-                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">Transfer Remarks</th>
-                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base">APA 2024</th>
+                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base font-medium">Pending Inquiry</th>
+                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base font-medium">Remarks</th>
+                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base font-medium">Update Pending Remarks</th>
+                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base font-medium">Transfer</th>
+                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base font-medium">Transfer Remarks</th>
+                        <th class="border border-gray-300 px-4 py-3 text-left text-sm md:text-base font-medium">APA 2024</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% if page_obj %}
                         {% for employee in page_obj %}
-                        <tr class="employee-card hover:bg-gray-100 transition duration-150 ease-in-out fade-in delay-{{forloop.counter}}00">
+                        <tr class="employee-card hover:bg-blue-50 transition-all duration-200 ease-in-out fade-in delay-{{forloop.counter}}00 even:bg-gray-50">
                             
-                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.branch.branch_code }}</td>
+                            <td class="border border-gray-300 px-4 py-4 text-sm md:text-base">{{ employee.branch.branch_code }}</td>
                             {% if  employee.branch %}
-                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.branch }}</td>
+                            <td class="border border-gray-300 px-4 py-4 text-sm md:text-base">{{ employee.branch }}</td>
                             {% else %}
-                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base"> </td>
+                            <td class="border border-gray-300 px-4 py-4 text-sm md:text-base"> </td>
                             {% endif %}
-                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">
-                                <a href="{% url 'HRMS:employee_detail' employee.SAP_ID %}" class="text-blue-600 hover:underline">{{ employee.SAP_ID }}</a>
-                            
+                            <td class="border border-gray-300 px-4 py-4 text-sm md:text-base font-medium">
+                                <a href="{% url 'HRMS:employee_detail' employee.SAP_ID %}" class="text-blue-600 hover:text-blue-800 hover:underline view-details flex items-center" data-employee-id="{{ employee.SAP_ID }}" onclick="openEmployeeModal('{{ employee.SAP_ID }}'); return false;">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                    </svg>
+                                    {{ employee.SAP_ID }}
+                                </a>
                             </td>
-                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">
+                            <td class="border border-gray-300 px-4 py-4 text-sm md:text-base font-medium">
                                {{ employee.name }}
-
                             </td>
-                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.employee_type }}</td>
-                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.designation }}</td>
-                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.employee_grade }}</td>
-                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">
+                            <td class="border border-gray-300 px-4 py-4 text-sm md:text-base">{{ employee.employee_type }}</td>
+                            <td class="border border-gray-300 px-4 py-4 text-sm md:text-base">{{ employee.designation }}</td>
+                            <td class="border border-gray-300 px-4 py-4 text-sm md:text-base">{{ employee.employee_grade }}</td>
+                            <td class="border border-gray-300 px-4 py-4 text-sm md:text-base">
                                 {% if employee.pending_inquiry %}
-                                    <span class="text-green-600 font-semibold">Yes</span>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        <svg class="-ml-0.5 mr-1.5 h-2 w-2 text-green-400" fill="currentColor" viewBox="0 0 8 8">
+                                            <circle cx="4" cy="4" r="3" />
+                                        </svg>
+                                        Yes
+                                    </span>
                                 {% else %}
-                                    <span class="text-red-600 font-semibold">No</span>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                        <svg class="-ml-0.5 mr-1.5 h-2 w-2 text-red-400" fill="currentColor" viewBox="0 0 8 8">
+                                            <circle cx="4" cy="4" r="3" />
+                                        </svg>
+                                        No
+                                    </span>
                                 {% endif %}
                             </td>
-                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.remarks }}</td>
-                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">
-                                <a href="{% url 'transfer_employees:pending' employee.SAP_ID %}" class="btn btn-primary px-4 py-1 rounded-md">Update</a>
+                            <td class="border border-gray-300 px-4 py-4 text-sm md:text-base">{{ employee.remarks }}</td>
+                            <td class="border border-gray-300 px-4 py-4 text-sm md:text-base">
+                                <a href="{% url 'transfer_employees:pending' employee.SAP_ID %}" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 shadow hover:shadow-md">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                    </svg>
+                                    Update
+                                </a>
                             </td>
-                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">
+                            <td class="border border-gray-300 px-4 py-4 text-sm md:text-base">
                                 {% if not employee.transfer_remarks %}
-                                <a  href="{% url 'transfer_employees:transfer' employee.SAP_ID %}" class="btn btn-secondary px-4 py-1 rounded-md">Transfer</a>
+                                <a href="{% url 'transfer_employees:transfer' employee.SAP_ID %}" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 shadow hover:shadow-md">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m-4 6H4m0 0l4 4m-4-4l4-4"></path>
+                                    </svg>
+                                    Transfer
+                                </a>
                                 {% endif %}
                             </td>  
-                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">{{ employee.transfer_remarks }}</td>
+                            <td class="border border-gray-300 px-4 py-4 text-sm md:text-base">{{ employee.transfer_remarks }}</td>
                             
-                            <td class="border border-gray-300 px-6 py-6 text-sm md:text-base">
+                            <td class="border border-gray-300 px-4 py-4 text-sm md:text-base">
                                 <select 
                                     name="grade_assignment" 
-                                    class="border px-1 py-2 rounded bg-white focus:ring-blue-300 focus:outline-none transition" 
+                                    class="border px-1 py-2 rounded bg-white focus:ring-blue-300 focus:outline-none transition-all duration-200 hover:bg-gray-50" 
                                     data-employee-id="{{ employee.SAP_ID }}" 
                                     onchange="updateGrade(this)">
-                                    {% for grade, label in employee.GRADE_CHOICES %}
-                                        <option 
-                                            value="{{ grade }}" 
-                                            {% if employee.grade_assignment == grade %} selected {% endif %}>
-                                            {{ label }}
-                                        </option>
-                                    {% endfor %}
+                                    <option value="Not Assigned" {% if employee.grade_assignment == 'Not Assigned' %}selected{% endif %}>Not Assigned</option>
+                                    <option value="Excellent" {% if employee.grade_assignment == 'Excellent' %}selected{% endif %}>Excellent</option>
+                                    <option value="Very Good" {% if employee.grade_assignment == 'Very Good' %}selected{% endif %}>Very Good</option>
+                                    <option value="Good" {% if employee.grade_assignment == 'Good' %}selected{% endif %}>Good</option>
+                                    <option value="Needs Improvement" {% if employee.grade_assignment == 'Needs Improvement' %}selected{% endif %}>Needs Improvement</option>
+                                    <option value="Unsatisfactory" {% if employee.grade_assignment == 'Unsatisfactory' %}selected{% endif %}>Unsatisfactory</option>
                                 </select>
                             </td>                            
                             
@@ -238,41 +267,35 @@
         
         <div class="flex flex-col sm:flex-row justify-between items-center px-4 py-4 bg-gray-50 dark:bg-gray-800 rounded-b-lg border-t border-gray-200 dark:border-gray-700">
             <div class="text-sm text-gray-600 dark:text-gray-300 mb-3 sm:mb-0">
-                Showing <span class="font-semibold">{{ page_obj.start_index }}-{{ page_obj.end_index }}</span> of <span class="font-semibold">{{ page_obj.paginator.count }}</span>
+                Showing <span class="font-semibold">{{ page_obj.start_index }}-{{ page_obj.end_index }}</span> of <span class="font-semibold">{{ page_obj.paginator.count }}</span> employees
             </div>
             <div class="flex space-x-2">
                 {% if page_obj.has_previous %}
-                    <a href="?page={{ page_obj.previous_page_number }}&search={{ search_query }}" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 ease-in-out">
-                        <span class="flex items-center">
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-                            Prev
-                        </span>
-                    </a>
-                {% endif %}
+                    <a href="?page={{ page_obj.previous_page_number }}&search={{ search_query }}" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 ease-in-out flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                        Prev
+                    {% endif %}
         
-                <div class="hidden md:flex space-x-1">
-                    {% for num in page_obj.paginator.page_range %}
-                        {% if num >= page_obj.number|add:-1 and num <= page_obj.number|add:1 %}
-                            {% if num == page_obj.number %}
-                                <button class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-md shadow-sm">{{ num }}</button>
-                            {% else %}
-                                <a href="?page={{ num }}&search={{ search_query }}" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 ease-in-out">{{ num }}</a>
+                    <div class="hidden md:flex space-x-1">
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if num >= page_obj.number|add:-2 and num <= page_obj.number|add:2 %}
+                                {% if num == page_obj.number %}
+                                    <button class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-md shadow-sm">{{ num }}</button>
+                                {% else %}
+                                    <a href="?page={{ num }}&search={{ search_query }}" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 ease-in-out">{{ num }}</a>
+                                {% endif %}
                             {% endif %}
-                        {% endif %}
-                    {% endfor %}
-                </div>
+                        {% endfor %}
+                    </div>
         
-                {% if page_obj.has_next %}
-                    <a href="?page={{ page_obj.next_page_number }}&search={{ search_query }}" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 ease-in-out">
-                        <span class="flex items-center">
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}&search={{ search_query }}" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 ease-in-out flex items-center">
                             Next
                             <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                        </span>
-                    </a>
-                {% endif %}
-            </div>
-        </div>        
-        
+                        {% endif %}
+                    </div>
+                </div>        
+                
     </div>
 </div>
 <script>
@@ -445,6 +468,282 @@ function updateGrade(selectElement) {
     }
 
     
+</script>
+            
+{% endblock content %}
+
+
+
+<!-- Employee Details Modal -->
+<div id="employeeDetailsModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <!-- Background overlay -->
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeEmployeeModal()"></div>
+        
+        <!-- Modal panel -->
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="sm:flex sm:items-start">
+                    <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                            Employee Details
+                        </h3>
+                        
+                        <!-- Tabs -->
+                        <div class="mt-4 border-b border-gray-200">
+                            <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="employeeTabs" role="tablist">
+                                <li class="mr-2" role="presentation">
+                                    <button class="inline-block p-4 border-b-2 border-blue-600 rounded-t-lg active" id="basic-tab" data-tabs-target="#basic" type="button" role="tab" aria-controls="basic" aria-selected="true">Basic Information</button>
+                                </li>
+                                <li class="mr-2" role="presentation">
+                                    <button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" id="contact-tab" data-tabs-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false">Contact Information</button>
+                                </li>
+                                <li class="mr-2" role="presentation">
+                                    <button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" id="employment-tab" data-tabs-target="#employment" type="button" role="tab" aria-controls="employment" aria-selected="false">Employment Details</button>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Tab Content -->
+                        <div id="employeeTabContent" class="mt-4">
+                            <!-- Basic Information Tab -->
+                            <div class="block" id="basic" role="tabpanel" aria-labelledby="basic-tab">
+                                <div class="overflow-hidden">
+                                    <table class="min-w-full divide-y divide-gray-200">
+                                        <thead class="bg-yellow-300">
+                                            <tr>
+                                                <th colspan="2" class="px-6 py-3 text-center text-lg font-medium text-gray-900 uppercase tracking-wider">
+                                                    Basic Information
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="bg-white divide-y divide-gray-200" id="basicInfoContent">
+                                            <!-- Content will be loaded dynamically -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            <!-- Contact Information Tab -->
+                            <div class="hidden" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+                                <div class="overflow-hidden">
+                                    <table class="min-w-full divide-y divide-gray-200">
+                                        <thead class="bg-yellow-300">
+                                            <tr>
+                                                <th colspan="2" class="px-6 py-3 text-center text-lg font-medium text-gray-900 uppercase tracking-wider">
+                                                    Contact Information
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="bg-white divide-y divide-gray-200" id="contactInfoContent">
+                                            <!-- Content will be loaded dynamically -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            <!-- Employment Details Tab -->
+                            <div class="hidden" id="employment" role="tabpanel" aria-labelledby="employment-tab">
+                                <div class="overflow-hidden">
+                                    <table class="min-w-full divide-y divide-gray-200">
+                                        <thead class="bg-yellow-300">
+                                            <tr>
+                                                <th colspan="2" class="px-6 py-3 text-center text-lg font-medium text-gray-900 uppercase tracking-wider">
+                                                    Employment Details
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="bg-white divide-y divide-gray-200" id="employmentInfoContent">
+                                            <!-- Content will be loaded dynamically -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm" onclick="closeEmployeeModal()">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Fix the grade options in the AJAX response
+function generateGradeOptions(selectedGrade) {
+    const gradeChoices = [
+        'Excellent',
+        'Very Good',
+        'Good',
+        'Needs Improvement',
+        'Unsatisfactory',
+        'Not Assigned'
+    ];
+
+    return gradeChoices
+        .map(
+            grade =>
+                `<option value="${grade}" ${
+                    grade === selectedGrade ? 'selected' : ''
+                }>${grade}</option>`
+        )
+        .join('');
+}
+
+// Employee Modal Functions
+function openEmployeeModal(employeeId) {
+    // Show the modal
+    document.getElementById('employeeDetailsModal').classList.remove('hidden');
+    
+    // Fetch employee details
+    fetch(`/api/employee/${employeeId}/`)
+        .then(response => response.json())
+        .then(data => {
+            // Populate Basic Information
+            document.getElementById('basicInfoContent').innerHTML = `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 w-1/2">SAP ID</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 w-1/2">${data.SAP_ID || '-'}</td>
+                </tr>
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Name</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${data.name || '-'}</td>
+                </tr>
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Current Place of Posting</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${data.current_place_of_posting || '-'}</td>
+                </tr>
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Father/Husband Name</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${data.father_husband_name || '-'}</td>
+                </tr>
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">CNIC No</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${data.cnic_no || '-'}</td>
+                </tr>
+            `;
+            
+            // Populate Contact Information
+            document.getElementById('contactInfoContent').innerHTML = `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 w-1/2">Mobile No</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 w-1/2">${data.mobile_no || '-'}</td>
+                </tr>
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Official Phone No</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${data.official_phone_no || '-'}</td>
+                </tr>
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Emergency Contact No</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${data.emergency_contact_no || '-'}</td>
+                </tr>
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Email</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${data.email || '-'}</td>
+                </tr>
+            `;
+            
+            // Populate Employment Details
+            document.getElementById('employmentInfoContent').innerHTML = `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 w-1/2">Division</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 w-1/2">${data.division || '-'}</td>
+                </tr>
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Branch Code</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${data.branch_code || '-'}</td>
+                </tr>
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Branch Name</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${data.branch || '-'}</td>
+                </tr>
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Designation</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${data.designation || '-'}</td>
+                </tr>
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Cadre</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${data.cadre || '-'}</td>
+                </tr>
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Employee Type</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${data.employee_type || '-'}</td>
+                </tr>
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Employee Grade</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${data.employee_grade || '-'}</td>
+                </tr>
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Branch</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${data.branch || '-'}</td>
+                </tr>
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Department</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${data.department || '-'}</td>
+                </tr>
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Qualifications</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${data.qualifications || '-'}</td>
+                </tr>
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Date of Last Promotion</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${data.date_of_last_promotion || '-'}</td>
+                </tr>
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Date Current Posting</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${data.date_current_posting || '-'}</td>
+                </tr>
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Date Current Assignment</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${data.date_current_assignment || '-'}</td>
+                </tr>
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Date of Retirement</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${data.date_of_retirement || '-'}</td>
+                </tr>
+            `;
+        })
+        .catch(error => {
+            console.error('Error fetching employee details:', error);
+            alert('Failed to load employee details. Please try again.');
+        });
+}
+
+function closeEmployeeModal() {
+    document.getElementById('employeeDetailsModal').classList.add('hidden');
+}
+
+// Tab functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const tabs = document.querySelectorAll('[data-tabs-target]');
+    const tabContents = document.querySelectorAll('[role="tabpanel"]');
+    
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const target = document.querySelector(tab.dataset.tabsTarget);
+            
+            tabContents.forEach(tabContent => {
+                tabContent.classList.add('hidden');
+            });
+            
+            tabs.forEach(t => {
+                t.classList.remove('border-blue-600');
+                t.classList.add('border-transparent');
+                t.setAttribute('aria-selected', false);
+            });
+            
+            tab.classList.remove('border-transparent');
+            tab.classList.add('border-blue-600');
+            tab.setAttribute('aria-selected', true);
+            
+            target.classList.remove('hidden');
+        });
+    });
+});
 </script>
             
 {% endblock content %}

@@ -398,6 +398,11 @@ UNFOLD = {
                 "collapsible": True,
                 "items": [
                     {
+                        "title": _("Purpose of Letter"),
+                        "icon": "local_hospital",
+                        "link": reverse_lazy("admin:reporting_purpose_changelist"),
+                    },
+                    {
                         "title": _("Hospital Names"),
                         "icon": "local_hospital",
                         "link": reverse_lazy("admin:reporting_hospitalname_changelist"),
