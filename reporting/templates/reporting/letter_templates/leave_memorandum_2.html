@@ -556,7 +556,7 @@
         const sapId = document.getElementById('absence_employee').value;
 
         if (sapId) {
-            fetch(`/get_employee_data/?sap_id=${sapId}`)
+            fetch(`/get_employee/?sap_id=${sapId}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.employee_name && data.designation) {
@@ -584,7 +584,7 @@
         const sapId2 = document.getElementById('absence_employee2').value;
 
         if (sapId2) {
-            fetch(`/get_employee_data/?sap_id=${sapId2}`)
+            fetch(`/get_employee/?sap_id=${sapId2}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.employee_name && data.designation) {
