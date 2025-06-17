@@ -41,6 +41,9 @@
                             <option value="">Select Leave Type</option>
                             <option value="PL">Privilege Leave</option>
                             <option value="CL">Casual Leave</option>
+                            <option value="EX-Pak">Ex-Pakistan Leave</option>
+                            <option value="SL">Sick Leave</option>
+                            <option value="ML">Mandatory Leave</option>
                         </select>
                     </div>
 
@@ -197,7 +200,7 @@
         
 
         <!-- Signature Section -->
-        <div id="employee-details" class="mb-1 text-right">
+        <div id="employee-details" class="mb-1 text-right mt-10">
             <!-- Data will be inserted here dynamically-->
         </div>
     
@@ -490,6 +493,37 @@
     formatDate('application_date', 'application_date_text');
     formatDate('effect_from', 'effect_from_text');
     formatDate('effect_to', 'effect_to_text');
+    
+    // Function to calculate effect_to date based on granted leaves and effect_from date
+    function calculateEffectToDate() {
+        const grantedLeavesInput = document.getElementById('granted_leaves');
+        const effectFromInput = document.getElementById('effect_from');
+        const effectToInput = document.getElementById('effect_to');
+        
+        if (grantedLeavesInput && effectFromInput && effectToInput) {
+            const grantedLeaves = parseInt(grantedLeavesInput.value, 10);
+            const effectFromDate = new Date(effectFromInput.value);
+            
+            if (!isNaN(grantedLeaves) && grantedLeaves > 0 && !isNaN(effectFromDate.getTime())) {
+                // Calculate the effect_to date by adding granted leaves - 1 days to effect_from
+                // We subtract 1 because the leave period includes both the start and end dates
+                const effectToDate = new Date(effectFromDate);
+                effectToDate.setDate(effectFromDate.getDate() + (grantedLeaves - 1));
+                
+                // Format the date as YYYY-MM-DD for the input field
+                const effectToFormatted = effectToDate.toISOString().split('T')[0];
+                effectToInput.value = effectToFormatted;
+                
+                // Trigger the change event to update the formatted display
+                const event = new Event('change');
+                effectToInput.dispatchEvent(event);
+            }
+        }
+    }
+    
+    // Add event listeners to recalculate effect_to when granted_leaves or effect_from changes
+    document.getElementById('granted_leaves').addEventListener('input', calculateEffectToDate);
+    document.getElementById('effect_from').addEventListener('change', calculateEffectToDate);
 
 
     document.getElementById('leave_type_option').addEventListener('change', function() {
@@ -502,10 +536,19 @@
         const extensionPolicySection = document.getElementById('extension_policy_section');
         const stationPermissionSection = document.getElementById('station_permission_section');
         
-        if (this.value === 'Ex-Pak') {
+        if (this.value === 'EX-Pak') {
+            extensionPolicySection.style.display = 'block';
+            stationPermissionSection.style.display = 'none';
+        } else if (this.value === 'SL') {
+            // For Sick Leave, show both sections
+            extensionPolicySection.style.display = 'block';
+            stationPermissionSection.style.display = 'block';
+        } else if (this.value === 'ML') {
+            // For Mandatory Leave, show extension policy only
             extensionPolicySection.style.display = 'block';
             stationPermissionSection.style.display = 'none';
         } else {
+            // For other leave types (PL, CL)
             extensionPolicySection.style.display = 'none';
             stationPermissionSection.style.display = 'block';
         }
