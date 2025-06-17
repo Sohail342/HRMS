@@ -41,16 +41,7 @@
                 <div class="relative">
                     <select id="form_type" name="form_type"
                         class="w-full bg-white border border-gray-300 py-3 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm appearance-none hover:border-blue-400 group-hover:shadow">
-                        <option value="leave_memorandum">Leave Memorandum</option>
-                        <option value="request_for_issuance">Request For Issuance</option>
-                        <option value="hospitalization">Hospitalization</option>
-                        {% comment %} <option value="joining_memorandum">Joining Memorandum</option>
-                        <option value="order_office_memorandun">Order Office Memorandum</option>
-                        <option value="grant_of_extension">Grant of Extension</option>
-                        <option value="maternity_Leave">Maternity Leave Memorandum</option>
-                        <option value="reimbursement_against_purchase">Reimbursement Against Purchase</option>
-                        <option value="payment_of_bill">Payment of Bill</option>
-                        <option value="relieving_order">Relieving Order</option> {% endcomment %}
+                        <option value="">Loading letter templates...</option>
                     </select>
                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                         <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -175,4 +166,37 @@
 </div>
 
 <script src="{% static 'reporting/js/file-upload.js' %}"></script>
+<script>
+    // Fetch letter templates when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fetch letter templates from the API
+        fetch('{% url "reporting:get_letter_templates" %}')
+            .then(response => response.json())
+            .then(data => {
+                const dropdown = document.getElementById('form_type');
+                // Clear the loading option
+                dropdown.innerHTML = '';
+                
+                // Add a default option
+                const defaultOption = document.createElement('option');
+                defaultOption.value = '';
+                defaultOption.textContent = 'Select letter type';
+                dropdown.appendChild(defaultOption);
+                
+                // Add options from the API response
+                data.templates.forEach(template => {
+                    const option = document.createElement('option');
+                    option.value = template.id;
+                    option.textContent = template.name;
+                    dropdown.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching letter templates:', error);
+                // Show error message in dropdown
+                const dropdown = document.getElementById('form_type');
+                dropdown.innerHTML = '<option value="">Error loading templates</option>';
+            });
+    });
+</script>
 {% endblock %}

@@ -168,16 +168,14 @@
         </div>
 
         <!-- Title -->
-        <u><h1 class="text-center text-xl font-bold mb-5">MEMORANDUM</h1></u>
+        <u><h1 class="text-center text-xl font-bold mb-5">LEAVE MEMORANDUM</h1></u>
 
         <!-- Body Text -->
         <p class="mb-4" style="text-align: justify;">
-            With reference to his application dated <b><span id="application_date_text">______________</span></b> {{employee.employee_salutation | capitalize_words }} {{employee.name}}, {{employee.employee_grade}}/{{employee.employee_type}} SAP ID: {{employee.SAP_ID}}, 
-            NBP, Regional Office, {{employee.region}} is advised that he has been granted <span id="granted_leaves_text">______________</span> <span id="leave_type_text">______________</span> leave effective from <span id="effect_from_text">______________</span> to <span id="effect_to_text">______________</span>.
+            Consequent upon applying <span id="leave_type_text">______________</span> leave by {{employee.employee_salutation | capitalize_words }} {{employee.name}}, {{employee.employee_grade}}/{{employee.employee_type}} having SAP-ID-{{employee.SAP_ID}}, dated <b><span id="application_date_text">______________</span></b>. {{employee.employee_salutation | capitalize_words }} {{employee.name}} is hereby informed that  <span id="granted_leaves_text">______________</span> <span id="leave_type_text">______________</span> Leave has been sanctioned by the competent authorities from <span id="effect_from_text">______________</span> till <span id="effect_to_text">______________</span>.
         </p>
         <p class="mb-4" style="text-align: justify;">
-            {{employee.employee_salutation | capitalize_words }} {{employee.name}} will accordingly stand relieved to his duties as of close of office today i.e. <b>{{current_time | date:"F j, Y" }}</b> to avail sanctioned leave(s). <span id="extension_text"></span> {% if is_friday == True %}Accordingly {{employee.employee_salutation | capitalize_words }} {{employee.name}} is hereby relieved of his duties by the close of office hours today i.e.
-            Friday, {{current_time | date:"F j, Y"}}. ({{next_day | date:"F, Y"}} & {{next_next_day | date:"F, Y"}} i.e. Saturday and Sunday being public holidays){% endif %}
+            Accordingly, {{employee.employee_salutation | capitalize_words }} {{employee.name}}, is hereby relieved of his duties by the close of business hours today i.e. {{current_time | date:"F j, Y" }}. ({{next_day | date:"F j, Y"}} & {{next_next_day | date:"F j, Y"}} i.e. Saturday and Sunday being public holidays) <span id="extension_text"></span>
         </p>
 
 

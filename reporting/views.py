@@ -130,7 +130,24 @@ class LeaveMemorandum(MemorandumMixin, DetailView):
         context['hospital_name'] = HospitalName.objects.all()
     
         return context
-    template_name = 'reporting/letter_templates/leave_memorandum.html' 
+    
+    def get_template_names(self):
+        # Get the form_type from the session or use default
+        form_type = self.request.session.get('form_type', 'leave_memorandum')
+        
+        # Choose template based on form_type
+        if form_type == 'leave_memorandum_2':
+            return ['reporting/letter_templates/leave_memorandum_2.html']
+        else:
+            return ['reporting/letter_templates/leave_memorandum.html']
+    
+    def dispatch(self, request, *args, **kwargs):
+        # Store form_type in session if it's in the request
+        form_type = request.GET.get('form_type')
+        if form_type:
+            request.session['form_type'] = form_type
+        return super().dispatch(request, *args, **kwargs)
+    # template_name is removed as we're using get_template_names() method
 
 
 @method_decorator(is_letter_template_admin_required, name='dispatch')
@@ -240,6 +257,8 @@ class LetterForm(LoginRequiredMixin, ListView):
     
     FORM_TYPE_MAPPING = {
         'leave_memorandum': 'reporting:leave_memorandum',
+        'leave_memorandum_2': 'reporting:leave_memorandum',  # Using the same view but will render different template
+        'privilege_leave_memorandum': 'reporting:privilege_leave_memorandum',  # New mapping for privilege leave memorandum
         'joining_memorandum': 'reporting:joining_memorandum',
         'order_office_memorandun': 'reporting:order_office_memorandun',
         'hospitalization': 'reporting:hospitalization',
@@ -375,6 +394,58 @@ def application_leave(request, sap_id):
         return redirect('reporting:leave_memorandum', sap_id=sap_id)
 
     return render(request, 'reporting/leave_memorandum.html', sap_id=sap_id)
+    
+
+
+
+
+
+
+
+    
+
+# Add a new view function to get letter templates for dropdown
+def get_letter_templates(request):
+    """View function to provide letter templates data for dropdown"""
+    templates = [
+        {'id': 'leave_memorandum', 'name': 'Leave Memorandum'},
+        {'id': 'privilege_leave_memorandum', 'name': 'Privilege Leave Memorandum'},
+        {'id': 'request_for_issuance', 'name': 'Request For Issuance'},
+        {'id': 'hospitalization', 'name': 'Hospitalization'}
+    ]
+    return JsonResponse({'templates': templates})
+    
+
+
+
+
+
+
+
+    
+
+@method_decorator(is_letter_template_admin_required, name='dispatch')
+class PrivilegeLeaveMemorandum(MemorandumMixin, DetailView):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        current_time = timezone.now()
+        weekday = current_time.strftime('%A')
+
+        context['employees'] = Employee.objects.all()
+        context['current_time'] = timezone.now()
+        context['admin_signuture'] = Signature.objects.all()
+        context['current_time'] = current_time
+        context['next_day'] = current_time + timedelta(days=1)
+        context['next_next_day'] = current_time + timedelta(days=2)
+        context['holidays'] = PulicHolidays.objects.all()
+        context['is_friday'] = weekday == 'Friday',
+
+        context['hospital_name'] = HospitalName.objects.all()
+    
+        return context
+    
+    template_name = 'reporting/letter_templates/leave_memorandum_2.html'
     
 
 
