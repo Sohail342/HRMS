@@ -79,7 +79,7 @@ def get_employee(request):
 #  AJAX request
 def get_employee_data(request):
     sap_id = request.GET.get('sap_id')
-    employee = get_object_or_404(Signature, SAP_ID=sap_id)
+    employee = get_object_or_404(Employee, SAP_ID=sap_id)
 
     
     data = {
