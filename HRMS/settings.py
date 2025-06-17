@@ -390,6 +390,11 @@ UNFOLD = {
                         "icon": "swap_horiz",
                         "link": reverse_lazy("admin:transfer_employees_inquiry_changelist"),
                     },
+                    {
+                        "title": _("APA Grading"),
+                        "icon": "swap_horiz",
+                        "link": reverse_lazy("admin:HRIS_App_apa_grading_changelist"),
+                    },
                 ],
             },
             {

@@ -1,0 +1,261 @@
+{% extends "sidebar.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'HRIS_App/css/enhanced-ui.css' %}">
+<style>
+    /* Custom styles for APA Grading page */
+    .filter-section {
+        transition: all 0.3s ease;
+    }
+    
+    .grade-badge {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-align: center;
+        white-space: nowrap;
+        text-transform: uppercase;
+    }
+    
+    .grade-Outstanding {
+        background-color: #4f46e5;
+        color: white;
+    }
+    
+    .grade-VeryGood {
+        background-color: #10b981;
+        color: white;
+    }
+    
+    .grade-Good {
+        background-color: #3b82f6;
+        color: white;
+    }
+    
+    .grade-NeedsImprovement {
+        background-color: #f59e0b;
+        color: white;
+    }
+    
+    .grade-Unsatisfactory {
+        background-color: #ef4444;
+        color: white;
+    }
+    
+    /* Responsive table styles */
+    @media (max-width: 768px) {
+        .responsive-table {
+            display: block;
+            width: 100%;
+            overflow-x: auto;
+        }
+        
+        .filter-container {
+            flex-direction: column;
+        }
+        
+        .filter-item {
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 fade-in">
+    <h1 class="text-2xl md:text-3xl font-bold text-center mb-6 text-gray-800 slide-in-top">APA Grading Management</h1>
+    
+    <!-- Search and Filter Section -->
+    <div class="filter-section bg-white rounded-lg shadow-md p-4 mb-6">
+        <form method="get" action="{% url 'HRMS:apa_grading' %}" id="search-form" class="space-y-4">
+            <div class="filter-container flex flex-wrap gap-4">
+                <!-- Search Input -->
+                <div class="filter-item flex-1 min-w-[250px]">
+                    <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Search by Name or SAP ID</label>
+                    <div class="relative">
+                        <input type="text" name="search" id="search" value="{{ search_query }}" 
+                               class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 pl-10"
+                               placeholder="Enter name or SAP ID...">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Grade Filter -->
+                <div class="filter-item flex-1 min-w-[200px]">
+                    <label for="grade" class="block text-sm font-medium text-gray-700 mb-1">Filter by Grade</label>
+                    <select name="grade" id="grade" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                        <option value="">All Grades</option>
+                        {% for grade_code, grade_name in grade_choices %}
+                            <option value="{{ grade_code }}" {% if grade_filter == grade_code %}selected{% endif %}>{{ grade_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Year Filter -->
+                <div class="filter-item flex-1 min-w-[200px]">
+                    <label for="year" class="block text-sm font-medium text-gray-700 mb-1">Filter by Year</label>
+                    <select name="year" id="year" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                        <option value="">All Years</option>
+                        {% for year in years %}
+                            <option value="{{ year }}" {% if year_filter == year %}selected{% endif %}>{{ year }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Submit Button -->
+                <div class="filter-item flex items-end">
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-150 ease-in-out">
+                        Apply Filters
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Results Section -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        {% if page_obj %}
+            <div class="responsive-table">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SAP ID</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Designation</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Grade</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Year</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Comments</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for grading in page_obj %}
+                            <tr class="hover:bg-gray-50 transition-colors duration-150">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-medium text-gray-900">{{ grading.employee.name }}</div>
+                                    <div class="text-sm text-gray-500">{{ grading.employee.employee_grade.grade_name|default:"N/A" }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ grading.employee.SAP_ID }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ grading.employee.designation.title|default:"N/A" }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="grade-badge grade-{{ grading.grade|cut:' ' }}">{{ grading.get_grade_display }}</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ grading.year }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{{ grading.comments|default:"No comments" }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6" class="px-6 py-4 text-center text-gray-500">No grading records found.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+                <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
+                    <div class="flex-1 flex justify-between sm:hidden">
+                        {% if page_obj.has_previous %}
+                            <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if grade_filter %}&grade={{ grade_filter }}{% endif %}{% if year_filter %}&year={{ year_filter }}{% endif %}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                Previous
+                            </a>
+                        {% endif %}
+                        {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if grade_filter %}&grade={{ grade_filter }}{% endif %}{% if year_filter %}&year={{ year_filter }}{% endif %}" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                Next
+                            </a>
+                        {% endif %}
+                    </div>
+                    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                        <div>
+                            <p class="text-sm text-gray-700">
+                                Showing <span class="font-medium">{{ page_obj.start_index }}</span> to <span class="font-medium">{{ page_obj.end_index }}</span> of <span class="font-medium">{{ page_obj.paginator.count }}</span> results
+                            </p>
+                        </div>
+                        <div>
+                            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                                {% if page_obj.has_previous %}
+                                    <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if grade_filter %}&grade={{ grade_filter }}{% endif %}{% if year_filter %}&year={{ year_filter }}{% endif %}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                        <span class="sr-only">Previous</span>
+                                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                        </svg>
+                                    </a>
+                                {% endif %}
+                                
+                                {% for i in page_obj.paginator.page_range %}
+                                    {% if page_obj.number == i %}
+                                        <span class="relative inline-flex items-center px-4 py-2 border border-blue-500 bg-blue-50 text-sm font-medium text-blue-600">
+                                            {{ i }}
+                                        </span>
+                                    {% elif i > page_obj.number|add:'-3' and i < page_obj.number|add:'3' %}
+                                        <a href="?page={{ i }}{% if search_query %}&search={{ search_query }}{% endif %}{% if grade_filter %}&grade={{ grade_filter }}{% endif %}{% if year_filter %}&year={{ year_filter }}{% endif %}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                            {{ i }}
+                                        </a>
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                {% if page_obj.has_next %}
+                                    <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if grade_filter %}&grade={{ grade_filter }}{% endif %}{% if year_filter %}&year={{ year_filter }}{% endif %}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                        <span class="sr-only">Next</span>
+                                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                                        </svg>
+                                    </a>
+                                {% endif %}
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="p-6 text-center text-gray-500">
+                <p>No grading records available.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- JavaScript for enhanced UX -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Auto-submit form when select filters change
+        const gradeSelect = document.getElementById('grade');
+        const yearSelect = document.getElementById('year');
+        
+        if (gradeSelect) {
+            gradeSelect.addEventListener('change', function() {
+                document.getElementById('search-form').submit();
+            });
+        }
+        
+        if (yearSelect) {
+            yearSelect.addEventListener('change', function() {
+                document.getElementById('search-form').submit();
+            });
+        }
+        
+        // Add responsive behavior for mobile
+        const handleResize = function() {
+            const filterSection = document.querySelector('.filter-section');
+            if (window.innerWidth < 768) {
+                filterSection.classList.add('space-y-2');
+            } else {
+                filterSection.classList.remove('space-y-2');
+            }
+        };
+        
+        // Initial call and add event listener
+        handleResize();
+        window.addEventListener('resize', handleResize);
+    });
+</script>
+{% endblock %}

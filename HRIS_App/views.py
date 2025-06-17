@@ -4,7 +4,7 @@ from django.http import JsonResponse
 import csv
 from group_head.decorators import admin_employee_required, admin_or_admin_employee_required
 from .calculate_remaining_grades import calculate_remaining_grades
-from django.db.models import CharField
+from django.db.models import CharField, Q
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 import json
@@ -18,6 +18,7 @@ from .models import (
     EmployeeGrade, 
     Branch, 
     Qualification,
+    APA_Grading,
 )
 
 
@@ -225,4 +226,73 @@ def index(request):
 def employee_detail_view(request, sap_id):
     employee = get_object_or_404(Employee, SAP_ID=sap_id)
     return render(request, 'HRIS_App/employee_details.html', {'employee': employee})
+
+
+@login_required(login_url='account:login')
+@admin_or_admin_employee_required
+def apa_grading_view(request):
+    """View for APA grading management with search and filter functionality"""
+    # Get filter parameters from request
+    search_query = request.GET.get('search', '')
+    grade_filter = request.GET.get('grade', '')
+    year_filter = request.GET.get('year', '')
+    
+    # Start with all gradings
+    gradings = APA_Grading.objects.all().select_related('employee').order_by('-year', 'employee__name')
+    
+    # Apply filters
+    if search_query:
+        gradings = gradings.filter(
+            Q(employee__name__icontains=search_query) | 
+            Q(employee__SAP_ID__icontains=search_query)
+        )
+    
+    if grade_filter:
+        gradings = gradings.filter(grade=grade_filter)
+        
+    if year_filter:
+        gradings = gradings.filter(year=year_filter)
+    
+    # Pagination
+    paginator = Paginator(gradings, 20)  # 20 items per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    # Get unique years for filter dropdown
+    years = APA_Grading.objects.values_list('year', flat=True).distinct().order_by('-year')
+    
+    # Check if it's an AJAX request
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        data = {
+            'gradings': [
+                {
+                    'id': grading.id,
+                    'employee_name': grading.employee.name,
+                    'employee_sap_id': grading.employee.SAP_ID,
+                    'grade': grading.grade,
+                    'year': grading.year,
+                    'comments': grading.comments,
+                    'designation': grading.employee.designation.title if grading.employee.designation else 'N/A',
+                    'employee_grade': grading.employee.employee_grade.grade_name if grading.employee.employee_grade else 'N/A',
+                }
+                for grading in page_obj.object_list
+            ],
+            'total_count': paginator.count,
+            'has_previous': page_obj.has_previous(),
+            'has_next': page_obj.has_next(),
+            'previous_page_number': page_obj.previous_page_number() if page_obj.has_previous() else None,
+            'next_page_number': page_obj.next_page_number() if page_obj.has_next() else None,
+        }
+        return JsonResponse(data)
+    
+    context = {
+        'page_obj': page_obj,
+        'search_query': search_query,
+        'grade_filter': grade_filter,
+        'year_filter': year_filter,
+        'years': years,
+        'grade_choices': APA_Grading.grade_choices,
+    }
+    
+    return render(request, 'HRIS_App/apa_grading.html', context)
 

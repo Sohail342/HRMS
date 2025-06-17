@@ -1,8 +1,6 @@
 from import_export import resources, fields
-from import_export.widgets import DateWidget
 from import_export.widgets import ForeignKeyWidget, ManyToManyWidget
 from import_export import resources
-from import_export.results import RowResult
 from .models import (
 Employee, 
 Designation, 
@@ -13,8 +11,22 @@ Branch,
 Qualification, 
 Wing, Region, 
 FunctionalGroup, 
-Group, Division
+Group, Division, APA_Grading
 )
+
+
+class APA_GradingResource(resources.ModelResource):
+    employee = fields.Field(
+        column_name='employee',
+        attribute='employee',
+        widget=ForeignKeyWidget(Employee, 'name')
+    )
+
+    class Meta:
+        model = APA_Grading
+        fields = ('id', 'employee', 'grade', 'year', 'comments')
+        export_order = ('employee', 'grade', 'year', 'comments')
+
 
 
 class WingResource(resources.ModelResource):

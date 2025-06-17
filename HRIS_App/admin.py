@@ -1,14 +1,27 @@
 from django.contrib import admin
 from unfold.admin import ModelAdmin
-from .resources import FunctionalGroupResource, BranchResource, EmployeeResource, WingResource
+from .resources import BranchResource, EmployeeResource, WingResource
 from import_export.admin import ImportExportModelAdmin
 from unfold.contrib.import_export.forms import ExportForm, ImportForm
 from .forms import AdminEmployeeForm, NonAdminEmployeeForm
 from django import forms
 from .models import (
-    Group, FunctionalGroup, Division, Wing, Region, Branch,
+    Group, APA_Grading,  Division, Wing, Region, Branch,
     Designation, Cadre, EmployeeType, EmployeeGrade, Qualification, Employee
 )
+
+
+@admin.register(APA_Grading)
+class APA_GradingAdmin(ModelAdmin, ImportExportModelAdmin):
+    import_form_class = ImportForm
+    export_form_class = ExportForm
+    list_display = ('get_sap_id', 'employee__name', 'grade', 'year', 'comments')
+    search_fields = ('id', 'name')
+    list_filter = ('grade', )
+
+    def get_sap_id(self, obj):
+        return obj.employee.SAP_ID
+    get_sap_id.short_description = 'SAP ID'
 
 @admin.register(Group)
 class GroupAdmin(ModelAdmin, ImportExportModelAdmin):

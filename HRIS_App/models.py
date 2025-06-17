@@ -388,3 +388,29 @@ class Employee(AbstractBaseUser, PermissionsMixin):
         verbose_name_plural = " Employees"
 
 
+
+class APA_Grading(models.Model):
+    """
+    Model to store APA grading for employees.
+    """
+    grade_choices = [
+        ('Outstanding', 'O'),
+        ('Very Good', 'VG'),
+        ('Good', 'G'),
+        ('Needs Improvement', 'NI'),
+        ('Unsatisfactory', 'US'),
+    ]
+
+    year = models.CharField(max_length=10, blank=True, null=True)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='apa_grading')
+    grade = models.CharField(max_length=100, choices=grade_choices, default='Not Assigned')
+    comments = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.employee.name} - {self.grade}"
+    
+    class Meta:
+        verbose_name = "APA Grading"
+        verbose_name_plural = " APA Gradings"
+
+
