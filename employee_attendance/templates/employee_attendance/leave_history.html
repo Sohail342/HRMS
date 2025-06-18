@@ -1,0 +1,303 @@
+{% extends "sidebar.html" %}
+
+{% block content %}
+<div class="container mx-auto p-6 bg-gray-50 min-h-screen">
+
+    <!-- Flash Messages -->
+    {% if messages %}
+        <div class="space-y-4 mb-6">
+            {% for message in messages %}
+                <div class="p-4 rounded-lg shadow-md 
+                    {% if message.tags == 'error' %}
+                        bg-red-100 border-l-4 border-red-500 text-red-700
+                    {% elif message.tags == 'success' %}
+                        bg-green-100 border-l-4 border-green-500 text-green-700
+                    {% else %}
+                        bg-blue-100 border-l-4 border-blue-500 text-blue-700
+                    {% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Header -->
+    <div class="text-center mb-10">
+        <h1 class="text-4xl font-extrabold text-blue-600">Leave History</h1>
+        <p class="mt-2 text-gray-600">View your leave applications and transactions</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="mb-8">
+        <div class="border-b border-gray-200">
+            <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                <button id="tab-applications" class="border-blue-500 text-blue-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm active-tab" aria-current="page">
+                    Leave Applications
+                </button>
+                <button id="tab-transactions" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                    Leave Transactions
+                </button>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Leave Applications Tab Content -->
+    <div id="content-applications" class="tab-content">
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="bg-gradient-to-r from-blue-500 to-blue-700 text-white py-4 px-6">
+                <h2 class="text-lg font-semibold">Your Leave Applications</h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Leave Type</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">From</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">To</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Days</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Applied On</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Details</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for application in leave_applications %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ application.leave_type.name }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ application.from_date }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ application.to_date }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ application.availed_leaves }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ application.application_date }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                    {% if application.leave_status == 'pending' %}bg-yellow-100 text-yellow-800
+                                    {% elif application.leave_status == 'approved' %}bg-green-100 text-green-800
+                                    {% else %}bg-red-100 text-red-800{% endif %}">
+                                    {{ application.leave_status|title }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <button class="text-blue-600 hover:text-blue-900 view-details" data-id="{{ application.id }}">
+                                    View Details
+                                </button>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">No leave applications found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leave Transactions Tab Content -->
+    <div id="content-transactions" class="tab-content hidden">
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="bg-gradient-to-r from-green-500 to-green-700 text-white py-4 px-6">
+                <h2 class="text-lg font-semibold">Your Leave Transactions</h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Leave Type</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Transaction Type</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Days</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Year</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for transaction in leave_transactions %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ transaction.transaction_date }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ transaction.leave_type.name }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                    {% if transaction.transaction_type == 'usage' %}bg-red-100 text-red-800
+                                    {% elif transaction.transaction_type == 'adjustment' %}bg-blue-100 text-blue-800
+                                    {% elif transaction.transaction_type == 'carry_forward' %}bg-purple-100 text-purple-800
+                                    {% elif transaction.transaction_type == 'expire' %}bg-gray-100 text-gray-800
+                                    {% elif transaction.transaction_type == 'freeze' %}bg-indigo-100 text-indigo-800
+                                    {% else %}bg-green-100 text-green-800{% endif %}">
+                                    {{ transaction.transaction_type|title }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 
+                                {% if transaction.days < 0 %}text-red-600{% else %}text-green-600{% endif %}">
+                                {{ transaction.days }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ transaction.year }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-500">{{ transaction.notes|truncatechars:50 }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">No leave transactions found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Details Modal -->
+    <div id="application-details-modal" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4">
+            <div class="bg-gradient-to-r from-blue-500 to-blue-700 text-white py-4 px-6 rounded-t-lg flex justify-between items-center">
+                <h3 class="text-lg font-semibold">Leave Application Details</h3>
+                <button id="close-modal" class="text-white hover:text-gray-200">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="p-6" id="modal-content">
+                <!-- Content will be loaded dynamically -->
+                <div class="animate-pulse">
+                    <div class="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
+                    <div class="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
+                    <div class="h-4 bg-gray-200 rounded w-5/6 mb-4"></div>
+                    <div class="h-4 bg-gray-200 rounded w-2/3 mb-4"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tab switching functionality
+        const tabApplications = document.getElementById('tab-applications');
+        const tabTransactions = document.getElementById('tab-transactions');
+        const contentApplications = document.getElementById('content-applications');
+        const contentTransactions = document.getElementById('content-transactions');
+        
+        tabApplications.addEventListener('click', function() {
+            // Update active tab
+            tabApplications.classList.add('border-blue-500', 'text-blue-600');
+            tabApplications.classList.remove('border-transparent', 'text-gray-500');
+            tabTransactions.classList.add('border-transparent', 'text-gray-500');
+            tabTransactions.classList.remove('border-blue-500', 'text-blue-600');
+            
+            // Show/hide content
+            contentApplications.classList.remove('hidden');
+            contentTransactions.classList.add('hidden');
+        });
+        
+        tabTransactions.addEventListener('click', function() {
+            // Update active tab
+            tabTransactions.classList.add('border-blue-500', 'text-blue-600');
+            tabTransactions.classList.remove('border-transparent', 'text-gray-500');
+            tabApplications.classList.add('border-transparent', 'text-gray-500');
+            tabApplications.classList.remove('border-blue-500', 'text-blue-600');
+            
+            // Show/hide content
+            contentTransactions.classList.remove('hidden');
+            contentApplications.classList.add('hidden');
+        });
+        
+        // Modal functionality
+        const modal = document.getElementById('application-details-modal');
+        const closeModal = document.getElementById('close-modal');
+        const modalContent = document.getElementById('modal-content');
+        const viewDetailsButtons = document.querySelectorAll('.view-details');
+        
+        viewDetailsButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const applicationId = this.getAttribute('data-id');
+                
+                // Here you would typically fetch the application details via AJAX
+                // For now, we'll just simulate it with static content
+                
+                // Show loading state
+                modalContent.innerHTML = `
+                    <div class="animate-pulse">
+                        <div class="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
+                        <div class="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
+                        <div class="h-4 bg-gray-200 rounded w-5/6 mb-4"></div>
+                        <div class="h-4 bg-gray-200 rounded w-2/3 mb-4"></div>
+                    </div>
+                `;
+                
+                // Show modal
+                modal.classList.remove('hidden');
+                
+                // Simulate loading data
+                setTimeout(() => {
+                    // Find the application in the DOM to extract data
+                    // In a real app, you'd fetch this from the server
+                    const row = button.closest('tr');
+                    const cells = row.querySelectorAll('td');
+                    
+                    if (cells.length >= 6) {
+                        const leaveType = cells[0].textContent.trim();
+                        const fromDate = cells[1].textContent.trim();
+                        const toDate = cells[2].textContent.trim();
+                        const days = cells[3].textContent.trim();
+                        const appliedDate = cells[4].textContent.trim();
+                        const status = cells[5].querySelector('span').textContent.trim();
+                        
+                        modalContent.innerHTML = `
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <p class="text-sm text-gray-500">Leave Type</p>
+                                    <p class="text-base font-medium">${leaveType}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Status</p>
+                                    <p class="text-base font-medium">${status}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">From Date</p>
+                                    <p class="text-base font-medium">${fromDate}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">To Date</p>
+                                    <p class="text-base font-medium">${toDate}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Days</p>
+                                    <p class="text-base font-medium">${days}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Applied On</p>
+                                    <p class="text-base font-medium">${appliedDate}</p>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <p class="text-sm text-gray-500">Reason</p>
+                                <p class="text-base">Reason for leave application would be displayed here.</p>
+                            </div>
+                            <div class="mt-4">
+                                <p class="text-sm text-gray-500">Additional Information</p>
+                                <div class="mt-2 space-y-2">
+                                    <p class="text-sm"><span class="font-medium">Station Permission:</span> Yes/No</p>
+                                    <p class="text-sm"><span class="font-medium">Extension Policy:</span> Yes/No</p>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        modalContent.innerHTML = `<p class="text-center text-gray-500">Could not load application details.</p>`;
+                    }
+                }, 500);
+            });
+        });
+        
+        closeModal.addEventListener('click', function() {
+            modal.classList.add('hidden');
+        });
+        
+        // Close modal when clicking outside
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modal.classList.add('hidden');
+            }
+        });
+    });
+</script>
+{% endblock %}

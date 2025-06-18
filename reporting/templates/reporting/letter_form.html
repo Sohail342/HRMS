@@ -52,7 +52,7 @@
             </div>
 
             <!-- SAP ID Input -->
-            <div class="mb-6 group">
+            <div class="mb-6 group" id="sap_id_field">
                 <label for="sap_id" class="block text-sm font-medium text-gray-700 mb-2 group-hover:text-blue-600 transition-colors">Enter SAP ID for Employee:</label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -62,7 +62,7 @@
                     </div>
                     <input type="number" name="sap_id" id="sap_id"
                         class="w-full bg-white border border-gray-300 py-3 px-4 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm hover:border-blue-400 group-hover:shadow"
-                        placeholder="Enter SAP ID" required>
+                        placeholder="Enter SAP ID" required min="1" oninvalid="this.setCustomValidity('Please enter a valid SAP ID')" oninput="this.setCustomValidity('')">
                 </div>
             </div>
 
@@ -123,7 +123,7 @@
                         <input type="number" name="sap_id_for_template_upload" id="sap_id_for_template_upload" 
                             class="block w-full pl-10 px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm hover:border-indigo-400 transition-all duration-200 group-hover:shadow-sm" 
                             placeholder="Enter employee SAP ID"
-                            required>
+                            required min="1" oninvalid="this.setCustomValidity('Please enter a valid SAP ID')" oninput="this.setCustomValidity('')">
                     </div>
                 </div>
                 <div class="mb-4 group">
@@ -169,11 +169,28 @@
 <script>
     // Fetch letter templates when the page loads
     document.addEventListener('DOMContentLoaded', function() {
-        // Fetch letter templates from the API
-        fetch('{% url "reporting:get_letter_templates" %}')
-            .then(response => response.json())
+        console.log('DOM loaded, fetching letter templates...');
+        
+        // Get the URL for the API endpoint
+        const apiUrl = '{% url "reporting:get_letter_templates" %}';
+        console.log('API URL:', apiUrl);
+        
+        // Add status message to the dropdown
+        const dropdown = document.getElementById('form_type');
+        dropdown.innerHTML = '<option value="">Attempting to load templates...</option>';
+        
+        // Fetch letter templates from the API with improved error handling
+        fetch(apiUrl)
+            .then(response => {
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
-                const dropdown = document.getElementById('form_type');
+                console.log('Data received:', data);
+                
                 // Clear the loading option
                 dropdown.innerHTML = '';
                 
@@ -183,20 +200,61 @@
                 defaultOption.textContent = 'Select letter type';
                 dropdown.appendChild(defaultOption);
                 
-                // Add options from the API response
-                data.templates.forEach(template => {
-                    const option = document.createElement('option');
-                    option.value = template.id;
-                    option.textContent = template.name;
-                    dropdown.appendChild(option);
-                });
+                // Check if templates exist in the response
+                if (data && data.templates && Array.isArray(data.templates)) {
+                    // Add options from the API response
+                    data.templates.forEach(template => {
+                        console.log('Adding template:', template);
+                        const option = document.createElement('option');
+                        option.value = template.id;
+                        option.textContent = template.name;
+                        dropdown.appendChild(option);
+                    });
+                } else {
+                    console.error('Invalid data format received:', data);
+                    dropdown.innerHTML = '<option value="">Invalid data format</option>';
+                }
+                
+                // Check if we need to hide SAP ID field based on initial value
+                toggleSapIdField();
             })
             .catch(error => {
                 console.error('Error fetching letter templates:', error);
-                // Show error message in dropdown
-                const dropdown = document.getElementById('form_type');
+                // Show detailed error message in dropdown and console
                 dropdown.innerHTML = '<option value="">Error loading templates</option>';
+                
+                // Try to diagnose the issue
+                console.log('Attempting to diagnose the issue...');
+                fetch(apiUrl, { method: 'HEAD' })
+                    .then(response => {
+                        console.log('HEAD request status:', response.status);
+                    })
+                    .catch(headError => {
+                        console.error('HEAD request failed:', headError);
+                    });
             });
+             
+        // Add event listener to form type dropdown
+        const formTypeDropdown = document.getElementById('form_type');
+        formTypeDropdown.addEventListener('change', toggleSapIdField);
+        
+        // Function to toggle SAP ID field visibility
+        function toggleSapIdField() {
+            const selectedValue = formTypeDropdown.value;
+            const sapIdField = document.getElementById('sap_id_field');
+            const sapIdInput = document.getElementById('sap_id');
+            
+            console.log('Toggle SAP ID field for value:', selectedValue);
+            
+            // Hide SAP ID field for leave_memorandum and privilege_leave_memorandum
+            if (selectedValue === 'leave_memorandum' || selectedValue === 'privilege_leave_memorandum') {
+                sapIdField.style.display = 'none';
+                sapIdInput.removeAttribute('required');
+            } else {
+                sapIdField.style.display = 'block';
+                sapIdInput.setAttribute('required', 'required');
+            }
+        }
     });
 </script>
 {% endblock %}

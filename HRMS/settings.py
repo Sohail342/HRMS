@@ -360,11 +360,7 @@ UNFOLD = {
                         "icon": "trending_up",
                         "link": reverse_lazy("admin:employee_user_ricpkpi_changelist"),
                     },
-                    {
-                        "title": _("Leave Application"),
-                        "icon": "event_note",
-                        "link": reverse_lazy("admin:employee_attendance_leaveapplication_changelist"),
-                    },
+                    
                     {
                         "title": _("Non-Involvement Certificate"),
                         "icon": "verified_user",

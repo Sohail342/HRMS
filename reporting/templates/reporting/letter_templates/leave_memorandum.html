@@ -10,8 +10,27 @@
         <div class="w-full lg:w-5/12 p-6 bg-white shadow-lg rounded-lg my-4">
             <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Application Form</h2>
             
+            <!-- Employee SAP ID Search Field -->
+            <div class="mb-6">
+                <label for="search_sap_id" class="block text-sm font-medium text-gray-700 mb-2">Employee SAP ID:</label>
+                <div class="flex space-x-2 w-10/12">
+                    <input type="number" id="search_sap_id" class="p-2 flex-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" placeholder="Enter SAP ID">
+                    <button type="button" id="search_employee" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                        Search
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Employee Leave Balance Section -->
+            <div id="leave-balance-section" class="mb-6 hidden">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Leave Balances</h3>
+                <div id="leave-balances" class="space-y-2">
+                    <!-- Leave balances will be populated here -->
+                </div>
+            </div>
+            
             <!-- Leave Application Form -->
-            <form action="{% url 'reporting:application_leave' employee.SAP_ID %}" method="post" enctype="multipart/form-data">
+            <form action="{% if employee and employee.SAP_ID %}{% url 'reporting:application_leave' employee.SAP_ID %}{% else %}#{% endif %}" method="post" enctype="multipart/form-data" id="leave-application-form">
                 {% csrf_token %}
                 <!-- Input Fields for User Data -->
                 <div class="space-y-4">
@@ -36,15 +55,21 @@
                     </div>
 
                     <div>
+                        <label for="purpose" class="block text-sm font-medium text-gray-700">Purpose/Reason:</label>
+                        <textarea id="purpose" name="purpose" class="mt-1 p-2 w-10/12 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required rows="3" placeholder="Enter the purpose of leave"></textarea>
+                    </div>
+
+                    <div>
                         <label for="leave_type_option" class="block text-sm font-medium text-gray-700">Leave Type:</label>
                         <select id="leave_type_option" name="leave_type_option" class="mt-1 p-2 w-10/12 border border-blue-500 rounded-md focus:outline-none focus:border-blue-700 transition-colors duration-300 shadow-sm text-sm" required>
                             <option value="">Select Leave Type</option>
-                            <option value="PL">Privilege Leave</option>
-                            <option value="CL">Casual Leave</option>
-                            <option value="EX-Pak">Ex-Pakistan Leave</option>
-                            <option value="SL">Sick Leave</option>
-                            <option value="ML">Mandatory Leave</option>
+                            {% for leave_type in leave_types %}
+                                <option value="{{ leave_type.id }}" data-code="{{ leave_type.code }}">{{ leave_type.name }}</option>
+                            {% endfor %}
                         </select>
+                        <div class="mt-1 text-xs text-gray-500">
+                            <span id="leave_balance_display">Available balance: <span class="font-semibold">--</span></span>
+                        </div>
                     </div>
 
                     <div id="extension_policy_section">
@@ -143,6 +168,11 @@
             <div id="sucessToast" class="fixed bottom-5 right-5 hidden bg-green-500 text-white text-base px-6 py-3 rounded-xl shadow-lg transition-opacity duration-300">
                 Employee found!
             </div>
+            
+            <!-- Leave Balance Warning Toast -->
+            <div id="balanceWarningToast" class="fixed bottom-5 right-5 hidden bg-yellow-500 text-white text-base px-6 py-3 rounded-xl shadow-lg transition-opacity duration-300">
+                Insufficient leave balance for selected leave type!
+            </div>
         </div>
 
         <!-- Right Column - Dynamic Letter Preview -->
@@ -165,7 +195,7 @@
                 <p class="font-semibold pr-3">Administration Division</p>
             </div>
             <div class="text-sm mt-3 mb-12">
-                <p>No. OPG/<span id="leave_type_text"></span>/ADMN/{{employee.SAP_ID}}/{{current_time |date:"Y" }}/</p>
+                <p>No. OPG/<span id="leave_type_text"></span>ADMN/{{employee.SAP_ID}}/{{current_time |date:"Y" }}/</p>
                 <p class="font-semibold">{{current_time |date:"F j, Y" }}</p>  
             </div>
         </div>
@@ -175,11 +205,14 @@
 
         <!-- Body Text -->
         <p class="mb-4" style="text-align: justify;">
-            With reference to his application dated <b><span id="application_date_text">______________</span></b> {{employee.employee_salutation | capitalize_words }} {{employee.name}}, {{employee.employee_grade}}/{{employee.employee_type}} SAP ID: {{employee.SAP_ID}}, 
-            NBP, Regional Office, {{employee.region}} is advised that he has been granted <span id="granted_leaves_text">______________</span> <span id="leave_type_text">______________</span> leave effective from <span id="effect_from_text">______________</span> to <span id="effect_to_text">______________</span>.
+            With reference to his application dated <b><span id="application_date_text">______________</span></b> <span class="employee-salutation">{{employee.employee_salutation | capitalize_words }}</span> <span class="employee-name">{{employee.name}}</span>, <span class="employee-grade">{{employee.employee_grade}}</span>/<span class="employee-type">{{employee.employee_type}}</span> SAP ID: <span class="employee-sapid">{{employee.SAP_ID}}</span>, 
+            NBP, Regional Office, <span class="employee-region">{{employee.region}}</span> is advised that he has been granted <span id="granted_leaves_text">______________</span> <span id="leave_type_text">______________</span> leave effective from <span id="effect_from_text">______________</span> to <span id="effect_to_text">______________</span>.
         </p>
         <p class="mb-4" style="text-align: justify;">
-            {{employee.employee_salutation | capitalize_words }} {{employee.name}} will accordingly stand relieved to his duties as of close of office today i.e. <b>{{current_time | date:"F j, Y" }}</b> to avail sanctioned leave(s). <span id="extension_text"></span> {% if is_friday == True %}Accordingly {{employee.employee_salutation | capitalize_words }} {{employee.name}} is hereby relieved of his duties by the close of office hours today i.e.
+            <strong>Purpose/Reason:</strong> <span id="purpose_text">______________</span>
+        </p>
+        <p class="mb-4" style="text-align: justify;">
+            <span class="employee-salutation">{{employee.employee_salutation | capitalize_words }}</span> <span class="employee-name">{{employee.name}}</span> will accordingly stand relieved to his duties as of close of office today i.e. <b>{{current_time | date:"F j, Y" }}</b> to avail sanctioned leave(s). <span id="extension_text"></span> {% if is_friday == True %}Accordingly <span class="employee-salutation">{{employee.employee_salutation | capitalize_words }}</span> <span class="employee-name">{{employee.name}}</span> is hereby relieved of his duties by the close of office hours today i.e.
             Friday, {{current_time | date:"F j, Y"}}. ({{next_day | date:"F, Y"}} & {{next_next_day | date:"F, Y"}} i.e. Saturday and Sunday being public holidays){% endif %}
         </p>
 
@@ -208,10 +241,16 @@
     
 
         <!-- Recipient Information Section -->
-        <div class="mt-8">
-            <p class="font-semibold">{{employee.employee_salutation | capitalize_words}} {{employee.name}}</p>
-            <p class="text-sm">{{employee.employee_grade}}/ {{employee.employee_type}}</p>
-            <p class="text-sm">SAP ID: {{employee.SAP_ID}}</p>
+        <div class="mt-8" id="recipient-information-section">
+            {% if employee and employee.SAP_ID %}
+                <p class="font-semibold">{{employee.employee_salutation | capitalize_words}} {{employee.name}}</p>
+                <p class="text-sm">{{employee.employee_grade}}/ {{employee.employee_type}}</p>
+                <p class="text-sm">SAP ID: {{employee.SAP_ID}}</p>
+            {% else %}
+                <p class="font-semibold recipient-name">______________</p>
+                <p class="text-sm recipient-grade-type">______________</p>
+                <p class="text-sm recipient-sapid">SAP ID: ______________</p>
+            {% endif %}
         </div>
 
         <!-- Footer Section -->
@@ -529,23 +568,28 @@
 
 
     document.getElementById('leave_type_option').addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        const leaveTypeCode = selectedOption.getAttribute('data-code') || '';
+        const leaveTypeName = selectedOption.text;
+        
+        // Update all leave type text elements with the full leave type name
         const leaveTypeTextElements = document.querySelectorAll('#leave_type_text');
         leaveTypeTextElements.forEach(element => {
-            element.textContent = this.value || "______________";
+            element.textContent = leaveTypeName || "______________";
         });
         
         // Toggle between extension policy and station permission based on leave type
         const extensionPolicySection = document.getElementById('extension_policy_section');
         const stationPermissionSection = document.getElementById('station_permission_section');
         
-        if (this.value === 'EX-Pak') {
+        if (leaveTypeCode === 'EX-Pak') {
             extensionPolicySection.style.display = 'block';
             stationPermissionSection.style.display = 'none';
-        } else if (this.value === 'SL') {
+        } else if (leaveTypeCode === 'SL') {
             // For Sick Leave, show both sections
             extensionPolicySection.style.display = 'block';
             stationPermissionSection.style.display = 'block';
-        } else if (this.value === 'ML') {
+        } else if (leaveTypeCode === 'ML') {
             // For Mandatory Leave, show extension policy only
             extensionPolicySection.style.display = 'block';
             stationPermissionSection.style.display = 'none';
@@ -554,6 +598,12 @@
             extensionPolicySection.style.display = 'none';
             stationPermissionSection.style.display = 'block';
         }
+    });
+
+    // Update purpose text in the document when purpose textarea changes
+    document.getElementById('purpose').addEventListener('input', function() {
+        const purposeText = document.getElementById('purpose_text');
+        purposeText.textContent = this.value || "______________";
     });
 
     // numbers to Aplhabets
@@ -593,6 +643,207 @@
     });
 
 
+    // Event listener for the SAP ID search button
+    document.getElementById('search_employee').addEventListener('click', function(event) {
+        // Prevent form submission
+        event.preventDefault();
+        
+        const sapId = document.getElementById('search_sap_id').value;
+
+        if (sapId) {
+            fetch(`/get_employee/?sap_id=${sapId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.employee_name && data.designation) {
+                        // Update the letter preview with employee data
+                        updateLetterWithEmployeeData(data, sapId);
+                        // Fetch leave balances for this employee
+                        fetchLeaveBalances(sapId);
+                        showSuccessToast("Employee found!");
+                    } else {
+                        showErrorToast("Employee with this SAP ID not found!");
+                        $('#leave-balance-section').addClass('hidden');
+                    }
+                })
+                .catch(error => {
+                    showErrorToast("Employee with this SAP ID not found!");
+                    $('#leave-balance-section').addClass('hidden');
+                });
+        } else {
+            showErrorToast("Please enter an SAP ID before searching.");
+            $('#leave-balance-section').addClass('hidden');
+        }
+    });
+    
+    // Function to fetch leave balances
+    function fetchLeaveBalances(sapId) {
+        $.ajax({
+            url: "{% url 'reporting:get_employee_leave_balance' %}",
+            data: {
+                'sap_id': sapId
+            },
+            dataType: 'json',
+            success: function(data) {
+                if (data.leave_balances && data.leave_balances.length > 0) {
+                    // Show the leave balance section
+                    $('#leave-balance-section').removeClass('hidden');
+                    
+                    // Clear previous balances
+                    $('#leave-balances').empty();
+                    
+                    // Add each leave balance
+                    data.leave_balances.forEach(function(balance) {
+                        $('#leave-balances').append(`
+                            <div class="p-3 bg-white rounded shadow-sm mb-2">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-medium text-gray-800">${balance.leave_type_name}</span>
+                                    <span class="text-sm bg-blue-100 text-blue-800 py-1 px-2 rounded">
+                                        Available: ${balance.available_leaves}
+                                    </span>
+                                </div>
+                                <div class="mt-2 grid grid-cols-2 gap-2 text-sm">
+                                    <div>
+                                        <span class="text-gray-500">Entitled:</span>
+                                        <span class="ml-1">${balance.entitled_leaves}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-500">Used:</span>
+                                        <span class="ml-1">${balance.used_leaves}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-500">Carried Forward:</span>
+                                        <span class="ml-1">${balance.carried_forward_leaves}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-500">Frozen:</span>
+                                        <span class="ml-1">${balance.frozen_leaves}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `);
+                    });
+                    
+                    // Update leave balance display when leave type is selected
+                    $('#leave_type_option').on('change', function() {
+                        const selectedLeaveTypeId = $(this).val();
+                        if (selectedLeaveTypeId) {
+                            const selectedLeaveType = data.leave_balances.find(balance => 
+                                balance.leave_type_id == selectedLeaveTypeId);
+                            
+                            if (selectedLeaveType) {
+                                $('#leave_balance_display').html(`Available balance: <span class="font-semibold">${selectedLeaveType.available_leaves}</span>`);
+                                
+                                // Check if requested leaves exceed available balance
+                                const grantedLeaves = parseInt($('#granted_leaves').val()) || 0;
+                                if (grantedLeaves > selectedLeaveType.available_leaves) {
+                                    showBalanceWarningToast();
+                                }
+                            } else {
+                                $('#leave_balance_display').html('Available balance: <span class="font-semibold">--</span>');
+                            }
+                        } else {
+                            $('#leave_balance_display').html('Available balance: <span class="font-semibold">--</span>');
+                        }
+                    });
+                    
+                    // Check balance when granted leaves are changed
+                    $('#granted_leaves').on('input', function() {
+                        const selectedLeaveTypeId = $('#leave_type_option').val();
+                        if (selectedLeaveTypeId) {
+                            const selectedLeaveType = data.leave_balances.find(balance => 
+                                balance.leave_type_id == selectedLeaveTypeId);
+                            
+                            if (selectedLeaveType) {
+                                const grantedLeaves = parseInt($(this).val()) || 0;
+                                if (grantedLeaves > selectedLeaveType.available_leaves) {
+                                    showBalanceWarningToast();
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    // Hide the section if no balances
+                    $('#leave-balance-section').addClass('hidden');
+                }
+            },
+            error: function() {
+                // Hide the section on error
+                $('#leave-balance-section').addClass('hidden');
+                showErrorToast("Error fetching leave balances");
+            }
+        });
+    }
+    
+    // Function to update the letter with employee data
+    function updateLetterWithEmployeeData(data, sapId) {
+        // Update all employee-related fields in the letter
+        const employeeNameElements = document.querySelectorAll('.employee-name');
+        employeeNameElements.forEach(el => {
+            el.textContent = data.employee_name;
+        });
+        
+        const employeeDesignationElements = document.querySelectorAll('.employee-designation');
+        employeeDesignationElements.forEach(el => {
+            el.textContent = data.designation;
+        });
+        
+        const employeeSapIdElements = document.querySelectorAll('.employee-sapid');
+        employeeSapIdElements.forEach(el => {
+            el.textContent = sapId;
+        });
+        
+        // Update other employee-related fields if they exist
+        if (data.employee_grade) {
+            const employeeGradeElements = document.querySelectorAll('.employee-grade');
+            employeeGradeElements.forEach(el => {
+                el.textContent = data.employee_grade;
+            });
+        }
+        
+        if (data.employee_type) {
+            const employeeTypeElements = document.querySelectorAll('.employee-type');
+            employeeTypeElements.forEach(el => {
+                el.textContent = data.employee_type;
+            });
+        }
+        
+        if (data.region) {
+            const employeeRegionElements = document.querySelectorAll('.employee-region');
+            employeeRegionElements.forEach(el => {
+                el.textContent = data.region;
+            });
+        }
+        
+        // Update recipient information section
+        const recipientSection = document.getElementById('recipient-information-section');
+        if (recipientSection) {
+            // Clear existing content
+            recipientSection.innerHTML = '';
+            
+            // Create and append new elements with employee data
+            const nameP = document.createElement('p');
+            nameP.className = 'font-semibold';
+            nameP.textContent = (data.employee_salutation ? data.employee_salutation + ' ' : '') + data.employee_name;
+            recipientSection.appendChild(nameP);
+            
+            const gradeTypeP = document.createElement('p');
+            gradeTypeP.className = 'text-sm';
+            gradeTypeP.textContent = (data.employee_grade || '') + '/ ' + (data.employee_type || '');
+            recipientSection.appendChild(gradeTypeP);
+            
+            const sapIdP = document.createElement('p');
+            sapIdP.className = 'text-sm';
+            sapIdP.textContent = 'SAP ID: ' + sapId;
+            recipientSection.appendChild(sapIdP);
+        }
+        
+        // Update form action URL if needed
+        const form = document.getElementById('leave-application-form');
+        if (form) {
+            form.action = "{% url 'reporting:application_leave' '0' %}".replace('0', sapId);
+        }
+    }
+    
     // Event listener for the first backup employee's "Fetch" button
     document.getElementById('fetch_employee_data').addEventListener('click', function(event) {
         // Prevent form submission
@@ -677,6 +928,16 @@
     function showSuccessToast(message) {
         const toast = document.getElementById('sucessToast');
         toast.textContent = message;
+        toast.classList.remove('hidden');
+        toast.classList.add('opacity-100');
+
+        setTimeout(() => {
+            toast.classList.add('hidden');
+        }, 3000);
+    }
+    
+    function showBalanceWarningToast() {
+        const toast = document.getElementById('balanceWarningToast');
         toast.classList.remove('hidden');
         toast.classList.add('opacity-100');
 

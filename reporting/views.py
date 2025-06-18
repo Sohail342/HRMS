@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.shortcuts import get_object_or_404
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils import timezone
 from group_head.decorators import is_letter_template_admin_required
@@ -9,7 +10,7 @@ from django.contrib import messages
 import cloudinary
 import json
 import base64
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from .models import Signature, LetterTemplates, HospitalName, PermenantLetterTemplates, Purpose, PulicHolidays
 from django.views.generic import DetailView, ListView
 from HRIS_App.models import Employee
@@ -18,6 +19,7 @@ from django.views.generic import ListView
 from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator
 from employee_attendance.models import LeaveApplication
+from employee_attendance.models_leave_management import EmployeeLeaveBalance, LeaveType
 
 
 @csrf_exempt
@@ -66,6 +68,7 @@ def get_employee(request):
 
     data = {
         'employee_name': employee.name,
+        'employee_type': str(employee.employee_type) if employee.employee_type else "",
         'employee_cnic':employee.cnic_no,
         'designation': employee.designation_id,
         'sap_id': str(employee.SAP_ID) if employee.SAP_ID else "", 
@@ -101,8 +104,10 @@ class MemorandumMixin:
     context_object_name = 'employee'
     
     def get_object(self):
-        sap_id = self.kwargs.get('sap_id')
-        return get_object_or_404(Employee, SAP_ID=sap_id)
+        sap_id = self.kwargs.get('sap_id') or self.request.GET.get('sap_id')
+        if sap_id:
+            return get_object_or_404(Employee, SAP_ID=sap_id)
+        return None
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -124,6 +129,7 @@ class LeaveMemorandum(MemorandumMixin, DetailView):
         context['current_time'] = current_time
         context['next_day'] = current_time + timedelta(days=1)
         context['next_next_day'] = current_time + timedelta(days=2)
+        context['leave_types'] = LeaveType.objects.all()
         context['holidays'] = PulicHolidays.objects.all()
         context['is_friday'] = weekday == 'Friday',
 
@@ -257,8 +263,8 @@ class LetterForm(LoginRequiredMixin, ListView):
     
     FORM_TYPE_MAPPING = {
         'leave_memorandum': 'reporting:leave_memorandum',
-        'leave_memorandum_2': 'reporting:leave_memorandum',  # Using the same view but will render different template
-        'privilege_leave_memorandum': 'reporting:privilege_leave_memorandum',  # New mapping for privilege leave memorandum
+        'leave_memorandum_2': 'reporting:leave_memorandum',  
+        'privilege_leave_memorandum': 'reporting:privilege_leave_memorandum',
         'joining_memorandum': 'reporting:joining_memorandum',
         'order_office_memorandun': 'reporting:order_office_memorandun',
         'hospitalization': 'reporting:hospitalization',
@@ -275,7 +281,7 @@ class LetterForm(LoginRequiredMixin, ListView):
 
     def post(self, request, *args, **kwargs):
         form_type = request.POST.get('form_type')
-        sap_id = request.POST.get('sap_id')
+        sap_id = request.POST.get('sap_id', '')
         description = request.POST.get('description')
         sap_id_for_template_upload = request.POST.get('sap_id_for_template_upload')
 
@@ -288,7 +294,15 @@ class LetterForm(LoginRequiredMixin, ListView):
                 return redirect('reporting:lettername')
 
 
+            # Validate SAP ID for template upload
+            if not sap_id_for_template_upload or sap_id_for_template_upload.strip() == '':
+                messages.error(request, "Please enter a valid SAP ID for template upload.")
+                return redirect('reporting:lettername')
+                
             try:
+                # Convert to integer
+                sap_id_for_template_upload = int(sap_id_for_template_upload)
+                
                 # Get the employee object
                 employee = get_object_or_404(Employee, SAP_ID=sap_id_for_template_upload)
 
@@ -304,20 +318,48 @@ class LetterForm(LoginRequiredMixin, ListView):
 
                 messages.success(request, "Template uploaded successfully.")
                 return redirect('reporting:lettername')
+            except ValueError:
+                messages.error(request, "SAP ID must be a valid number.")
+                return redirect('reporting:lettername')
 
             except ValidationError as e:
                 messages.error(request, f"Error uploading file: {e}")
 
             except Exception as e:
                 messages.error(request, f"An error occurred: {e}")
-                
-
                 return redirect('reporting:lettername')
 
+        # Special handling for leave_memorandum and privilege_leave_memorandum which don't require SAP ID
+        if form_type in ['leave_memorandum', 'privilege_leave_memorandum']:
+            # For these form types, we don't need SAP ID
+            redirect_view = self.FORM_TYPE_MAPPING.get(form_type)
+            if redirect_view:
+                # If SAP ID is provided and valid, include it in the URL
+                if sap_id and sap_id.strip() != '':
+                    try:
+                        sap_id = int(sap_id)
+                        url = f"{reverse(redirect_view)}?sap_id={sap_id}"
+                        return redirect(url)
+                    except ValueError:
+                        # If SAP ID is invalid, just redirect without it
+                        return redirect(reverse(redirect_view))
+                else:
+                    return redirect(reverse(redirect_view))
+            else:
+                errors = "Invalid form type."
+                return render(request, self.template_name, {'errors': errors, 'employees': self.get_queryset()})
         
-        # Validate SAP ID
+        # Validate SAP ID for other form types
+        if not sap_id or sap_id.strip() == '':
+            errors = "Please enter a valid SAP ID."
+            return render(request, self.template_name, {'errors': errors, 'employees': self.get_queryset()})
+            
         try:
+            sap_id = int(sap_id)  # Convert to integer
             verify_sap_id = Employee.objects.get(SAP_ID=sap_id)
+        except ValueError:
+            errors = "SAP ID must be a valid number."
+            return render(request, self.template_name, {'errors': errors, 'employees': self.get_queryset()})
         except Employee.DoesNotExist:
             errors = "SAP ID is not registered."
             return render(request, self.template_name, {'errors': errors, 'employees': self.get_queryset()})
@@ -325,6 +367,7 @@ class LetterForm(LoginRequiredMixin, ListView):
         # Redirect based on the form type
         redirect_view = self.FORM_TYPE_MAPPING.get(form_type)
         if redirect_view:
+            # For other views that require sap_id in the URL
             return redirect(redirect_view, sap_id=sap_id)
         
         # If no valid form type, render the same page with error
@@ -368,7 +411,7 @@ def application_leave(request, sap_id):
         # Validate the data
         if not sap_id or not leave_type or not from_date or not reason:
             messages.error(request, "All fields are required.")
-            return redirect('reporting:leave_memorandum', sap_id=sap_id)
+            return redirect(f"{reverse('reporting:leave_memorandum')}?sap_id={sap_id}")
 
         # Get the employee object
         employee = get_object_or_404(Employee, SAP_ID=sap_id)
@@ -388,10 +431,10 @@ def application_leave(request, sap_id):
 
         except Exception as e:
             messages.error(request, f"Error saving leave application: {e}")
-            return redirect('reporting:leave_memorandum', sap_id=sap_id)
+            return redirect(f"{reverse('reporting:leave_memorandum')}?sap_id={sap_id}")
 
         messages.success(request, "Leave application submitted successfully.")
-        return redirect('reporting:leave_memorandum', sap_id=sap_id)
+        return redirect(f"{reverse('reporting:leave_memorandum')}?sap_id={sap_id}")
 
     return render(request, 'reporting/leave_memorandum.html', sap_id=sap_id)
     
@@ -407,13 +450,77 @@ def application_leave(request, sap_id):
 # Add a new view function to get letter templates for dropdown
 def get_letter_templates(request):
     """View function to provide letter templates data for dropdown"""
-    templates = [
-        {'id': 'leave_memorandum', 'name': 'Leave Memorandum'},
-        {'id': 'privilege_leave_memorandum', 'name': 'Privilege Leave Memorandum'},
-        {'id': 'request_for_issuance', 'name': 'Request For Issuance'},
-        {'id': 'hospitalization', 'name': 'Hospitalization'}
-    ]
-    return JsonResponse({'templates': templates})
+    try:
+        templates = [
+            {'id': 'leave_memorandum', 'name': 'Leave Memorandum'},
+            {'id': 'privilege_leave_memorandum', 'name': 'Privilege Leave Memorandum'},
+            {'id': 'request_for_issuance', 'name': 'Request For Issuance'},
+            {'id': 'hospitalization', 'name': 'Hospitalization'}
+        ]
+        return JsonResponse({'templates': templates})
+    except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error in get_letter_templates: {str(e)}")
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+def get_employee_leave_balance(request):
+    """API endpoint to get employee leave balance by SAP ID and leave type"""
+    sap_id = request.GET.get('sap_id')
+    leave_type_id = request.GET.get('leave_type_id')
+    
+    if not sap_id:
+        return JsonResponse({'error': 'SAP ID is required'}, status=400)
+    
+    try:
+        # Get the employee
+        employee = get_object_or_404(Employee, SAP_ID=sap_id)
+        
+        # Get current year
+        current_year = date.today().year
+        
+        # Filter query based on whether leave_type_id is provided
+        if leave_type_id:
+            try:
+                leave_type = LeaveType.objects.get(id=leave_type_id)
+                balances = EmployeeLeaveBalance.objects.filter(
+                    employee=employee,
+                    leave_type=leave_type,
+                    year=current_year
+                )
+            except LeaveType.DoesNotExist:
+                return JsonResponse({'error': 'Leave type not found'}, status=404)
+        else:
+            # Get all leave balances for this employee
+            balances = EmployeeLeaveBalance.objects.filter(
+                employee=employee,
+                year=current_year
+            )
+        
+        # Format the response
+        balance_data = []
+        for balance in balances:
+            balance_data.append({
+                'leave_type_id': balance.leave_type.id,
+                'leave_type_name': balance.leave_type.get_name_display(),
+                'entitled_leaves': balance.entitled_leaves,
+                'carried_forward_leaves': balance.carried_forward_leaves,
+                'used_leaves': balance.used_leaves,
+                'frozen_leaves': balance.frozen_leaves,
+                'available_leaves': balance.available_leaves,
+                'total_balance': balance.total_balance,
+                'year': balance.year
+            })
+        
+        return JsonResponse({
+            'employee_name': employee.name,
+            'sap_id': employee.SAP_ID,
+            'leave_balances': balance_data
+        })
+        
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
     
 
 

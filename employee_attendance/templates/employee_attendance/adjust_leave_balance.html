@@ -1,0 +1,307 @@
+{% extends "sidebar.html" %}
+
+{% block content %}
+<div class="container mx-auto p-6 bg-gray-50 min-h-screen">
+
+    <!-- Flash Messages -->
+    {% if messages %}
+        <div class="space-y-4 mb-6">
+            {% for message in messages %}
+                <div class="p-4 rounded-lg shadow-md 
+                    {% if message.tags == 'error' %}
+                        bg-red-100 border-l-4 border-red-500 text-red-700
+                    {% elif message.tags == 'success' %}
+                        bg-green-100 border-l-4 border-green-500 text-green-700
+                    {% else %}
+                        bg-blue-100 border-l-4 border-blue-500 text-blue-700
+                    {% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Header -->
+    <div class="text-center mb-10">
+        <h1 class="text-4xl font-extrabold text-blue-600">Adjust Leave Balance</h1>
+        <p class="mt-2 text-gray-600">Manually adjust employee leave balances</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Employee Search Form -->
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
+                <div class="bg-gradient-to-r from-blue-500 to-blue-700 text-white py-4 px-6">
+                    <h2 class="text-lg font-semibold">Search Employee</h2>
+                </div>
+                <div class="p-6">
+                    <form method="get" action="" class="space-y-4">
+                        <div>
+                            <label for="employee_id" class="block text-sm font-medium text-gray-700">Employee ID</label>
+                            <input type="text" name="employee_id" id="employee_id" value="{{ request.GET.employee_id }}" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                        </div>
+                        <div>
+                            <label for="employee_name" class="block text-sm font-medium text-gray-700">Employee Name</label>
+                            <input type="text" name="employee_name" id="employee_name" value="{{ request.GET.employee_name }}" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                        </div>
+                        <div>
+                            <label for="department" class="block text-sm font-medium text-gray-700">Department</label>
+                            <select name="department" id="department" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                <option value="">All Departments</option>
+                                {% for dept in departments %}
+                                <option value="{{ dept.id }}" {% if request.GET.department == dept.id|stringformat:"s" %}selected{% endif %}>{{ dept.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                Search
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {% if selected_employee %}
+            <!-- Selected Employee Info -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                <div class="bg-gradient-to-r from-green-500 to-green-700 text-white py-4 px-6">
+                    <h2 class="text-lg font-semibold">Selected Employee</h2>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-4">
+                        <div>
+                            <p class="text-sm text-gray-500">Name</p>
+                            <p class="text-base font-medium">{{ selected_employee.name }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Employee ID</p>
+                            <p class="text-base font-medium">{{ selected_employee.sap_id }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Employee Type</p>
+                            <p class="text-base font-medium">{{ selected_employee.employee_type }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Department</p>
+                            <p class="text-base font-medium">{{ selected_employee.department }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Designation</p>
+                            <p class="text-base font-medium">{{ selected_employee.designation }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Join Date</p>
+                            <p class="text-base font-medium">{{ selected_employee.join_date }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Main Content -->
+        <div class="lg:col-span-2">
+            {% if selected_employee %}
+            <!-- Current Leave Balances -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
+                <div class="bg-gradient-to-r from-blue-500 to-blue-700 text-white py-4 px-6">
+                    <h2 class="text-lg font-semibold">Current Leave Balances</h2>
+                </div>
+                <div class="p-6">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Leave Type</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Balance</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Used</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Frozen</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Entitled</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                {% for balance in leave_balances %}
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ balance.leave_type.name }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-semibold">{{ balance.current_balance }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600">{{ balance.used }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600">{{ balance.frozen }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ balance.total_entitled }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">No leave balances found.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Adjustment Form -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                <div class="bg-gradient-to-r from-purple-500 to-purple-700 text-white py-4 px-6">
+                    <h2 class="text-lg font-semibold">Adjust Leave Balance</h2>
+                </div>
+                <div class="p-6">
+                    <form method="post" action="" class="space-y-6">
+                        {% csrf_token %}
+                        <input type="hidden" name="employee_id" value="{{ selected_employee.id }}">
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="leave_type" class="block text-sm font-medium text-gray-700">Leave Type</label>
+                                <select name="leave_type" id="leave_type" required class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                    <option value="">Select Leave Type</option>
+                                    {% for leave_type in leave_types %}
+                                    <option value="{{ leave_type.id }}">{{ leave_type.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                {% if form.leave_type.errors %}
+                                <p class="mt-2 text-sm text-red-600">{{ form.leave_type.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <div>
+                                <label for="adjustment_type" class="block text-sm font-medium text-gray-700">Adjustment Type</label>
+                                <select name="adjustment_type" id="adjustment_type" required class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                    <option value="">Select Adjustment Type</option>
+                                    <option value="addition">Addition</option>
+                                    <option value="deduction">Deduction</option>
+                                    <option value="freeze">Freeze</option>
+                                    <option value="unfreeze">Unfreeze</option>
+                                    <option value="reset">Reset</option>
+                                </select>
+                                {% if form.adjustment_type.errors %}
+                                <p class="mt-2 text-sm text-red-600">{{ form.adjustment_type.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div id="days_field" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="days" class="block text-sm font-medium text-gray-700">Number of Days</label>
+                                <input type="number" name="days" id="days" step="0.5" min="0.5" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                {% if form.days.errors %}
+                                <p class="mt-2 text-sm text-red-600">{{ form.days.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <div>
+                                <label for="year" class="block text-sm font-medium text-gray-700">Year</label>
+                                <input type="number" name="year" id="year" value="{{ current_year }}" min="2000" max="2100" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                {% if form.year.errors %}
+                                <p class="mt-2 text-sm text-red-600">{{ form.year.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label for="notes" class="block text-sm font-medium text-gray-700">Notes</label>
+                            <textarea name="notes" id="notes" rows="3" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" placeholder="Reason for adjustment"></textarea>
+                            {% if form.notes.errors %}
+                            <p class="mt-2 text-sm text-red-600">{{ form.notes.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="flex justify-end">
+                            <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                Submit Adjustment
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Recent Adjustments -->
+            <div class="mt-8 bg-white rounded-lg shadow-lg overflow-hidden">
+                <div class="bg-gradient-to-r from-gray-500 to-gray-700 text-white py-4 px-6">
+                    <h2 class="text-lg font-semibold">Recent Adjustments</h2>
+                </div>
+                <div class="p-6">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Leave Type</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Days</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Notes</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Adjusted By</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                {% for transaction in recent_transactions %}
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ transaction.transaction_date }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ transaction.leave_type.name }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                            {% if transaction.transaction_type == 'adjustment_addition' %}bg-green-100 text-green-800
+                                            {% elif transaction.transaction_type == 'adjustment_deduction' %}bg-red-100 text-red-800
+                                            {% elif transaction.transaction_type == 'adjustment_freeze' %}bg-blue-100 text-blue-800
+                                            {% elif transaction.transaction_type == 'adjustment_unfreeze' %}bg-purple-100 text-purple-800
+                                            {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                            {{ transaction.get_transaction_type_display }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 
+                                        {% if transaction.days < 0 %}text-red-600{% elif transaction.days > 0 %}text-green-600{% endif %}">
+                                        {{ transaction.days }}
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-gray-500">{{ transaction.notes|truncatechars:30 }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ transaction.created_by.username }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">No recent adjustments found.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <!-- No Employee Selected Message -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                <div class="p-8 text-center">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                    <h3 class="mt-2 text-lg font-medium text-gray-900">No Employee Selected</h3>
+                    <p class="mt-1 text-sm text-gray-500">Please search and select an employee to adjust their leave balance.</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const adjustmentTypeSelect = document.getElementById('adjustment_type');
+        const daysField = document.getElementById('days_field');
+        
+        // Function to toggle days field visibility based on adjustment type
+        function toggleDaysField() {
+            const selectedValue = adjustmentTypeSelect.value;
+            
+            if (selectedValue === 'reset') {
+                daysField.classList.add('hidden');
+            } else {
+                daysField.classList.remove('hidden');
+            }
+        }
+        
+        // Initial check
+        toggleDaysField();
+        
+        // Add event listener for changes
+        adjustmentTypeSelect.addEventListener('change', toggleDaysField);
+    });
+</script>
+{% endblock %}

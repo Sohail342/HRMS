@@ -1,6 +1,7 @@
 from django import forms
 from .models import ContractRenewal
-from .models import EducationalDocument , NonInvolvementCertificate, StationaryRequest , LeaveApplication
+from .models import EducationalDocument , NonInvolvementCertificate, StationaryRequest
+from .models_leave_management import EmployeeLeaveApplication
 from HRIS_App.custom_forms import RequiredOptionalFieldsModelForm
 
 class ContractRenewalForm(RequiredOptionalFieldsModelForm):
@@ -42,8 +43,8 @@ class StationaryRequestForm(RequiredOptionalFieldsModelForm):
 
 class PermanentLeaveApplicationForm(RequiredOptionalFieldsModelForm):
     class Meta:
-        model = LeaveApplication
-        fields = ['leave_date', 'from_date', 'to_date', 'reason', 'application_type', 'supervisor_signature']
+        model = EmployeeLeaveApplication
+        fields = ['from_date', 'to_date', 'reason', 'leave_type', 'supervisor_signature']
 
         widgets = {
             'leave_date': forms.DateInput(attrs={'type': 'date'}),
@@ -65,8 +66,8 @@ class PermanentLeaveApplicationForm(RequiredOptionalFieldsModelForm):
 
 class PermanentLeaveApplicationForm(RequiredOptionalFieldsModelForm):
     class Meta:
-        model = LeaveApplication
-        fields = ['application_type', 'from_date', 'to_date', 'reason', 'supervisor_signature']
+        model = EmployeeLeaveApplication
+        fields = ['leave_type', 'from_date', 'to_date', 'reason', 'supervisor_signature']
         widgets = {
             'from_date': forms.DateInput(attrs={'type': 'date'}),
             'to_date': forms.DateInput(attrs={'type': 'date'}),

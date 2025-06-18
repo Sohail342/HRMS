@@ -1,0 +1,236 @@
+{% extends "sidebar.html" %}
+
+{% block content %}
+<div class="container mx-auto p-6 bg-gray-50 min-h-screen">
+
+    <!-- Flash Messages -->
+    {% if messages %}
+        <div class="space-y-4 mb-6">
+            {% for message in messages %}
+                <div class="p-4 rounded-lg shadow-md 
+                    {% if message.tags == 'error' %}
+                        bg-red-100 border-l-4 border-red-500 text-red-700
+                    {% elif message.tags == 'success' %}
+                        bg-green-100 border-l-4 border-green-500 text-green-700
+                    {% else %}
+                        bg-blue-100 border-l-4 border-blue-500 text-blue-700
+                    {% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Header -->
+    <div class="text-center mb-10">
+        <h1 class="text-4xl font-extrabold text-blue-600">Year-End Leave Processing</h1>
+        <p class="mt-2 text-gray-600">Manage leave carry-forward, expiry, and freezing operations</p>
+    </div>
+
+    <!-- Warning Banner -->
+    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-8">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-sm font-medium text-yellow-800">Attention Required</h3>
+                <div class="mt-2 text-sm text-yellow-700">
+                    <p>Year-end leave processing is a critical operation that affects all employee leave balances. This process:</p>
+                    <ul class="list-disc pl-5 mt-1 space-y-1">
+                        <li>Carries forward eligible leave balances to the next year</li>
+                        <li>Expires leave that cannot be carried forward</li>
+                        <li>Freezes eligible sick leave for regular employees</li>
+                        <li>Creates transaction records for all operations</li>
+                    </ul>
+                    <p class="mt-2 font-semibold">This operation cannot be undone. Please review all settings before proceeding.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Process Year-End Form -->
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                <div class="bg-gradient-to-r from-blue-500 to-blue-700 text-white py-4 px-6">
+                    <h2 class="text-lg font-semibold">Process Year-End Leave</h2>
+                </div>
+                <div class="p-6">
+                    <form method="post" action="" class="space-y-6">
+                        {% csrf_token %}
+                        
+                        <div>
+                            <label for="year" class="block text-sm font-medium text-gray-700">Year to Process</label>
+                            <select name="year" id="year" required class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                {% for year_option in available_years %}
+                                <option value="{{ year_option }}" {% if year_option == current_year %}selected{% endif %}>{{ year_option }}</option>
+                                {% endfor %}
+                            </select>
+                            <p class="mt-1 text-xs text-gray-500">Select the year for which you want to process leave balances.</p>
+                        </div>
+                        
+                        <div>
+                            <label for="employee_type" class="block text-sm font-medium text-gray-700">Employee Type</label>
+                            <select name="employee_type" id="employee_type" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                <option value="all">All Employee Types</option>
+                                <option value="regular_officer">Regular Officers</option>
+                                <option value="regular_executive">Regular Executives</option>
+                                <option value="contractual_officer">Contractual Officers</option>
+                                <option value="contractual_executive">Contractual Executives</option>
+                            </select>
+                            <p class="mt-1 text-xs text-gray-500">You can process for all employees or select a specific type.</p>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-start">
+                                <div class="flex items-center h-5">
+                                    <input type="checkbox" name="process_carry_forward" id="process_carry_forward" checked class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded">
+                                </div>
+                                <div class="ml-3 text-sm">
+                                    <label for="process_carry_forward" class="font-medium text-gray-700">Process Carry Forward</label>
+                                    <p class="text-gray-500">Carry forward eligible leave balances to the next year based on policy settings.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="flex items-center h-5">
+                                    <input type="checkbox" name="process_expiry" id="process_expiry" checked class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded">
+                                </div>
+                                <div class="ml-3 text-sm">
+                                    <label for="process_expiry" class="font-medium text-gray-700">Process Expiry</label>
+                                    <p class="text-gray-500">Expire leave balances that cannot be carried forward.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="flex items-center h-5">
+                                    <input type="checkbox" name="process_freezing" id="process_freezing" checked class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded">
+                                </div>
+                                <div class="ml-3 text-sm">
+                                    <label for="process_freezing" class="font-medium text-gray-700">Process Freezing</label>
+                                    <p class="text-gray-500">Freeze eligible sick leave for regular employees.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input type="checkbox" name="confirm_process" id="confirm_process" required class="focus:ring-red-500 h-4 w-4 text-red-600 border-gray-300 rounded">
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="confirm_process" class="font-medium text-red-700">Confirm Processing</label>
+                                <p class="text-red-500">I understand this is a critical operation that cannot be undone.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="pt-4">
+                            <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                Process Year-End Leave
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Processing Information -->
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
+                <div class="bg-gradient-to-r from-purple-500 to-purple-700 text-white py-4 px-6">
+                    <h2 class="text-lg font-semibold">Year-End Processing Information</h2>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-6">
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-900">Leave Carry Forward Rules</h3>
+                            <div class="mt-2 text-sm text-gray-500">
+                                <ul class="list-disc pl-5 space-y-1">
+                                    <li><span class="font-medium">Privileged Leave:</span> For Regular Officers and Executives, unused days up to the maximum limit can be carried forward until March 31st of the next year.</li>
+                                    <li><span class="font-medium">Casual Leave:</span> Expires on December 31st each year, no carry forward.</li>
+                                    <li><span class="font-medium">Sick Leave:</span> For Regular employees, unused days are frozen yearly and accumulate. For Contractual employees, expires at the end of the contract period.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-900">Minimum Consumption Requirements</h3>
+                            <div class="mt-2 text-sm text-gray-500">
+                                <ul class="list-disc pl-5 space-y-1">
+                                    <li><span class="font-medium">Regular Officers:</span> Must consume at least 15 days of Privileged Leave for encashment eligibility.</li>
+                                    <li><span class="font-medium">Contractual Staff:</span> Must use at least 15 Privileged Leave days yearly.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-900">Leave Period Variations</h3>
+                            <div class="mt-2 text-sm text-gray-500">
+                                <ul class="list-disc pl-5 space-y-1">
+                                    <li><span class="font-medium">Regular Officers:</span> Leave period typically starts January 1st.</li>
+                                    <li><span class="font-medium">Regular Executives:</span> Privileged Leave period ends March 31st of the next year.</li>
+                                    <li><span class="font-medium">Contractual Staff:</span> Leave period based on contract start date.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Processing History -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                <div class="bg-gradient-to-r from-green-500 to-green-700 text-white py-4 px-6">
+                    <h2 class="text-lg font-semibold">Recent Processing History</h2>
+                </div>
+                <div class="p-6">
+                    {% if processing_history %}
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Year Processed</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee Type</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Operations</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Processed By</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                {% for history in processing_history %}
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ history.processed_date }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ history.year }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ history.get_employee_type_display }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        {% if history.carry_forward_processed %}Carry Forward, {% endif %}
+                                        {% if history.expiry_processed %}Expiry, {% endif %}
+                                        {% if history.freezing_processed %}Freezing{% endif %}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ history.processed_by.username }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                            {% if history.status == 'completed' %}bg-green-100 text-green-800
+                                            {% elif history.status == 'failed' %}bg-red-100 text-red-800
+                                            {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                                            {{ history.get_status_display }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-8 text-gray-500">
+                        <p>No processing history found.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

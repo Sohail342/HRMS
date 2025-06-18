@@ -1,0 +1,202 @@
+{% extends "sidebar.html" %}
+
+{% block content %}
+<div class="container mx-auto p-6 bg-gray-50 min-h-screen">
+
+    <!-- Flash Messages -->
+    {% if messages %}
+        <div class="space-y-4 mb-6">
+            {% for message in messages %}
+                <div class="p-4 rounded-lg shadow-md 
+                    {% if message.tags == 'error' %}
+                        bg-red-100 border-l-4 border-red-500 text-red-700
+                    {% elif message.tags == 'success' %}
+                        bg-green-100 border-l-4 border-green-500 text-green-700
+                    {% else %}
+                        bg-blue-100 border-l-4 border-blue-500 text-blue-700
+                    {% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Header -->
+    <div class="text-center mb-10">
+        <h1 class="text-4xl font-extrabold text-blue-600">Apply for Leave</h1>
+        <p class="mt-2 text-gray-600">Submit your leave application</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Leave Application Form -->
+        <div class="md:col-span-2">
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="bg-gradient-to-r from-blue-500 to-blue-700 text-white py-4 px-6">
+                    <h2 class="text-lg font-semibold">Leave Application Form</h2>
+                </div>
+                <div class="p-6">
+                    <form method="post" class="space-y-6">
+                        {% csrf_token %}
+                        
+                        <!-- Leave Type -->
+                        <div class="mb-4">
+                            <label for="{{ form.leave_type.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Leave Type</label>
+                            {{ form.leave_type.errors }}
+                            <select name="{{ form.leave_type.html_name }}" id="{{ form.leave_type.id_for_label }}" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                <option value="" selected>---------</option>
+                                {% for choice in form.leave_type.field.queryset %}
+                                    <option value="{{ choice.id }}">{{ choice.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <!-- From Date -->
+                        <div class="mb-4">
+                            <label for="{{ form.from_date.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">From Date</label>
+                            {{ form.from_date.errors }}
+                            <input type="date" name="{{ form.from_date.html_name }}" id="{{ form.from_date.id_for_label }}" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        </div>
+                        
+                        <!-- To Date -->
+                        <div class="mb-4">
+                            <label for="{{ form.to_date.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">To Date</label>
+                            {{ form.to_date.errors }}
+                            <input type="date" name="{{ form.to_date.html_name }}" id="{{ form.to_date.id_for_label }}" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        </div>
+                        
+                        <!-- Reason -->
+                        <div class="mb-4">
+                            <label for="{{ form.reason.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Reason</label>
+                            {{ form.reason.errors }}
+                            <textarea name="{{ form.reason.html_name }}" id="{{ form.reason.id_for_label }}" rows="4" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"></textarea>
+                        </div>
+                        
+                        <!-- Station Permission -->
+                        <div class="mb-4">
+                            <div class="flex items-center">
+                                <input type="checkbox" name="{{ form.station_permission.html_name }}" id="{{ form.station_permission.id_for_label }}" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <label for="{{ form.station_permission.id_for_label }}" class="ml-2 block text-sm text-gray-700">Request Station Permission</label>
+                            </div>
+                            <p class="mt-1 text-xs text-gray-500">Check this if you need permission to leave the station during your leave period.</p>
+                        </div>
+                        
+                        <!-- Extension Policy -->
+                        <div class="mb-4">
+                            <div class="flex items-center">
+                                <input type="checkbox" name="{{ form.extension_policy.html_name }}" id="{{ form.extension_policy.id_for_label }}" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <label for="{{ form.extension_policy.id_for_label }}" class="ml-2 block text-sm text-gray-700">Apply Extension Policy</label>
+                            </div>
+                            <p class="mt-1 text-xs text-gray-500">Check this if your leave extends into the next year.</p>
+                        </div>
+                        
+                        <!-- Supervisor Signature -->
+                        <div class="mb-4">
+                            <label for="{{ form.supervisor_signature.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Supervisor Signature</label>
+                            {{ form.supervisor_signature.errors }}
+                            <input type="file" name="{{ form.supervisor_signature.html_name }}" id="{{ form.supervisor_signature.id_for_label }}" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                            <p class="mt-1 text-xs text-gray-500">Upload your supervisor's signature (if required).</p>
+                        </div>
+                        
+                        <!-- Submit Button -->
+                        <div class="flex justify-end">
+                            <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                Submit Application
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Leave Balances -->
+        <div class="md:col-span-1">
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="bg-gradient-to-r from-green-500 to-green-700 text-white py-4 px-6">
+                    <h2 class="text-lg font-semibold">Your Leave Balances</h2>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-4">
+                        {% for balance in leave_balances %}
+                        <div class="border-b pb-4 last:border-0 last:pb-0">
+                            <h3 class="font-medium text-gray-800">{{ balance.leave_type.name }}</h3>
+                            <div class="mt-2 grid grid-cols-2 gap-2 text-sm">
+                                <div class="text-gray-600">Entitled:</div>
+                                <div class="text-gray-900 font-medium">{{ balance.entitled_leaves|add:balance.carried_forward_leaves }}</div>
+                                
+                                <div class="text-gray-600">Used:</div>
+                                <div class="text-gray-900 font-medium">{{ balance.used_leaves }}</div>
+                                
+                                <div class="text-gray-600">Available:</div>
+                                <div class="text-gray-900 font-medium">{{ balance.available_leaves }}</div>
+                                
+                                {% if balance.frozen_leaves > 0 %}
+                                <div class="text-gray-600">Frozen:</div>
+                                <div class="text-gray-900 font-medium">{{ balance.frozen_leaves }}</div>
+                                {% endif %}
+                                
+                                {% if balance.carried_forward_leaves > 0 %}
+                                <div class="text-gray-600">Carried Forward:</div>
+                                <div class="text-gray-900 font-medium">{{ balance.carried_forward_leaves }}</div>
+                                {% endif %}
+                                
+                                {% if balance.carried_forward_expiry_date %}
+                                <div class="text-gray-600">Expiry Date:</div>
+                                <div class="text-gray-900 font-medium">{{ balance.carried_forward_expiry_date }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="text-gray-500 text-center py-4">No leave balances found.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Leave Policy Info -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden mt-6">
+                <div class="bg-gradient-to-r from-purple-500 to-purple-700 text-white py-4 px-6">
+                    <h2 class="text-lg font-semibold">Leave Policy Information</h2>
+                </div>
+                <div class="p-6">
+                    <div class="text-sm text-gray-600 space-y-3">
+                        <p><strong>Employee Type:</strong> {{ employee.employee_type.name }}</p>
+                        <p>Please note that different leave types have different policies regarding:</p>
+                        <ul class="list-disc pl-5 space-y-1">
+                            <li>Annual entitlement</li>
+                            <li>Carry forward limits</li>
+                            <li>Expiry dates</li>
+                            <li>Freezing options</li>
+                        </ul>
+                        <p class="mt-3">For more information, please contact HR or refer to the company leave policy document.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // JavaScript to calculate days between dates
+    document.addEventListener('DOMContentLoaded', function() {
+        const fromDateInput = document.getElementById('{{ form.from_date.id_for_label }}');
+        const toDateInput = document.getElementById('{{ form.to_date.id_for_label }}');
+        
+        function updateDaysCount() {
+            const fromDate = new Date(fromDateInput.value);
+            const toDate = new Date(toDateInput.value);
+            
+            if (fromDate && toDate && !isNaN(fromDate) && !isNaN(toDate)) {
+                // Calculate difference in days
+                const diffTime = Math.abs(toDate - fromDate);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 to include both start and end dates
+                
+                // Display the count somewhere if needed
+                console.log(`Leave days: ${diffDays}`);
+            }
+        }
+        
+        fromDateInput.addEventListener('change', updateDaysCount);
+        toDateInput.addEventListener('change', updateDaysCount);
+    });
+</script>
+{% endblock %}
