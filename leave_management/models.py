@@ -70,23 +70,29 @@ class LeaveBalance(models.Model):
         unique_together = ('employee', 'leave_type', 'year')
 
     def __str__(self):
-        return f"{self.employee.username} - {self.leave_type.name} ({self.remaining}/{self.annual_quota})"
+        return f"{self.employee.name} - {self.leave_type.name} ({self.remaining}/{self.annual_quota})"
 
 
 
 class LeaveManagement(models.Model):
     """Model for managing leave applications"""
 
+    STATUS_CHOICES = [
+        ('Pending', 'Pending'),
+        ('Approved', 'Approved'),
+        ('Rejected', 'Rejected'),
+    ]
+
     employee = models.ForeignKey("HRIS_App.Employee", on_delete=models.CASCADE)
     leave_type = models.ForeignKey(LeaveType, on_delete=models.CASCADE)
     start_date = models.DateField()
     end_date = models.DateField()
     reason = models.TextField(blank=True, null=True)
-    status = models.CharField(max_length=20, default='Pending')  # Pending, Approved, Rejected
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
     applied_on = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.employee.username} - {self.leave_type.name} ({self.status})"
+        return f"{self.employee.name} - {self.leave_type.name} ({self.status})"
 
     @property
     def leave_days(self):
@@ -100,7 +106,7 @@ class FrozenLeaveBalance(models.Model):
     days = models.PositiveIntegerField()
 
     def __str__(self):
-        return f"{self.employee.username} - {self.leave_type.name} ({self.year})"
+        return f"{self.employee.name} - {self.leave_type.name} ({self.year})"
 
 
 
@@ -111,5 +117,5 @@ class LeaveEncashmentRecord(models.Model):
     date_processed = models.DateField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.employee.username} - {self.year} - {self.encashed_days} days"
+        return f"{self.employee.name} - {self.year} - {self.encashed_days} days"
     

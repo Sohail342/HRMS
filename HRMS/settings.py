@@ -395,6 +395,48 @@ UNFOLD = {
                 ],
             },
             {
+                "title": _("Leave Management"),
+                "separator": True,
+                "collapsible": True,
+                "items": [
+                    {
+                        "title": _("Leave Types"),
+                        "icon": "category",
+                        "link": reverse_lazy("admin:leave_management_leavetype_changelist"),
+                    },
+                    {
+                        "title": _("Leave Rules"),
+                        "icon": "gavel",
+                        "link": reverse_lazy("admin:leave_management_leaverule_changelist"),
+                    },
+                    {
+                        "title": _("Leave Balances"),
+                        "icon": "account_balance_wallet",
+                        "link": reverse_lazy("admin:leave_management_leavebalance_changelist"),
+                    },
+                    {
+                        "title": _("Frozen Leave Balances"),
+                        "icon": "ac_unit",
+                        "link": reverse_lazy("admin:leave_management_frozenleavebalance_changelist"),
+                    },
+                    {
+                        "title": _("Leave Applications"),
+                        "icon": "event_note",
+                        "link": reverse_lazy("admin:leave_management_leavemanagement_changelist"),
+                    },
+                    {
+                        "title": _("Leave Encashments"),
+                        "icon": "monetization_on",
+                        "link": reverse_lazy("admin:leave_management_leaveencashmentrecord_changelist"),
+                    },
+                    {
+                        "title": _("Employee Profiles"),
+                        "icon": "badge",
+                        "link": reverse_lazy("admin:leave_management_employeeprofile_changelist"),
+                    },
+                ],
+            },
+            {
                 "title": _("Letter Templates"),
                 "separator": True,
                 "collapsible": True,

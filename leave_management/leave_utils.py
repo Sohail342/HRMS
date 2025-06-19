@@ -1,4 +1,3 @@
-# leave_utils.py
 from datetime import datetime, date, timedelta
 from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
@@ -45,19 +44,6 @@ def get_leave_cycle(employee_profile: EmployeeProfile):
     return (start, end)
 
 
-def assign_leave_balances(employee_profile: EmployeeProfile):
-    rule_set = LeaveRule.objects.filter(
-        cadre=employee_profile.cadre,
-        employment_type=employee_profile.employment_type
-    )
-    for rule in rule_set:
-        LeaveBalance.objects.update_or_create(
-            employee=employee_profile.employee,
-            leave_type=rule.leave_type,
-            defaults={"annual_quota": rule.annual_quota, "remaining": rule.annual_quota}
-        )
-
-
 def validate_leave_application(employee, leave_type, start_date, end_date):
     profile = employee.employeeprofile
     cycle_start, cycle_end = get_leave_cycle(profile)
@@ -75,8 +61,13 @@ def validate_leave_application(employee, leave_type, start_date, end_date):
 
 
 def apply_for_leave(employee, leave_type, start_date, end_date, reason):
+    # 1. Validate application rules (cycle range, sufficient balance, etc.)
     validate_leave_application(employee, leave_type, start_date, end_date)
 
+    # 2. Calculate number of leave days
+    leave_days = (end_date - start_date).days + 1
+
+    # 3. Create the leave record (status = Pending)
     leave = LeaveManagement.objects.create(
         employee=employee,
         leave_type=leave_type,
@@ -85,28 +76,30 @@ def apply_for_leave(employee, leave_type, start_date, end_date, reason):
         reason=reason,
         status='Pending'
     )
-    return leave
+
+    return {
+        "success": True,
+        "message": f"{leave_days} day(s) leave application submitted and is pending approval.",
+        "leave_id": leave.id,
+    }
 
 
-def freeze_sick_leaves():
-    current_year = datetime.now().year
-    sick_leave = LeaveType.objects.get(name="Sick")
+def freeze_and_carry_forward_leaves(year):
+    balances = LeaveBalance.objects.filter(year=year)
+    for lb in balances:
+        leave_type = lb.leave_type
 
-    profiles = EmployeeProfile.objects.filter(employment_type="Regular")
-    for profile in profiles:
-        try:
-            lb = LeaveBalance.objects.get(employee=profile.employee, leave_type=sick_leave)
-            if lb.remaining > 0 and sick_leave.is_freezable:
-                FrozenLeaveBalance.objects.create(
-                    employee=profile.employee,
-                    leave_type=sick_leave,
-                    year=current_year,
-                    days=lb.remaining
-                )
-                lb.remaining = 0
-                lb.save()
-        except LeaveBalance.DoesNotExist:
-            continue
+        if leave_type.is_freezable and lb.remaining > 0:
+            FrozenLeaveBalance.objects.create(
+                employee=lb.employee,
+                leave_type=leave_type,
+                year=year,
+                days=lb.remaining
+            )
+            print(f"Froze {lb.remaining} days of {leave_type.name} for {lb.employee.username}")
+        
+        lb.remaining = 0
+        lb.save()
 
 
 def expire_privileged_leaves():
