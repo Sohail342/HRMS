@@ -189,7 +189,7 @@
                 <p class="font-semibold pr-3">Administration Division</p>
             </div>
             <div class="text-sm mt-3 mb-12">
-                <p>No. OPG/<span id="leave_type_text"></span>ADMN/{{employee.SAP_ID}}/{{current_time |date:"Y" }}/</p>
+                <p>No. OPG/<span id="leave_type_text"></span>ADMN/<span id="sap_id_header">/{{current_time |date:"Y" }}/</p>
                 <p class="font-semibold">{{current_time |date:"F j, Y" }}</p>  
             </div>
         </div>
@@ -676,6 +676,14 @@
         employeeSapIdElements.forEach(el => {
             el.textContent = sapId;
         });
+        
+        // Update the SAP ID in the header while preserving the year
+        const sapIdHeader = document.getElementById('sap_id_header');
+        if (sapIdHeader) {
+            // Get the current year
+            const currentYear = new Date().getFullYear();
+            sapIdHeader.textContent = sapId + "/" + currentYear;
+        }
         
         // Update other employee-related fields if they exist
         if (data.employee_grade) {
