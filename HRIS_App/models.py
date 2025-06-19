@@ -394,11 +394,11 @@ class APA_Grading(models.Model):
     Model to store APA grading for employees.
     """
     grade_choices = [
-        ('Outstanding', 'O'),
-        ('Very Good', 'VG'),
-        ('Good', 'G'),
-        ('Needs Improvement', 'NI'),
-        ('Unsatisfactory', 'US'),
+        ('O', 'Outstanding'),
+        ('VG', 'Very Good'),
+        ('G', 'Good'),
+        ('NI', 'Needs Improvement'),
+        ('US', 'Unsatisfactory'),
     ]
 
     year = models.CharField(max_length=10, blank=True, null=True)
