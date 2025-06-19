@@ -645,21 +645,16 @@
                     if (data.employee_name && data.designation) {
                         // Update the letter preview with employee data
                         updateLetterWithEmployeeData(data, sapId);
-                        // Fetch leave balances for this employee
-                        fetchLeaveBalances(sapId);
                         showSuccessToast("Employee found!");
                     } else {
-                        
-                        $('#leave-balance-section').addClass('hidden');
+                        showErrorToast("Employee with this SAP ID not found!");
                     }
                 })
                 .catch(error => {
                     showErrorToast("Employee with this SAP ID not found!");
-                    $('#leave-balance-section').addClass('hidden');
                 });
         } else {
             showErrorToast("Please enter an SAP ID before searching.");
-            $('#leave-balance-section').addClass('hidden');
         }
     });
     
@@ -755,7 +750,7 @@
                     }
                 })
                 .catch(error => {
-                    showErrorToast("Employee with this SAP ID not found!");
+                    showErrorToast("Error fetching employee data. Please try again.");
                 });
         } else {
             showErrorToast("Please enter an SAP ID before fetching data.");
@@ -783,7 +778,7 @@
                     }
                 })
                 .catch(error => {
-                    showErrorToast("Employee with this SAP ID not found!");
+                    showErrorToast("Error fetching employee data. Please try again.");
                 });
         } else {
             showErrorToast("Please enter an SAP ID before fetching data.");

@@ -17,7 +17,7 @@ class APA_GradingAdmin(ModelAdmin, ImportExportModelAdmin):
     export_form_class = ExportForm
     resource_class = APA_GradingResource
     list_display = ('get_sap_id', 'employee__name', 'grade', 'year', 'comments')
-    search_fields = ('id', 'name')
+    search_fields = ('id', 'employee__name', 'employee__SAP_ID', 'grade', 'year')
     list_filter = ('grade', )
 
     def get_sap_id(self, obj):
