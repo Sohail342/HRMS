@@ -54,10 +54,7 @@
                         <input type="date" id="effect_to" name="effect_to" class="mt-1 p-2 w-10/12 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required>
                     </div>
 
-                    <div>
-                        <label for="purpose" class="block text-sm font-medium text-gray-700">Purpose/Reason:</label>
-                        <textarea id="purpose" name="purpose" class="mt-1 p-2 w-10/12 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required rows="3" placeholder="Enter the purpose of leave"></textarea>
-                    </div>
+
 
                     <div>
                         <label for="leave_type_option" class="block text-sm font-medium text-gray-700">Leave Type:</label>
@@ -69,9 +66,6 @@
                                 {% endif %}
                             {% endfor %}
                         </select>
-                        <div class="mt-1 text-xs text-gray-500">
-                            <span id="leave_balance_display">Available balance: <span class="font-semibold">--</span></span>
-                        </div>
                     </div>
 
                     <div id="extension_policy_section">
@@ -209,9 +203,7 @@
         <p class="mb-4" style="text-align: justify;">
             Consequent upon applying <span id="leave_type_text">______________</span> leave by <span class="employee-salutation">{{employee.employee_salutation | capitalize_words }}</span> <span class="employee-name">{{employee.name}}</span>, <span class="employee-grade">{{employee.employee_grade}}</span>/<span class="employee-type">{{employee.employee_type}}</span> having SAP-ID-<span class="employee-sapid">{{employee.SAP_ID}}</span>, dated <b><span id="application_date_text">______________</span></b>. <span class="employee-salutation">{{employee.employee_salutation | capitalize_words }}</span> <span class="employee-name">{{employee.name}}</span> is hereby informed that  <span id="granted_leaves_text">______________</span> <span id="leave_type_text">______________</span> Leave has been sanctioned by the competent authorities from <span id="effect_from_text">______________</span> till <span id="effect_to_text">______________</span>.
         </p>
-        <p class="mb-4" style="text-align: justify;">
-            <strong>Purpose/Reason:</strong> <span id="purpose_text">______________</span>
-        </p>
+
         <p class="mb-4" style="text-align: justify;">
             Accordingly, <span class="employee-salutation">{{employee.employee_salutation | capitalize_words }}</span> <span class="employee-name">{{employee.name}}</span>, is hereby relieved of his duties by the close of business hours today i.e. {{current_time | date:"F j, Y" }}. ({{next_day | date:"F j, Y"}} & {{next_next_day | date:"F j, Y"}} i.e. Saturday and Sunday being public holidays) <span id="extension_text"></span>
         </p>
@@ -575,13 +567,7 @@
     document.getElementById('effect_from').addEventListener('change', calculateEffectToDate);
 
 
-    // Update purpose text when purpose textarea changes
-    document.getElementById('purpose').addEventListener('input', function() {
-        const purposeText = document.getElementById('purpose_text');
-        if (purposeText) {
-            purposeText.textContent = this.value || "______________";
-        }
-    });
+
 
     document.getElementById('leave_type_option').addEventListener('change', function() {
         const selectedOption = this.options[this.selectedIndex];
@@ -595,11 +581,7 @@
             element.textContent = leaveTypeName || "______________";
         });
         
-        // Set purpose text based on leave type
-        if (leaveTypeName) {
-            const purposeText = leaveTypeName;
-            document.getElementById('purpose').value = purposeText;
-        }
+
         
         // Toggle between extension policy and station permission based on leave type
         const extensionPolicySection = document.getElementById('extension_policy_section');
@@ -618,39 +600,8 @@
             extensionPolicySection.style.display = 'none';
             stationPermissionSection.style.display = 'block';
         }
-        
-        // Update leave balance display if we have leave balances data
-        const sapId = document.getElementById('search_sap_id').value;
-        if (sapId && selectedLeaveTypeId) {
-            $.ajax({
-                url: "{% url 'reporting:get_employee_leave_balance' %}",
-                data: {
-                    'sap_id': sapId,
-                    'leave_type_id': selectedLeaveTypeId
-                },
-                dataType: 'json',
-                success: function(data) {
-                    if (data.leave_balances && data.leave_balances.length > 0) {
-                        const leaveBalance = data.leave_balances[0];
-                        $('#leave_balance_display').html(`Available balance: <span class="font-semibold">${leaveBalance.available_leaves}</span>`);
-                        
-                        // Check if requested leaves exceed available balance
-                        const grantedLeaves = parseInt($('#granted_leaves').val()) || 0;
-                        if (grantedLeaves > leaveBalance.available_leaves) {
-                            showBalanceWarningToast();
-                        }
-                    } else {
-                        $('#leave_balance_display').html('Available balance: <span class="font-semibold">--</span>');
-                    }
-                },
-                error: function() {
-                    $('#leave_balance_display').html('Available balance: <span class="font-semibold">--</span>');
-                }
-            });
-        } else {
-            $('#leave_balance_display').html('Available balance: <span class="font-semibold">--</span>');
-        }
     });
+        
 
     // numbers to Aplhabets
     function numberToWords(num) {
@@ -674,42 +625,6 @@
 
         return words;
     }
-
-    // Fetch Data
-    document.getElementById('granted_leaves').addEventListener('input', function() {
-        let value = parseInt(this.value, 10);
-        if (!isNaN(value) && value > 0) {
-            const formattedValue = `${numberToWords(value)} (${value.toString().padStart(2, '0')}) day(s)`;
-            document.getElementById('granted_leaves_text').textContent = formattedValue;
-            document.getElementById('granted_leaves_text').setAttribute('data-formatted-value', formattedValue);
-            
-            // Check if requested leaves exceed available balance
-            const selectedLeaveTypeId = $('#leave_type_option').val();
-            const sapId = document.getElementById('search_sap_id').value;
-            
-            if (sapId && selectedLeaveTypeId) {
-                $.ajax({
-                    url: "{% url 'reporting:get_employee_leave_balance' %}",
-                    data: {
-                        'sap_id': sapId,
-                        'leave_type_id': selectedLeaveTypeId
-                    },
-                    dataType: 'json',
-                    success: function(data) {
-                        if (data.leave_balances && data.leave_balances.length > 0) {
-                            const leaveBalance = data.leave_balances[0];
-                            if (value > leaveBalance.available_leaves) {
-                                showBalanceWarningToast();
-                            }
-                        }
-                    }
-                });
-            }
-        } else {
-            document.getElementById('granted_leaves_text').textContent = "______________";
-            document.getElementById('granted_leaves_text').removeAttribute('data-formatted-value');
-        }
-    });
 
 
     // Event listener for the SAP ID search button
@@ -945,67 +860,6 @@
             $('#leave-balance-section').addClass('hidden');
         }
     });
-    
-    // Function to fetch leave balances
-    function fetchLeaveBalances(sapId) {
-        $.ajax({
-            url: "{% url 'reporting:get_employee_leave_balance' %}",
-            data: {
-                'sap_id': sapId
-            },
-            dataType: 'json',
-            success: function(data) {
-                if (data.leave_balances && data.leave_balances.length > 0) {
-                    // Show the leave balance section
-                    $('#leave-balance-section').removeClass('hidden');
-                    
-                    // Clear previous balances
-                    $('#leave-balances').empty();
-                    
-                    // Add each leave balance
-                    data.leave_balances.forEach(function(balance) {
-                        $('#leave-balances').append(`
-                            <div class="p-3 bg-white rounded shadow-sm mb-2">
-                                <div class="flex justify-between items-center">
-                                    <span class="font-medium text-gray-800">${balance.leave_type_name}</span>
-                                    <span class="text-sm bg-blue-100 text-blue-800 py-1 px-2 rounded">
-                                        Available: ${balance.available_leaves}
-                                    </span>
-                                </div>
-                                <div class="mt-2 grid grid-cols-2 gap-2 text-sm">
-                                    <div>
-                                        <span class="text-gray-500">Entitled:</span>
-                                        <span class="ml-1">${balance.entitled_leaves}</span>
-                                    </div>
-                                    <div>
-                                        <span class="text-gray-500">Used:</span>
-                                        <span class="ml-1">${balance.used_leaves}</span>
-                                    </div>
-                                    <div>
-                                        <span class="text-gray-500">Carried Forward:</span>
-                                        <span class="ml-1">${balance.carried_forward_leaves}</span>
-                                    </div>
-                                    <div>
-                                        <span class="text-gray-500">Frozen:</span>
-                                        <span class="ml-1">${balance.frozen_leaves}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        `);
-                    });
-                } else {
-                    // Hide the section if no balances
-                    $('#leave-balance-section').addClass('hidden');
-                }
-            },
-            error: function() {
-                // Hide the section on error
-                $('#leave-balance-section').addClass('hidden');
-                showErrorToast("Error fetching leave balances");
-            }
-        });
-    }
-});
 
 
     document.querySelectorAll('input[name="extension"]').forEach((radio) => {
@@ -1034,6 +888,9 @@
     });
    
 
+    // Close any unclosed functions or blocks
+    // This fixes the "Unexpected end of input" error
+    });
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.js"></script>

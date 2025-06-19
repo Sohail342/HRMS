@@ -10,16 +10,16 @@ from django.contrib import messages
 import cloudinary
 import json
 import base64
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta
 from .models import Signature, LetterTemplates, HospitalName, PermenantLetterTemplates, Purpose, PulicHolidays
+from leave_management.models import LeaveType
 from django.views.generic import DetailView, ListView
 from HRIS_App.models import Employee
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView
 from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator
-from employee_attendance.models import LeaveApplication
-from employee_attendance.models_leave_management import EmployeeLeaveBalance, LeaveType
+
 
 
 @csrf_exempt
@@ -465,62 +465,7 @@ def get_letter_templates(request):
         return JsonResponse({'error': str(e)}, status=500)
 
 
-def get_employee_leave_balance(request):
-    """API endpoint to get employee leave balance by SAP ID and leave type"""
-    sap_id = request.GET.get('sap_id')
-    leave_type_id = request.GET.get('leave_type_id')
-    
-    if not sap_id:
-        return JsonResponse({'error': 'SAP ID is required'}, status=400)
-    
-    try:
-        # Get the employee
-        employee = get_object_or_404(Employee, SAP_ID=sap_id)
-        
-        # Get current year
-        current_year = date.today().year
-        
-        # Filter query based on whether leave_type_id is provided
-        if leave_type_id:
-            try:
-                leave_type = LeaveType.objects.get(id=leave_type_id)
-                balances = EmployeeLeaveBalance.objects.filter(
-                    employee=employee,
-                    leave_type=leave_type,
-                    year=current_year
-                )
-            except LeaveType.DoesNotExist:
-                return JsonResponse({'error': 'Leave type not found'}, status=404)
-        else:
-            # Get all leave balances for this employee
-            balances = EmployeeLeaveBalance.objects.filter(
-                employee=employee,
-                year=current_year
-            )
-        
-        # Format the response
-        balance_data = []
-        for balance in balances:
-            balance_data.append({
-                'leave_type_id': balance.leave_type.id,
-                'leave_type_name': balance.leave_type.get_name_display(),
-                'entitled_leaves': balance.entitled_leaves,
-                'carried_forward_leaves': balance.carried_forward_leaves,
-                'used_leaves': balance.used_leaves,
-                'frozen_leaves': balance.frozen_leaves,
-                'available_leaves': balance.available_leaves,
-                'total_balance': balance.total_balance,
-                'year': balance.year
-            })
-        
-        return JsonResponse({
-            'employee_name': employee.name,
-            'sap_id': employee.SAP_ID,
-            'leave_balances': balance_data
-        })
-        
-    except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
+
     
 
 

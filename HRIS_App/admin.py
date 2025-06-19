@@ -1,6 +1,6 @@
 from django.contrib import admin
 from unfold.admin import ModelAdmin
-from .resources import BranchResource, EmployeeResource, WingResource
+from .resources import BranchResource, EmployeeResource, WingResource, APA_GradingResource
 from import_export.admin import ImportExportModelAdmin
 from unfold.contrib.import_export.forms import ExportForm, ImportForm
 from .forms import AdminEmployeeForm, NonAdminEmployeeForm
@@ -15,6 +15,7 @@ from .models import (
 class APA_GradingAdmin(ModelAdmin, ImportExportModelAdmin):
     import_form_class = ImportForm
     export_form_class = ExportForm
+    resource_class = APA_GradingResource
     list_display = ('get_sap_id', 'employee__name', 'grade', 'year', 'comments')
     search_fields = ('id', 'name')
     list_filter = ('grade', )

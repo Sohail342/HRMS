@@ -138,38 +138,11 @@ def create_password_view(request, sap_id):
 
 # -------------------------------------------------------------------------------------------------------
 
-from employee_attendance.models import  LeaveApplication
-
 @login_required(login_url="employee_user:user_login")
 @employee_user_required
 def dashboard_view(request):
     user_type = request.user.employee_type
-    
-    # Get leaves for employee ( requested user )
-    casual_leaves = LeaveApplication.objects.filter(employee=request.user, application_type='Casual').values('availed_leaves')
-    casual_leaves_count = sum(item['availed_leaves'] for item in casual_leaves)
-    remaining_casual_leaves = 20 - casual_leaves_count
-    
-    
-    privilege_leaves = LeaveApplication.objects.filter(employee=request.user, application_type='Privilege').values('availed_leaves')
-    privilege_leaves_count = sum(item['availed_leaves'] for item in privilege_leaves)
-    remaining_privilege_leaves = 30 - privilege_leaves_count
-    
-    sick_leaves = LeaveApplication.objects.filter(employee=request.user, application_type='Sick').values('availed_leaves')
-    sick_leaves_count = sum(item['availed_leaves'] for item in sick_leaves)
-    remaining_sick_leaves = 18 - sick_leaves_count
-    
-    pending_count = LeaveApplication.objects.filter(employee=request.user, leave_status='pending').count()
-    approved_count = LeaveApplication.objects.filter(employee=request.user, leave_status='approved').count()
-    declined_count = LeaveApplication.objects.filter(employee=request.user, leave_status='declined').count()
-    
-    pending_requests = LeaveApplication.objects.filter(employee=request.user, leave_status='pending')
-    approved_requests = LeaveApplication.objects.filter(employee=request.user, leave_status='approved')
-    declined_requests = LeaveApplication.objects.filter(employee=request.user, leave_status='declined')
-    
-    approved_requests_list = list(approved_requests.values('application_type', 'from_date', 'to_date', 'reason'))
-    pending_requests_list = list(pending_requests.values('application_type', 'from_date', 'to_date','reason'))
-    declined_requests_list = list(declined_requests.values('application_type', 'from_date', 'to_date','reason'))
+    # Dashboard content goes here
     
     
     content = {

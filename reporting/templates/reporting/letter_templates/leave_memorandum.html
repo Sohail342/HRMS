@@ -54,10 +54,7 @@
                         <input type="date" id="effect_to" name="effect_to" class="mt-1 p-2 w-10/12 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required>
                     </div>
 
-                    <div>
-                        <label for="purpose" class="block text-sm font-medium text-gray-700">Purpose/Reason:</label>
-                        <textarea id="purpose" name="purpose" class="mt-1 p-2 w-10/12 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required rows="3" placeholder="Enter the purpose of leave"></textarea>
-                    </div>
+
 
                     <div>
                         <label for="leave_type_option" class="block text-sm font-medium text-gray-700">Leave Type:</label>
@@ -67,9 +64,6 @@
                                 <option value="{{ leave_type.id }}" data-code="{{ leave_type.code }}">{{ leave_type.name }}</option>
                             {% endfor %}
                         </select>
-                        <div class="mt-1 text-xs text-gray-500">
-                            <span id="leave_balance_display">Available balance: <span class="font-semibold">--</span></span>
-                        </div>
                     </div>
 
                     <div id="extension_policy_section">
@@ -208,9 +202,7 @@
             With reference to his application dated <b><span id="application_date_text">______________</span></b> <span class="employee-salutation">{{employee.employee_salutation | capitalize_words }}</span> <span class="employee-name">{{employee.name}}</span>, <span class="employee-grade">{{employee.employee_grade}}</span>/<span class="employee-type">{{employee.employee_type}}</span> SAP ID: <span class="employee-sapid">{{employee.SAP_ID}}</span>, 
             NBP, Regional Office, <span class="employee-region">{{employee.region}}</span> is advised that he has been granted <span id="granted_leaves_text">______________</span> <span id="leave_type_text">______________</span> leave effective from <span id="effect_from_text">______________</span> to <span id="effect_to_text">______________</span>.
         </p>
-        <p class="mb-4" style="text-align: justify;">
-            <strong>Purpose/Reason:</strong> <span id="purpose_text">______________</span>
-        </p>
+
         <p class="mb-4" style="text-align: justify;">
             <span class="employee-salutation">{{employee.employee_salutation | capitalize_words }}</span> <span class="employee-name">{{employee.name}}</span> will accordingly stand relieved to his duties as of close of office today i.e. <b>{{current_time | date:"F j, Y" }}</b> to avail sanctioned leave(s). <span id="extension_text"></span> {% if is_friday == True %}Accordingly <span class="employee-salutation">{{employee.employee_salutation | capitalize_words }}</span> <span class="employee-name">{{employee.name}}</span> is hereby relieved of his duties by the close of office hours today i.e.
             Friday, {{current_time | date:"F j, Y"}}. ({{next_day | date:"F, Y"}} & {{next_next_day | date:"F, Y"}} i.e. Saturday and Sunday being public holidays){% endif %}
@@ -581,29 +573,25 @@
         // Toggle between extension policy and station permission based on leave type
         const extensionPolicySection = document.getElementById('extension_policy_section');
         const stationPermissionSection = document.getElementById('station_permission_section');
+        const leaveBalanceDisplay = document.getElementById('leave_balance_display');
         
         if (leaveTypeCode === 'EX-Pak') {
+            // For Ex-Pakistan leave, show extension policy only and hide leave balance
             extensionPolicySection.style.display = 'block';
             stationPermissionSection.style.display = 'none';
-        } else if (leaveTypeCode === 'SL') {
-            // For Sick Leave, show both sections
-            extensionPolicySection.style.display = 'block';
-            stationPermissionSection.style.display = 'block';
-        } else if (leaveTypeCode === 'ML') {
-            // For Mandatory Leave, show extension policy only
-            extensionPolicySection.style.display = 'block';
-            stationPermissionSection.style.display = 'none';
+            if (leaveBalanceDisplay) {
+                leaveBalanceDisplay.style.display = 'none';
+            }
+            // Force a redraw to ensure the extension policy section is visible
+            extensionPolicySection.offsetHeight;
         } else {
-            // For other leave types (PL, CL)
+            // For all other leave types, show station permission only and show leave balance
             extensionPolicySection.style.display = 'none';
             stationPermissionSection.style.display = 'block';
+            if (leaveBalanceDisplay) {
+                leaveBalanceDisplay.style.display = 'block';
+            }
         }
-    });
-
-    // Update purpose text in the document when purpose textarea changes
-    document.getElementById('purpose').addEventListener('input', function() {
-        const purposeText = document.getElementById('purpose_text');
-        purposeText.textContent = this.value || "______________";
     });
 
     // numbers to Aplhabets
@@ -661,7 +649,7 @@
                         fetchLeaveBalances(sapId);
                         showSuccessToast("Employee found!");
                     } else {
-                        showErrorToast("Employee with this SAP ID not found!");
+                        
                         $('#leave-balance-section').addClass('hidden');
                     }
                 })
@@ -675,104 +663,6 @@
         }
     });
     
-    // Function to fetch leave balances
-    function fetchLeaveBalances(sapId) {
-        $.ajax({
-            url: "{% url 'reporting:get_employee_leave_balance' %}",
-            data: {
-                'sap_id': sapId
-            },
-            dataType: 'json',
-            success: function(data) {
-                if (data.leave_balances && data.leave_balances.length > 0) {
-                    // Show the leave balance section
-                    $('#leave-balance-section').removeClass('hidden');
-                    
-                    // Clear previous balances
-                    $('#leave-balances').empty();
-                    
-                    // Add each leave balance
-                    data.leave_balances.forEach(function(balance) {
-                        $('#leave-balances').append(`
-                            <div class="p-3 bg-white rounded shadow-sm mb-2">
-                                <div class="flex justify-between items-center">
-                                    <span class="font-medium text-gray-800">${balance.leave_type_name}</span>
-                                    <span class="text-sm bg-blue-100 text-blue-800 py-1 px-2 rounded">
-                                        Available: ${balance.available_leaves}
-                                    </span>
-                                </div>
-                                <div class="mt-2 grid grid-cols-2 gap-2 text-sm">
-                                    <div>
-                                        <span class="text-gray-500">Entitled:</span>
-                                        <span class="ml-1">${balance.entitled_leaves}</span>
-                                    </div>
-                                    <div>
-                                        <span class="text-gray-500">Used:</span>
-                                        <span class="ml-1">${balance.used_leaves}</span>
-                                    </div>
-                                    <div>
-                                        <span class="text-gray-500">Carried Forward:</span>
-                                        <span class="ml-1">${balance.carried_forward_leaves}</span>
-                                    </div>
-                                    <div>
-                                        <span class="text-gray-500">Frozen:</span>
-                                        <span class="ml-1">${balance.frozen_leaves}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        `);
-                    });
-                    
-                    // Update leave balance display when leave type is selected
-                    $('#leave_type_option').on('change', function() {
-                        const selectedLeaveTypeId = $(this).val();
-                        if (selectedLeaveTypeId) {
-                            const selectedLeaveType = data.leave_balances.find(balance => 
-                                balance.leave_type_id == selectedLeaveTypeId);
-                            
-                            if (selectedLeaveType) {
-                                $('#leave_balance_display').html(`Available balance: <span class="font-semibold">${selectedLeaveType.available_leaves}</span>`);
-                                
-                                // Check if requested leaves exceed available balance
-                                const grantedLeaves = parseInt($('#granted_leaves').val()) || 0;
-                                if (grantedLeaves > selectedLeaveType.available_leaves) {
-                                    showBalanceWarningToast();
-                                }
-                            } else {
-                                $('#leave_balance_display').html('Available balance: <span class="font-semibold">--</span>');
-                            }
-                        } else {
-                            $('#leave_balance_display').html('Available balance: <span class="font-semibold">--</span>');
-                        }
-                    });
-                    
-                    // Check balance when granted leaves are changed
-                    $('#granted_leaves').on('input', function() {
-                        const selectedLeaveTypeId = $('#leave_type_option').val();
-                        if (selectedLeaveTypeId) {
-                            const selectedLeaveType = data.leave_balances.find(balance => 
-                                balance.leave_type_id == selectedLeaveTypeId);
-                            
-                            if (selectedLeaveType) {
-                                const grantedLeaves = parseInt($(this).val()) || 0;
-                                if (grantedLeaves > selectedLeaveType.available_leaves) {
-                                    showBalanceWarningToast();
-                                }
-                            }
-                        }
-                    });
-                } else {
-                    // Hide the section if no balances
-                    $('#leave-balance-section').addClass('hidden');
-                }
-            },
-            error: function() {
-                // Hide the section on error
-                $('#leave-balance-section').addClass('hidden');
-                showErrorToast("Error fetching leave balances");
-            }
-        });
-    }
     
     // Function to update the letter with employee data
     function updateLetterWithEmployeeData(data, sapId) {
@@ -948,6 +838,9 @@
 
 
     $(document).ready(function() {
+    // Initially hide the extension policy section
+    $('#extension_policy_section').hide();
+    
     $('#form_type').on('change', function() {
         var sapId = $(this).val();
         if (sapId) {

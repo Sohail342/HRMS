@@ -20,8 +20,6 @@ urlpatterns = [
     path('template_search/', views.template_search, name='template_search'), 
     path('search_permanent_saved_templates', views.search_permanent_saved_templates, name='search_permanent_saved_templates'),
     path('get_letter_templates/', views.get_letter_templates, name='get_letter_templates'),
-    path('get_employee_leave_balance/', views.get_employee_leave_balance, name='get_employee_leave_balance'),
-
     path('application_leave/<str:sap_id>/', views.application_leave, name="application_leave"),
 ]
 

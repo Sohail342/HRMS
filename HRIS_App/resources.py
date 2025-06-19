@@ -19,7 +19,7 @@ class APA_GradingResource(resources.ModelResource):
     employee = fields.Field(
         column_name='employee',
         attribute='employee',
-        widget=ForeignKeyWidget(Employee, 'name')
+        widget=ForeignKeyWidget(Employee, 'SAP_ID')
     )
 
     class Meta:
