@@ -19,6 +19,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView
 from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator
+from leave_management.leave_utils import apply_for_leave
+from leave_management.models import LeaveType
 
 
 
@@ -380,61 +382,47 @@ class LetterForm(LoginRequiredMixin, ListView):
 def application_leave(request, sap_id):
     if request.method == 'POST':
 
-        leave_type = request.POST.get('leave_type_option')
-        leave_days = request.POST.get('granted_leaves') 
+        leave_type_value = request.POST.get('leave_type_option')
         from_date_str = request.POST.get('effect_from')
+        to_date_str = request.POST.get('effect_to')
         reason = request.POST.get('purpose')
 
         # Convert string date to datetime object first
         date_format = "%Y-%m-%d"
-        from_date = datetime.strptime(from_date_str, date_format).date()
-        
-        # Calculate to_date using the datetime object
-        to_date = from_date + timezone.timedelta(days=(int(leave_days) - 1) + 1 )
-
-        # Calculate availed leave
-        availed_leave = (to_date - from_date).days + 1
-        
-        # Convert Leave type to Full form
-        if leave_type == 'CL':
-            leave_type = 'Casual'
-        elif leave_type == 'ML':
-            leave_type = 'Mandatory'
-        elif leave_type == 'SL':
-            leave_type = 'Sick'
-        elif leave_type == 'PL':
-            leave_type = 'Privilege'
-        elif leave_type == 'Ex-Pak':
-            leave_type = 'Ex-Pakistan'
-
+        from_date = datetime.strptime(from_date_str, date_format).date() if from_date_str else None
+        to_date = datetime.strptime(to_date_str, date_format).date() if to_date_str else None
 
         # Validate the data
-        if not sap_id or not leave_type or not from_date or not reason:
+        if not sap_id or not leave_type_value or not from_date:
             messages.error(request, "All fields are required.")
             return redirect(f"{reverse('reporting:leave_memorandum')}?sap_id={sap_id}")
 
         # Get the employee object
         employee = get_object_or_404(Employee, SAP_ID=sap_id)
-
-        # Save the leave application
+        
+        # Get the LeaveType instance based on the value from the form
         try:
-            leave_application = LeaveApplication(
+            leave_type_id = int(leave_type_value)
+            leave_type = LeaveType.objects.get(id=leave_type_id)
+            # Apply for leave application
+            apply_for_leave(
                 employee=employee,
-                application_type=leave_type,
-                leave_date=datetime.now().date(),
-                from_date=from_date,
-                to_date=to_date,
-                reason=reason,
-                availed_leaves=int(leave_days)
+                leave_type=leave_type,
+                start_date=from_date,
+                end_date=to_date,
+                reason=reason
             )
-            leave_application.save()
+            
+            # If the leave application is successful, redirect to the leave memorandum page
+            messages.success(request, "Leave application submitted successfully.")
+            return redirect(f"{reverse('reporting:leave_memorandum')}?sap_id={sap_id}")
 
+        except LeaveType.DoesNotExist:
+            messages.error(request, f"Invalid leave type: {leave_type_value}")
+            return redirect(f"{reverse('reporting:leave_memorandum')}?sap_id={sap_id}")
         except Exception as e:
             messages.error(request, f"Error saving leave application: {e}")
             return redirect(f"{reverse('reporting:leave_memorandum')}?sap_id={sap_id}")
-
-        messages.success(request, "Leave application submitted successfully.")
-        return redirect(f"{reverse('reporting:leave_memorandum')}?sap_id={sap_id}")
 
     return render(request, 'reporting/leave_memorandum.html', sap_id=sap_id)
     

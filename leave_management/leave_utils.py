@@ -1,6 +1,7 @@
 from datetime import datetime, date, timedelta
 from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
+from HRIS_App.models import Employee
 
 from .models import (
     LeaveType, LeaveRule, LeaveBalance, EmployeeProfile,
@@ -9,6 +10,9 @@ from .models import (
 
 
 def assign_all_employee_leave_balances():
+    """
+    Assign leave balances to all employees based on their profiles and leave rules.
+    """
     current_year = datetime.now().year
     profiles = EmployeeProfile.objects.select_related("employee")
 
@@ -28,6 +32,72 @@ def assign_all_employee_leave_balances():
                     "remaining": rule.annual_quota,
                 }
             )
+
+
+def create_employee_profiles_from_employees():
+    """
+    Create EmployeeProfile for all Employees who don't have one.
+    Cadre and employment_type are taken from related Employee fields.
+    """
+    created_count = 0
+    skipped = 0
+
+    emp = Employee.objects.select_related('cadre', 'employee_type')
+    for _ in range(20):
+        if hasattr(emp, 'employeeprofile'):
+            skipped += 1
+            continue
+
+        # Safely get cadre and employment_type as string
+        cadre = emp.cadre.name if emp.cadre else None
+        employment_type = emp.employee_type.name if emp.employee_type else None
+
+        if not cadre or not employment_type:
+            skipped += 1
+            continue  # Skip if required info missing
+
+        # Create EmployeeProfile
+        EmployeeProfile.objects.create(
+            employee=emp,
+            cadre=cadre,
+            employment_type=employment_type
+        )
+        created_count += 1
+
+    return f"✅ Created: {created_count} profiles | Skipped: {skipped}"
+
+
+
+def initialize_leave_balances_for_new_year(year=None):
+    """
+    Create leave balances for all employees for a new year.
+    """
+    year = year or datetime.now().year
+    profiles = EmployeeProfile.objects.select_related("employee")
+
+    created_count = 0
+    for profile in profiles:
+        rules = LeaveRule.objects.filter(
+            cadre=profile.cadre,
+            employment_type=profile.employment_type
+        )
+
+        for rule in rules:
+            leave_balance, created = LeaveBalance.objects.get_or_create(
+                employee=profile.employee,
+                leave_type=rule.leave_type,
+                year=year,
+                defaults={
+                    "annual_quota": rule.annual_quota,
+                    "remaining": rule.annual_quota
+                }
+            )
+            if created:
+                created_count += 1
+
+    return f"✅ Initialized leave balances for year {year}. New entries: {created_count}"
+
+
 
 
 def get_leave_cycle(employee_profile: EmployeeProfile):
@@ -54,6 +124,10 @@ def validate_leave_application(employee, leave_type, start_date, end_date):
         leave_balance = LeaveBalance.objects.get(employee=employee, leave_type=leave_type)
     except LeaveBalance.DoesNotExist:
         raise ValidationError("Leave balance not set for this type.")
+        
+    # Check if employee has zero balance
+    if leave_balance.remaining == 0:
+        raise ValidationError(f"You have 0 {leave_type.name} leaves remaining. Cannot apply for this leave type.")
 
     requested_days = (end_date - start_date).days + 1
     if leave_balance.remaining < requested_days:
@@ -96,7 +170,7 @@ def freeze_and_carry_forward_leaves(year):
                 year=year,
                 days=lb.remaining
             )
-            print(f"Froze {lb.remaining} days of {leave_type.name} for {lb.employee.username}")
+            print(f"Froze {lb.remaining} days of {leave_type.name} for {lb.employee.name}")
         
         lb.remaining = 0
         lb.save()

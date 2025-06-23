@@ -4,6 +4,32 @@
 
 {% block content %}
 <body class="p-8 bg-gray-100">
+    <!-- Django Messages -->
+    {% if messages %}
+    <div class="messages-container fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md">
+        {% for message in messages %}
+        <div class="message {% if message.tags %}{{ message.tags }}{% endif %} p-4 mb-2 rounded-lg shadow-lg text-white {% if message.tags == 'error' %}bg-red-500{% elif message.tags == 'success' %}bg-green-500{% elif message.tags == 'warning' %}bg-yellow-500{% elif message.tags == 'info' %}bg-blue-500{% endif %}">
+            {{ message }}
+            <button class="float-right ml-2 focus:outline-none" onclick="this.parentElement.remove()">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- Toast Messages -->
+    <div id="errorToast" class="fixed top-4 right-4 bg-red-500 text-white p-4 rounded-lg shadow-lg z-50 hidden">
+        Error message here
+    </div>
+    <div id="successToast" class="fixed top-4 right-4 bg-green-500 text-white p-4 rounded-lg shadow-lg z-50 hidden">
+        Success message here
+    </div>
+    <div id="balanceWarningToast" class="fixed top-4 right-4 bg-yellow-500 text-white p-4 rounded-lg shadow-lg z-50 hidden">
+        Warning: You have zero balance for one or more leave types!
+    </div>
     <!-- Main Container with Two-Column Layout -->
     <div class="flex flex-col lg:flex-row gap-6 max-w-screen-xl mx-auto">
         <!-- Left Column - Application Form -->
@@ -116,7 +142,7 @@
                 </div>
                 
                 <div class="mt-6 text-center">
-                    <button type="submit" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                    <button type="submit" id="submit-application" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
                         Submit Application
                     </button>
                 </div>
@@ -262,6 +288,15 @@
 </body>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
+    // Auto-dismiss Django messages after 5 seconds
+    $(document).ready(function() {
+        setTimeout(function() {
+            $('.messages-container .message').fadeOut('slow', function() {
+                $(this).remove();
+            });
+        }, 5000);
+    });
+    
     // Function to prepare the document for PDF generation
     function prepareDocumentForPDF() {
         const application_date_elem = document.getElementById('application_date');
@@ -616,6 +651,39 @@
 
         return words;
     }
+    
+    // Toast message functions
+    function showErrorToast(message) {
+        const toast = document.getElementById('errorToast');
+        toast.textContent = message;
+        toast.classList.remove('hidden');
+        toast.classList.add('opacity-100');
+
+        setTimeout(() => {
+            toast.classList.add('hidden');
+        }, 3000);
+    }
+    
+    function showSuccessToast(message) {
+        const toast = document.getElementById('successToast');
+        toast.textContent = message;
+        toast.classList.remove('hidden');
+        toast.classList.add('opacity-100');
+
+        setTimeout(() => {
+            toast.classList.add('hidden');
+        }, 3000);
+    }
+    
+    function showBalanceWarningToast() {
+        const toast = document.getElementById('balanceWarningToast');
+        toast.classList.remove('hidden');
+        toast.classList.add('opacity-100');
+
+        setTimeout(() => {
+            toast.classList.add('hidden');
+        }, 3000);
+    }
 
     // Fetch Data
     document.getElementById('granted_leaves').addEventListener('input', function() {
@@ -631,6 +699,76 @@
     });
 
 
+    // Function to fetch leave balances
+    function fetchLeaveBalances(sapId) {
+        if (!sapId) return;
+        
+        // Make an AJAX call to get the employee's leave balances
+        $.ajax({
+            url: "{% url 'leave_management:get_leave_balances' %}",
+            data: {
+                'sap_id': sapId
+            },
+            dataType: 'json',
+            success: function(data) {
+                // Clear previous balances
+                $('#leave-balances').empty();
+                
+                // Check if we have any leave balances
+                if (data.balances && data.balances.length > 0) {
+                    // Show the leave balance section
+                    $('#leave-balance-section').removeClass('hidden');
+                    
+                    // Store balances for validation
+                    window.leaveBalances = {};
+                    
+                    // Add each leave balance to the display
+                    data.balances.forEach(function(balance) {
+                        // Store balance for validation
+                        window.leaveBalances[balance.leave_type] = {
+                            annual_quota: balance.annual_quota,
+                            remaining: balance.remaining
+                        };
+                        
+                        const balanceHtml = `
+                            <div class="flex justify-between items-center">
+                                <span class="font-medium">${balance.leave_type}:</span>
+                                <span class="${balance.remaining === 0 ? 'text-red-600 font-bold' : ''}">
+                                    ${balance.remaining}/${balance.annual_quota}
+                                </span>
+                            </div>
+                        `;
+                        $('#leave-balances').append(balanceHtml);
+                        
+                        // Show warning if any leave type has zero balance
+                        if (balance.remaining === 0) {
+                            showBalanceWarningToast();
+                        }
+                    });
+                    
+                    // Display success message
+                    showSuccessToast("Leave balances loaded successfully!");
+                } else {
+                    // No leave balances found
+                    $('#leave-balance-section').addClass('hidden');
+                    showErrorToast("No leave balances found for this employee.");
+                }
+            },
+            error: function(xhr) {
+                // Handle error
+                $('#leave-balances').html('<p class="text-red-500">Error loading leave balances.</p>');
+                $('#leave-balance-section').removeClass('hidden');
+                
+                // Display error message from server if available
+                if (xhr.responseJSON && xhr.responseJSON.error) {
+                    showErrorToast(xhr.responseJSON.error);
+                } else {
+                    showErrorToast("Error loading leave balances.");
+                }
+            }
+        });
+    }
+
     // Event listener for the SAP ID search button
     document.getElementById('search_employee').addEventListener('click', function(event) {
         // Prevent form submission
@@ -645,6 +783,8 @@
                     if (data.employee_name && data.designation) {
                         // Update the letter preview with employee data
                         updateLetterWithEmployeeData(data, sapId);
+                        // Fetch leave balances for the employee
+                        fetchLeaveBalances(sapId);
                         showSuccessToast("Employee found!");
                     } else {
                         showErrorToast("Employee with this SAP ID not found!");
@@ -655,6 +795,52 @@
                 });
         } else {
             showErrorToast("Please enter an SAP ID before searching.");
+        }
+    });
+    
+    // Event listener for leave type selection
+    document.getElementById('leave_type_option').addEventListener('change', function() {
+        // Get the selected leave type
+        const selectedLeaveType = this.options[this.selectedIndex].text;
+        
+        // Check if we have balance data and the selected leave type exists in our balances
+        if (window.leaveBalances && window.leaveBalances[selectedLeaveType]) {
+            const balance = window.leaveBalances[selectedLeaveType];
+            
+            // If remaining balance is 0, show warning
+            if (balance.remaining === 0) {
+                showBalanceWarningToast();
+                showErrorToast(`You have zero balance for ${selectedLeaveType} leave!`);
+            } else {
+                // Show available balance
+                showSuccessToast(`Available ${selectedLeaveType} leave balance: ${balance.remaining}/${balance.annual_quota}`);
+            }
+        }
+    });
+    
+    // Form submission validation
+    document.getElementById('submit-application').addEventListener('click', function(event) {
+        // Get the selected leave type
+        const leaveTypeSelect = document.getElementById('leave_type_option');
+        const selectedLeaveType = leaveTypeSelect.options[leaveTypeSelect.selectedIndex].text;
+        
+        // Get the number of days requested
+        const grantedLeaves = parseInt(document.getElementById('granted_leaves').value) || 0;
+        
+        // Check if we have balance data and the selected leave type exists in our balances
+        if (window.leaveBalances && window.leaveBalances[selectedLeaveType]) {
+            const balance = window.leaveBalances[selectedLeaveType];
+            
+            // If requested days exceed remaining balance, prevent submission
+            if (grantedLeaves > balance.remaining) {
+                event.preventDefault();
+                showErrorToast(`Insufficient leave balance! You requested ${grantedLeaves} days but only have ${balance.remaining} days available.`);
+                return false;
+            } else if (balance.remaining === 0) {
+                event.preventDefault();
+                showErrorToast(`You have zero balance for ${selectedLeaveType} leave!`);
+                return false;
+            }
         }
     });
     
