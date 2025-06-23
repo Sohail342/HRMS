@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     
     # Third party apps
     'tailwind',
-    'django_browser_reload',
+    'theme',
     'import_export',
     "widget_tweaks",
     'cloudinary',
@@ -64,6 +64,13 @@ INSTALLED_APPS = [
 ]
 
 
+# Tailwind App
+TAILWIND_APP_NAME = 'theme'
+
+
+NPM_BIN_PATH = '/usr/bin/node'
+
+
 MIDDLEWARE = [
     'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -79,7 +86,6 @@ MIDDLEWARE += [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    "django_browser_reload.middleware.BrowserReloadMiddleware",
     'django.middleware.cache.FetchFromCacheMiddleware', 
 ]
 
