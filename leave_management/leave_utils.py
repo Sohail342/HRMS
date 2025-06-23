@@ -42,8 +42,7 @@ def create_employee_profiles_from_employees():
     created_count = 0
     skipped = 0
 
-    emp = Employee.objects.select_related('cadre', 'employee_type')
-    for _ in range(20):
+    for emp in Employee.objects.select_related('cadre', 'employee_type'):
         if hasattr(emp, 'employeeprofile'):
             skipped += 1
             continue
