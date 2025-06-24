@@ -355,3 +355,30 @@ def export_csv(request):
         writer.writerow(row)
     
     return response
+
+
+@login_required(login_url='account:login')
+@admin_or_admin_employee_required
+def get_branches_by_region(request):
+    """Get branches for a specific region"""
+    region_name = request.GET.get('region', '')
+    
+    if region_name:
+        # Filter branches by the selected region
+        branches = Branch.objects.filter(region__name=region_name).order_by('branch_name')
+    else:
+        # If no region is selected, return all branches
+        branches = Branch.objects.all().order_by('branch_name')
+    
+    # Format the response data
+    data = {
+        'branches': [
+            {
+                'id': branch.id,
+                'branch_name': branch.branch_name,
+                'branch_code': branch.branch_code
+            } for branch in branches
+        ]
+    }
+    
+    return JsonResponse(data)

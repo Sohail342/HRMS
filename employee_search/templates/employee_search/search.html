@@ -113,12 +113,56 @@
             </div>
 
             <!-- Advanced Filters Section -->
-            <div id="filterSection" class="filter-section mt-4 bg-gray-50 rounded-lg p-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div id="filterSection" class="filter-section mt-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 shadow-inner">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" />
+                    </svg>
+                    Advanced Filters
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    <!-- Region Filter (Moved to top for logical flow) -->
+                    <div class="bg-white p-3 rounded-lg shadow-sm border border-blue-100 transition-all duration-300 hover:shadow-md">
+                        <label for="region" class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+                            </svg>
+                            Region
+                        </label>
+                        <select name="region" id="region" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition-all duration-300">
+                            <option value="">All Regions</option>
+                            {% for r in regions %}
+                            <option value="{{ r.name }}" {% if region == r.name %}selected{% endif %}>{{ r.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Branch Filter (Positioned after Region) -->
+                    <div class="bg-white p-3 rounded-lg shadow-sm border border-blue-100 transition-all duration-300 hover:shadow-md">
+                        <label for="branch" class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z" />
+                            </svg>
+                            Branch
+                        </label>
+                        <select name="branch" id="branch" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition-all duration-300">
+                            <option value="">All Branches</option>
+                            {% for br in branches %}
+                            <option value="{{ br.branch_name }}" {% if branch == br.branch_name %}selected{% endif %}>{{ br.branch_name }}</option>
+                            {% endfor %}
+                        </select>
+                        <p class="text-xs text-gray-500 mt-1 italic">Branches will filter based on selected region</p>
+                    </div>
+
                     <!-- Employee Type Filter -->
-                    <div>
-                        <label for="employee_type" class="block text-sm font-medium text-gray-700 mb-1">Employee Type</label>
-                        <select name="employee_type" id="employee_type" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                    <div class="bg-white p-3 rounded-lg shadow-sm border border-blue-100 transition-all duration-300 hover:shadow-md">
+                        <label for="employee_type" class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                            </svg>
+                            Employee Type
+                        </label>
+                        <select name="employee_type" id="employee_type" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition-all duration-300">
                             <option value="">All Types</option>
                             {% for type in employee_types %}
                             <option value="{{ type.name }}" {% if employee_type == type.name %}selected{% endif %}>{{ type.name }}</option>
@@ -127,9 +171,15 @@
                     </div>
 
                     <!-- Designation Filter -->
-                    <div>
-                        <label for="designation" class="block text-sm font-medium text-gray-700 mb-1">Designation</label>
-                        <select name="designation" id="designation" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                    <div class="bg-white p-3 rounded-lg shadow-sm border border-blue-100 transition-all duration-300 hover:shadow-md">
+                        <label for="designation" class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clip-rule="evenodd" />
+                                <path d="M2 13.692V16a2 2 0 002 2h12a2 2 0 002-2v-2.308A24.974 24.974 0 0110 15c-2.796 0-5.487-.46-8-1.308z" />
+                            </svg>
+                            Designation
+                        </label>
+                        <select name="designation" id="designation" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition-all duration-300">
                             <option value="">All Designations</option>
                             {% for des in designations %}
                             <option value="{{ des.title }}" {% if designation == des.title %}selected{% endif %}>{{ des.title }}</option>
@@ -138,9 +188,14 @@
                     </div>
 
                     <!-- Employee Grade Filter -->
-                    <div>
-                        <label for="employee_grade" class="block text-sm font-medium text-gray-700 mb-1">Employee Grade</label>
-                        <select name="employee_grade" id="employee_grade" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                    <div class="bg-white p-3 rounded-lg shadow-sm border border-blue-100 transition-all duration-300 hover:shadow-md">
+                        <label for="employee_grade" class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                            Employee Grade
+                        </label>
+                        <select name="employee_grade" id="employee_grade" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition-all duration-300">
                             <option value="">All Grades</option>
                             {% for grade in employee_grades %}
                             <option value="{{ grade.grade_name }}" {% if employee_grade == grade.grade_name %}selected{% endif %}>{{ grade.grade_name }}</option>
@@ -148,40 +203,21 @@
                         </select>
                     </div>
 
-                    <!-- Branch Filter -->
-                    <div>
-                        <label for="branch" class="block text-sm font-medium text-gray-700 mb-1">Branch</label>
-                        <select name="branch" id="branch" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
-                            <option value="">All Branches</option>
-                            {% for br in branches %}
-                            <option value="{{ br.branch_name }}" {% if branch == br.branch_name %}selected{% endif %}>{{ br.branch_name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
                     <!-- Cadre Filter -->
-                    <div>
-                        <label for="cadre" class="block text-sm font-medium text-gray-700 mb-1">Cadre</label>
-                        <select name="cadre" id="cadre" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                    <div class="bg-white p-3 rounded-lg shadow-sm border border-blue-100 transition-all duration-300 hover:shadow-md">
+                        <label for="cadre" class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
+                            </svg>
+                            Cadre
+                        </label>
+                        <select name="cadre" id="cadre" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition-all duration-300">
                             <option value="">All Cadres</option>
                             {% for c in cadres %}
                             <option value="{{ c.name }}" {% if cadre == c.name %}selected{% endif %}>{{ c.name }}</option>
                             {% endfor %}
                         </select>
                     </div>
-
-                    <!-- Region Filter -->
-                    <div>
-                        <label for="region" class="block text-sm font-medium text-gray-700 mb-1">Region</label>
-                        <select name="region" id="region" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
-                            <option value="">All Regions</option>
-                            {% for r in regions %}
-                            <option value="{{ r.name }}" {% if region == r.name %}selected{% endif %}>{{ r.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                
                 </div>
 
                 <div class="mt-4 flex justify-between">
@@ -417,79 +453,94 @@
         </div>
 
         <!-- Results Table -->
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto shadow-inner rounded-b-lg">
             <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
+                <thead class="bg-gradient-to-r from-blue-50 to-indigo-50">
                     <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider column-sap-id">SAP ID</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider column-name">Name</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider column-email">Email</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider column-type">Type</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider column-designation">Designation</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider column-grade">Grade</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider column-branch">Branch</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider column-cnic">CNIC</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider column-father-name">Father/Husband</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider column-cadre">Cadre</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider column-qualifications">Qualifications</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider column-region">Region</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider column-retirement">Retirement Date</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider column-posting">Place of Posting</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider column-birth-date">Birth Date</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider column-contract-expiry">Contract Expiry</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider column-current-posting">Current Posting Date</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider column-mobile">Mobile Number</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        <th scope="col" class="px-6 py-3.5 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider column-sap-id border-b border-blue-100">SAP ID</th>
+                        <th scope="col" class="px-6 py-3.5 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider column-name border-b border-blue-100">Name</th>
+                        <th scope="col" class="px-6 py-3.5 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider column-email border-b border-blue-100">Email</th>
+                        <th scope="col" class="px-6 py-3.5 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider column-type border-b border-blue-100">Type</th>
+                        <th scope="col" class="px-6 py-3.5 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider column-designation border-b border-blue-100">Designation</th>
+                        <th scope="col" class="px-6 py-3.5 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider column-grade border-b border-blue-100">Grade</th>
+                        <th scope="col" class="px-6 py-3.5 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider column-branch border-b border-blue-100">Branch</th>
+                        <th scope="col" class="px-6 py-3.5 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider column-cnic border-b border-blue-100">CNIC</th>
+                        <th scope="col" class="px-6 py-3.5 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider column-father-name border-b border-blue-100">Father/Husband</th>
+                        <th scope="col" class="px-6 py-3.5 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider column-cadre border-b border-blue-100">Cadre</th>
+                        <th scope="col" class="px-6 py-3.5 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider column-qualifications border-b border-blue-100">Qualifications</th>
+                        <th scope="col" class="px-6 py-3.5 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider column-region border-b border-blue-100">Region</th>
+                        <th scope="col" class="px-6 py-3.5 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider column-retirement border-b border-blue-100">Retirement Date</th>
+                        <th scope="col" class="px-6 py-3.5 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider column-posting border-b border-blue-100">Place of Posting</th>
+                        <th scope="col" class="px-6 py-3.5 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider column-birth-date border-b border-blue-100">Birth Date</th>
+                        <th scope="col" class="px-6 py-3.5 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider column-contract-expiry border-b border-blue-100">Contract Expiry</th>
+                        <th scope="col" class="px-6 py-3.5 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider column-current-posting border-b border-blue-100">Current Posting Date</th>
+                        <th scope="col" class="px-6 py-3.5 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider column-mobile border-b border-blue-100">Mobile Number</th>
+                        <th scope="col" class="px-6 py-3.5 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider border-b border-blue-100">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
+                <tbody class="bg-white divide-y divide-gray-100">
                     {% for employee in page_obj %}
-                    <tr class="search-result-row hover:bg-blue-50 transition-colors duration-150">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 column-sap-id">{{ employee.SAP_ID }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 column-name">{{ employee.name|default:"N/A" }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 column-email">{{ employee.email|default:"N/A" }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 column-type">{{ employee.employee_type.name|default:"N/A" }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 column-designation">{{ employee.designation.title|default:"N/A" }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 column-grade">{{ employee.employee_grade.grade_name|default:"N/A" }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 column-branch">{{ employee.branch.branch_name|default:"N/A" }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 column-cnic">{{ employee.cnic_no|default:"N/A" }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 column-father-name">{{ employee.husband_or_father_name|default:"N/A" }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 column-cadre">{{ employee.cadre.name|default:"N/A" }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 column-qualifications">
+                    <tr class="search-result-row hover:bg-blue-50 transition-all duration-200 even:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-700 column-sap-id">{{ employee.SAP_ID }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 column-name">{{ employee.name|default:"N/A" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 column-email">{{ employee.email|default:"N/A" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 column-type">
+                            <span class="px-2 py-1 text-xs font-medium rounded-full {% if employee.employee_type.name %}bg-blue-100 text-blue-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ employee.employee_type.name|default:"N/A" }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 column-designation">{{ employee.designation.title|default:"N/A" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 column-grade">{{ employee.employee_grade.grade_name|default:"N/A" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 column-branch">{{ employee.branch.branch_name|default:"N/A" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 column-cnic">{{ employee.cnic_no|default:"N/A" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 column-father-name">{{ employee.husband_or_father_name|default:"N/A" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 column-cadre">{{ employee.cadre.name|default:"N/A" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 column-qualifications">
                             {% for qual in employee.qualifications.all %}
-                                {{ qual.name }}{% if not forloop.last %}, {% endif %}
+                                <span class="inline-block px-2 py-0.5 text-xs bg-indigo-50 text-indigo-700 rounded-full mr-1 mb-1">{{ qual.name }}</span>{% if not forloop.last %}{% endif %}
                             {% empty %}
-                                N/A
+                                <span class="text-gray-400">N/A</span>
                             {% endfor %}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 column-region">{{ employee.region.name|default:"N/A" }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 column-retirement">{{ employee.date_of_retirement|default:"N/A" }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 column-posting">{{ employee.place_of_posting|default:"N/A" }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 column-birth-date">{{ employee.birth_date|default:"N/A" }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 column-contract-expiry">{{ employee.date_of_contract_expiry|default:"N/A" }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 column-current-posting">{{ employee.date_current_posting|default:"N/A" }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 column-mobile">{{ employee.mobile_number|default:"N/A" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 column-region">
+                            <span class="px-2 py-1 text-xs font-medium rounded-full {% if employee.region.name %}bg-teal-100 text-teal-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ employee.region.name|default:"N/A" }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 column-retirement">{{ employee.date_of_retirement|default:"N/A" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 column-posting">{{ employee.place_of_posting|default:"N/A" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 column-birth-date">{{ employee.birth_date|default:"N/A" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 column-contract-expiry">{{ employee.date_of_contract_expiry|default:"N/A" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 column-current-posting">{{ employee.date_current_posting|default:"N/A" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 column-mobile">{{ employee.mobile_number|default:"N/A" }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             {% if employee.SAP_ID %}
-                            <a href="{% url 'HRMS:employee_detail' employee.SAP_ID %}" class="text-blue-600 hover:text-blue-900 transition-colors duration-150">View Details</a>
+                            <a href="{% url 'HRMS:employee_detail' employee.SAP_ID %}" class="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors duration-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                                    <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+                                </svg>
+                                View Details
+                            </a>
                             {% else %}
-                            <span class="text-gray-400">No SAP ID</span>
+                            <span class="text-gray-400 text-xs">No SAP ID</span>
                             {% endif %}
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="19" class="px-6 py-4 text-center text-sm text-gray-500">
-                            <div class="flex flex-col items-center justify-center py-6">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <td colspan="19" class="px-6 py-8 text-center text-sm text-gray-500">
+                            <div class="flex flex-col items-center justify-center py-8">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                                <p class="text-gray-600 text-lg">No employees found matching your criteria</p>
-                                <button type="button" onclick="document.getElementById('resetFilters').click()" class="mt-4 text-blue-600 hover:text-blue-800 font-medium flex items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                <p class="text-gray-600 text-lg font-medium mb-2">No employees found matching your criteria</p>
+                                <p class="text-gray-500 mb-4">Try adjusting your search filters to find what you're looking for.</p>
+                                <button type="button" onclick="document.getElementById('resetFilters').click()" class="mt-2 bg-blue-50 text-blue-700 hover:bg-blue-100 px-4 py-2 rounded-md transition-colors duration-200 flex items-center shadow-sm hover:shadow">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                                         <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
                                     </svg>
-                                    Reset Filters
+                                    Reset All Filters
                                 </button>
                             </div>
                         </td>
@@ -611,7 +662,7 @@
         
         // Fetch and display filter counts
         function fetchFilterCounts() {
-            const url = new URL("{% url 'employee_search:filter_counts' %}", window.location.origin);
+            const url = new URL("{% url 'employee_search:get_filter_counts' %}", window.location.origin);
             
             // Add current filter parameters to the request
             const currentUrl = new URL(window.location.href);
@@ -808,9 +859,69 @@
                 dropdown.addEventListener('change', function() {
                     // We'll update the counts after a short delay to allow the page to update
                     setTimeout(fetchFilterCounts, 100);
+                    
+                    // If this is the region dropdown, update branch options
+                    if (id === 'region') {
+                        updateBranchOptions(this.value);
+                    }
                 });
             }
         });
+        
+        // Function to update branch options based on selected region
+        function updateBranchOptions(regionName) {
+            const branchDropdown = document.getElementById('branch');
+            if (!branchDropdown) return;
+            
+            // Clear current branch selection when region changes
+            branchDropdown.value = '';
+            
+            // Fetch branches for the selected region
+            fetch(`{% url 'employee_search:get_branches_by_region' %}?region=${encodeURIComponent(regionName)}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Save the current selection (if any)
+                    const currentSelection = branchDropdown.value;
+                    
+                    // Clear all options except the first one (All Branches)
+                    while (branchDropdown.options.length > 1) {
+                        branchDropdown.remove(1);
+                    }
+                    
+                    // Add new options based on the response
+                    data.branches.forEach(branch => {
+                        const option = document.createElement('option');
+                        option.value = branch.branch_name;
+                        option.textContent = branch.branch_name;
+                        branchDropdown.appendChild(option);
+                    });
+                    
+                    // Restore selection if it exists in the new options
+                    if (currentSelection) {
+                        for (let i = 0; i < branchDropdown.options.length; i++) {
+                            if (branchDropdown.options[i].value === currentSelection) {
+                                branchDropdown.selectedIndex = i;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    // Add a subtle highlight effect to the branch dropdown
+                    branchDropdown.classList.add('bg-blue-50');
+                    setTimeout(() => {
+                        branchDropdown.classList.remove('bg-blue-50');
+                    }, 500);
+                })
+                .catch(error => {
+                    console.error('Error fetching branches:', error);
+                });
+        }
+        
+        // Initialize branch options based on initial region selection
+        const initialRegion = document.getElementById('region').value;
+        if (initialRegion) {
+            updateBranchOptions(initialRegion);
+        }
         
         // Column visibility toggle functionality
         const columnVisibilitySettings = JSON.parse(localStorage.getItem('employeeSearchColumnVisibility')) || {
