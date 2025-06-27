@@ -84,7 +84,7 @@ class FamilyMember(models.Model):
     relation = models.CharField(max_length=20, choices=RELATION_CHOICES)
     name = models.CharField(max_length=100)
     cnic = models.CharField(max_length=13)
-    age = models.PositiveIntegerField(blank=True, null=True)
+    age = models.PositiveIntegerField(blank=True, null=True, default=0)
     marital_status = models.BooleanField(default=False, blank=True, null=True)
     
     created_at = models.DateTimeField(auto_now_add=True)

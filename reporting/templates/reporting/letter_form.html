@@ -173,7 +173,6 @@
         
         // Get the URL for the API endpoint
         const apiUrl = '{% url "reporting:get_letter_templates" %}';
-        console.log('API URL:', apiUrl);
         
         // Add status message to the dropdown
         const dropdown = document.getElementById('form_type');
@@ -182,14 +181,12 @@
         // Fetch letter templates from the API with improved error handling
         fetch(apiUrl)
             .then(response => {
-                console.log('Response status:', response.status);
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
                 return response.json();
             })
             .then(data => {
-                console.log('Data received:', data);
                 
                 // Clear the loading option
                 dropdown.innerHTML = '';
@@ -219,7 +216,6 @@
                 toggleSapIdField();
             })
             .catch(error => {
-                console.error('Error fetching letter templates:', error);
                 // Show detailed error message in dropdown and console
                 dropdown.innerHTML = '<option value="">Error loading templates</option>';
                 
@@ -244,10 +240,9 @@
             const sapIdField = document.getElementById('sap_id_field');
             const sapIdInput = document.getElementById('sap_id');
             
-            console.log('Toggle SAP ID field for value:', selectedValue);
             
-            // Hide SAP ID field for leave_memorandum and privilege_leave_memorandum
-            if (selectedValue === 'leave_memorandum' || selectedValue === 'privilege_leave_memorandum') {
+            // Hide SAP ID field for leave_memorandum, privilege_leave_memorandum, and hospitalization
+            if (selectedValue === 'leave_memorandum' || selectedValue === 'privilege_leave_memorandum' || selectedValue === 'hospitalization') {
                 sapIdField.style.display = 'none';
                 sapIdInput.removeAttribute('required');
             } else {

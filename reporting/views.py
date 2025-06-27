@@ -80,6 +80,83 @@ def get_employee(request):
     return JsonResponse(data)
 
 
+def get_family_member(request):
+    sap_id = request.GET.get('sap_id')
+    relation = request.GET.get('relation')
+    
+    if not sap_id or not relation:
+        return JsonResponse({'success': False, 'error': 'Missing required parameters'}, status=400)
+    
+    employee = get_object_or_404(Employee, SAP_ID=sap_id)
+    
+    # Find the family member with the given relation
+    from .models import FamilyMember
+    family_member = FamilyMember.objects.filter(employee=employee, relation=relation).first()
+    
+    
+    if family_member:
+        data = {
+            'success': True,
+            'exists': True,
+            'name': family_member.name,
+            'cnic': family_member.cnic,
+            'age': family_member.age,
+            'marital_status': family_member.marital_status
+        }
+    else:
+        data = {
+            'success': True,
+            'exists': False
+        }
+    
+    return JsonResponse(data)
+
+
+@csrf_exempt
+def save_family_member(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            sap_id = data.get('sap_id')
+            relation = data.get('relation')
+            name = data.get('name')
+            cnic = data.get('cnic')
+            age = data.get('age', 0)
+            marital_status = data.get('marital_status', False)
+            
+            # Validate the data
+            if not sap_id or not relation or not name or not cnic:
+                return JsonResponse({'success': False, 'error': 'Missing required data'}, status=400)
+            
+            # Get the employee object
+            employee = get_object_or_404(Employee, SAP_ID=sap_id)
+            
+            # Check if family member already exists
+            from .models import FamilyMember
+            family_member, created = FamilyMember.objects.update_or_create(
+                employee=employee,
+                relation=relation,
+                defaults={
+                    'name': name,
+                    'cnic': cnic,
+                    'age': age,
+                    'marital_status': marital_status
+                }
+            )
+            
+            return JsonResponse({
+                'success': True, 
+                'created': created,
+                'name': family_member.name,
+                'cnic': family_member.cnic
+            })
+            
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=405)
+
+
 
 #  AJAX request
 def get_employee_data(request):
@@ -168,8 +245,8 @@ class Hospitilization(MemorandumMixin, DetailView):
         context['hospital_name'] = HospitalName.objects.all()
         context['purposes'] = Purpose.objects.all()
 
-        employee_type = str(context['employee'].employee_type)
-        context['employee_type'] = employee_type
+        # employee_type = str(context['employee'].employee_type)
+        # context['employee_type'] = employee_type
         return context
     template_name = 'reporting/letter_templates/hospitalization.html'
 
@@ -267,16 +344,8 @@ class LetterForm(LoginRequiredMixin, ListView):
         'leave_memorandum': 'reporting:leave_memorandum',
         'leave_memorandum_2': 'reporting:leave_memorandum',  
         'privilege_leave_memorandum': 'reporting:privilege_leave_memorandum',
-        'joining_memorandum': 'reporting:joining_memorandum',
-        'order_office_memorandun': 'reporting:order_office_memorandun',
         'hospitalization': 'reporting:hospitalization',
-        'maternity_Leave': 'reporting:maternity_Leave',
         'request_for_issuance': 'reporting:request_for_issuance',
-        'payment_of_bill': 'reporting:payment_of_bill',
-        'grant_of_extension': 'reporting:grant_of_extension',
-        'reimbursement': 'reporting:reimbursement',
-        'reimbursement_against_purchase': 'reporting:reimbursement_against_purchase',
-        'relieving_order': 'reporting:relieving_order',
     }
 
 
@@ -331,8 +400,8 @@ class LetterForm(LoginRequiredMixin, ListView):
                 messages.error(request, f"An error occurred: {e}")
                 return redirect('reporting:lettername')
 
-        # Special handling for leave_memorandum and privilege_leave_memorandum which don't require SAP ID
-        if form_type in ['leave_memorandum', 'privilege_leave_memorandum']:
+        # Special handling for leave_memorandum, privilege_leave_memorandum, and hospitalization which don't require SAP ID
+        if form_type in ['leave_memorandum', 'privilege_leave_memorandum', 'hospitalization']:
             # For these form types, we don't need SAP ID
             redirect_view = self.FORM_TYPE_MAPPING.get(form_type)
             if redirect_view:
@@ -486,6 +555,80 @@ class PrivilegeLeaveMemorandum(MemorandumMixin, DetailView):
         return context
     
     template_name = 'reporting/letter_templates/leave_memorandum_2.html'
+
+
+@csrf_exempt
+def save_purpose(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            purpose_name = data.get('purpose_name')
+            description = data.get('description', '')
+            
+            # Validate the data
+            if not purpose_name:
+                return JsonResponse({'success': False, 'error': 'Purpose name is required'}, status=400)
+            
+            # Check if purpose already exists
+            if Purpose.objects.filter(purpose_name=purpose_name).exists():
+                return JsonResponse({'success': False, 'error': 'Purpose already exists'}, status=400)
+            
+            # Create new purpose
+            purpose = Purpose.objects.create(
+                purpose_name=purpose_name,
+                description=description
+            )
+            
+            return JsonResponse({
+                'success': True, 
+                'id': purpose.id,
+                'purpose_name': purpose.purpose_name
+            })
+            
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=405)
+
+
+@csrf_exempt
+def save_hospital(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            hospital_name = data.get('hospital_name')
+            address = data.get('address', '')
+            phone = data.get('phone', '')
+            email = data.get('email', '')
+            website = data.get('website', '')
+            
+            # Validate the data
+            if not hospital_name:
+                return JsonResponse({'success': False, 'error': 'Hospital name is required'}, status=400)
+            
+            # Check if hospital already exists
+            if HospitalName.objects.filter(hospital_name=hospital_name).exists():
+                return JsonResponse({'success': False, 'error': 'Hospital already exists'}, status=400)
+            
+            # Create new hospital
+            hospital = HospitalName.objects.create(
+                hospital_name=hospital_name,
+                address=address,
+                phone=phone,
+                email=email,
+                website=website
+            )
+            
+            return JsonResponse({
+                'success': True, 
+                'id': hospital.id,
+                'hospital_name': hospital.hospital_name
+            })
+            
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=405)
     
 
 

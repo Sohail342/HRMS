@@ -9,6 +9,17 @@
         <div class="w-full lg:w-5/12 p-6 bg-white shadow-lg rounded-lg my-4">
             <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Application Form</h2>
 
+            <!-- Employee SAP ID Field at the top -->
+            <div class="mb-4">
+                <label for="employee_sap_id" class="block text-sm font-medium text-gray-700">Employee SAP ID:</label>
+                <div class="flex space-x-2 w-10/12">
+                    <input type="number" id="employee_sap_id" class="p-1.5 flex-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm sap-id-input" required placeholder="e.g. 83787">
+                    <button class="fetch-employee-btn px-2 py-1 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                        Fetch
+                    </button>
+                </div>
+            </div>
+
             <!-- Form Grid Layout -->
             <div class="grid grid-cols-1 md:grid-cols-1 gap-4">
                
@@ -34,22 +45,36 @@
 
                     <div>
                         <label for="self_purpose" class="block text-sm font-medium text-gray-700">Purpose:</label>
-                        <select id="self_purpose" class="p-1.5 w-10/12 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
-                            <option value="">Select Purpose</option>
-                            {% for purpose in purposes %}
-                                <option value="{{ purpose.purpose_name }}">{{ purpose.purpose_name }}</option>
-                            {% endfor %}
-                        </select>
+                        <div class="flex space-x-2 w-10/12">
+                            <select id="self_purpose" class="p-1.5 flex-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+                                <option value="">Select Purpose</option>
+                                {% for purpose in purposes %}
+                                    <option value="{{ purpose.purpose_name }}">{{ purpose.purpose_name }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="button" id="add_purpose_btn" class="px-2 py-1 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                </svg>
+                            </button>
+                        </div>
                     </div>
 
                     <div>
                         <label for="self_hospital" class="block text-sm font-medium text-gray-700">Hospital Name:</label>
-                        <select id="self_hospital" class="p-1.5 w-10/12 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
-                            <option value="">Select Hospital</option>
-                            {% for hospital in hospital_name %}
-                                <option value="{{ hospital.hospital_name }}">{{ hospital.hospital_name }}</option>
-                            {% endfor %}
-                        </select>
+                        <div class="flex space-x-2 w-10/12">
+                            <select id="self_hospital" class="p-1.5 flex-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+                                <option value="">Select Hospital</option>
+                                {% for hospital in hospital_name %}
+                                    <option value="{{ hospital.hospital_name }}">{{ hospital.hospital_name }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="button" id="add_hospital_btn" class="px-2 py-1 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                </svg>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -93,27 +118,51 @@
                         <label for="family_member_cnic" class="block text-sm font-medium text-gray-700">CNIC:</label>
                         <input type="text" id="family_member_cnic" placeholder="Enter CNIC" maxlength="13" class="p-1.5 w-10/12 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
                     </div>
+                    
+                    <!-- Additional Family Member Fields have been removed as requested -->
+                    
+                    <!-- Save Family Member Button -->
+                    <div class="mt-2">
+                        <button id="save_family_member" class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded-md text-sm transition duration-300 ease-in-out">
+                            Save Family Member
+                        </button>
+                        <span id="family_member_status" class="ml-2 text-sm"></span>
+                    </div>
 
                     <!-- Purpose Field -->
                     <div>
                         <label for="family_purpose" class="block text-sm font-medium text-gray-700">Purpose:</label>
-                        <select id="family_purpose" class="p-1.5 w-10/12 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
-                            <option value="">Select Purpose</option>
-                            {% for purpose in purposes %}
-                                <option value="{{ purpose.purpose_name }}">{{ purpose.purpose_name }}</option>
-                            {% endfor %}
-                        </select>
+                        <div class="flex space-x-2 w-10/12">
+                            <select id="family_purpose" class="p-1.5 flex-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+                                <option value="">Select Purpose</option>
+                                {% for purpose in purposes %}
+                                    <option value="{{ purpose.purpose_name }}">{{ purpose.purpose_name }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="button" id="add_family_purpose_btn" class="px-2 py-1 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                </svg>
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Hospital Name Field -->
                     <div>
                         <label for="family_hospital" class="block text-sm font-medium text-gray-700">Hospital Name:</label>
-                        <select id="family_hospital" class="p-1.5 w-10/12 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
-                            <option value="">Select Hospital</option>
-                            {% for hospital in hospital_name %}
-                                <option value="{{ hospital.hospital_name }}">{{ hospital.hospital_name }}</option>
-                            {% endfor %}
-                        </select>
+                        <div class="flex space-x-2 w-10/12">
+                            <select id="family_hospital" class="p-1.5 flex-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+                                <option value="">Select Hospital</option>
+                                {% for hospital in hospital_name %}
+                                    <option value="{{ hospital.hospital_name }}">{{ hospital.hospital_name }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="button" id="add_family_hospital_btn" class="px-2 py-1 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                </svg>
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Employee SAP ID Field -->
@@ -210,7 +259,7 @@
                         <p class="font-semibold pr-3">Administration Division</p>
                     </div>
                     <div class="text-sm mt-4 mb-8">
-                        <p class="mt-6">No.OPG/ADMN/{{employee.SAP_ID}}/{{current_time | date:"Y"}}/</p>
+                        <p class="mt-6">No.OPG/ADMN/<span id="letter_header_sapid">{{employee.SAP_ID}}</span>/{{current_time | date:"Y"}}/</p>
                         <p class="font-semibold">Date: {{current_time |date:"F j, Y" }}</p> 
                         <div class="mt-4">
                             <p>The Senior Welfare Officer</p>
@@ -277,6 +326,50 @@
 
     <div id="successToast" class="fixed bottom-5 right-5 hidden bg-green-500 text-white text-base px-4 py-2 rounded-lg shadow-lg transition-opacity duration-300 z-50">
         Employee found!
+    </div>
+    
+    <!-- Modal for adding new purpose -->
+    <div id="purposeModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4 transform transition-all">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Add New Purpose</h3>
+                <button type="button" class="close-modal text-gray-400 hover:text-gray-500">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="mb-4">
+                <label for="new_purpose_name" class="block text-sm font-medium text-gray-700 mb-1">Purpose Name</label>
+                <input type="text" id="new_purpose_name" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            </div>
+            <div class="flex justify-end space-x-3">
+                <button type="button" class="close-modal px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400">Cancel</button>
+                <button type="button" id="save_purpose_btn" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">Save</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal for adding new hospital -->
+    <div id="hospitalModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4 transform transition-all">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Add New Hospital</h3>
+                <button type="button" class="close-modal text-gray-400 hover:text-gray-500">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="mb-4">
+                <label for="new_hospital_name" class="block text-sm font-medium text-gray-700 mb-1">Hospital Name</label>
+                <input type="text" id="new_hospital_name" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            </div>
+            <div class="flex justify-end space-x-3">
+                <button type="button" class="close-modal px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400">Cancel</button>
+                <button type="button" id="save_hospital_btn" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">Save</button>
+            </div>
+        </div>
     </div>
 </body>
 
@@ -559,7 +652,24 @@ document.getElementById('category_type_option').addEventListener('change', funct
     document.querySelectorAll('.fetch-employee-btn').forEach(button => {
         button.addEventListener('click', function() {
             const inputField = this.previousElementSibling;  // Get the related input field
-            const sapId = inputField.value.trim();
+            let sapId = inputField.value.trim();
+            
+            // If using the top SAP ID field, update all other SAP ID fields
+            if (inputField.id === 'employee_sap_id') {
+                // Update the SAP ID fields in both self and family sections
+                if (document.getElementById('self_absence_employee')) {
+                    document.getElementById('self_absence_employee').value = sapId;
+                }
+                if (document.getElementById('family_absence_employee')) {
+                    document.getElementById('family_absence_employee').value = sapId;
+                }
+            } else {
+                // If using section-specific SAP ID fields, update the top field
+                document.getElementById('employee_sap_id').value = sapId;
+            }
+            
+            // Get the updated SAP ID (in case it was changed)
+            sapId = document.getElementById('employee_sap_id').value.trim();
 
             if (!sapId) {
                 showErrorToast("Please enter an SAP ID before fetching data.");
@@ -604,6 +714,12 @@ document.getElementById('category_type_option').addEventListener('change', funct
                         document.getElementById('employee_name_text').textContent = formattedSalutation  + " " + data.employee_name;
                         document.getElementById('employee_sapID_text').textContent = sapId;
                         document.getElementById('employee_grade_text').textContent = data.employee_grade;
+                        
+                        // Update SAP ID in the letter header
+                        document.getElementById('letter_header_sapid').textContent = sapId;
+                        
+                        // Update relationship dropdown based on employee type
+                        updateRelationshipDropdown(data.employee_type);
 
                         showSuccessToast("Employee found!");
                     } else {
@@ -628,6 +744,21 @@ document.getElementById('category_type_option').addEventListener('change', funct
         document.getElementById('employee_name_relation').textContent = "_____________";
         document.getElementById('employee_sapid_relation').textContent = "_____________";
         document.getElementById('employee_grade_relation').textContent = "_____________";
+        
+        // Reset SAP ID in the letter header
+        document.getElementById('letter_header_sapid').textContent = "_____________";
+        
+        // Reset relationship dropdown to default state
+        const relationshipDropdown = document.getElementById('family_member_relation');
+        // Clear existing options except the first one
+        while (relationshipDropdown.options.length > 1) {
+            relationshipDropdown.remove(1);
+        }
+        // Add a default "Not Allowed" option
+        const optionElement = document.createElement("option");
+        optionElement.value = "";
+        optionElement.text = "Not Allowed";
+        relationshipDropdown.add(optionElement);
 
         showErrorToast("Employee with this SAP ID not found!");
     }
@@ -654,6 +785,55 @@ document.getElementById('category_type_option').addEventListener('change', funct
         setTimeout(() => {
             toast.classList.add('hidden');
         }, 3000);
+    }
+    
+    // Update relationship dropdown based on employee type
+    function updateRelationshipDropdown(employeeType) {
+        const relationshipDropdown = document.getElementById('family_member_relation');
+        
+        // Clear existing options except the first one
+        while (relationshipDropdown.options.length > 1) {
+            relationshipDropdown.remove(1);
+        }
+        
+        // Add options based on employee type
+        if (employeeType === "Regular") {
+            const regularOptions = [
+                { value: "Father of", text: "Father of" },
+                { value: "Mother of", text: "Mother of" },
+                { value: "Son of", text: "Son of" },
+                { value: "Daughter of", text: "Daughter of" },
+                { value: "Wife of", text: "Wife of" },
+                { value: "Husband of", text: "Husband of" }
+            ];
+            
+            regularOptions.forEach(option => {
+                const optionElement = document.createElement("option");
+                optionElement.value = option.value;
+                optionElement.text = option.text;
+                relationshipDropdown.add(optionElement);
+            });
+        } else if (employeeType === "Contractual") {
+            const contractualOptions = [
+                { value: "Son of", text: "Son of" },
+                { value: "Daughter of", text: "Daughter of" },
+                { value: "Wife of", text: "Wife of" },
+                { value: "Husband of", text: "Husband of" }
+            ];
+            
+            contractualOptions.forEach(option => {
+                const optionElement = document.createElement("option");
+                optionElement.value = option.value;
+                optionElement.text = option.text;
+                relationshipDropdown.add(optionElement);
+            });
+        } else {
+            // For other employee types, add a "Not Allowed" option
+            const optionElement = document.createElement("option");
+            optionElement.value = "";
+            optionElement.text = "Not Allowed";
+            relationshipDropdown.add(optionElement);
+        }
     }
 
     // Show/hide sections based on category selection
@@ -697,7 +877,8 @@ document.getElementById('category_type_option').addEventListener('change', funct
         // Trigger employee data refresh to update salutation if employee data is already loaded
         const sapId = document.getElementById('employee_sap_id').value.trim();
         if (sapId) {
-            const fetchButton = document.querySelector('.fetch-employee-btn');
+            // Get the fetch button associated with the top SAP ID field
+            const fetchButton = document.querySelector('#employee_sap_id').nextElementSibling;
             if (fetchButton) {
                 fetchButton.click();
             }
@@ -821,58 +1002,308 @@ $(document).ready(function() {
     });
 });
 
-// Add event listener to family_member_relation dropdown to auto-populate CNIC
+// Add event listener to family_member_relation dropdown to auto-populate family member details
 document.getElementById('family_member_relation').addEventListener('change', function() {
     const relation = this.value;
-    const sapId = document.querySelector('.sap-id-input').value.trim();
+    // Always use the top-level SAP ID field
+    const sapId = document.getElementById('employee_sap_id').value.trim();
+    const statusElement = document.getElementById('family_member_status');
+    
+    // Clear status message
+    statusElement.textContent = '';
+    statusElement.className = 'ml-2 text-sm';
     
     if (relation && sapId) {
-        // Get the family member CNIC based on the selected relation and SAP ID
-        fetch(`/get_employee/?sap_id=${sapId}`)
+        // First, try to fetch existing family member data
+        fetch(`/get_family_member/?sap_id=${sapId}&relation=${encodeURIComponent(relation)}`)
             .then(response => response.json())
             .then(data => {
-                if (data.employee_name) {
-                    // Auto-populate family member name field based on relation
-                    let familyMemberName = '';
-                    if (relation === 'Father of') {
-                        familyMemberName = data.employee_salutation === 'MR.' ? 'Mr. ' + data.employee_name.split(' ')[0] + '\'s Father' : '';
-                    } else if (relation === 'Mother of') {
-                        familyMemberName = data.employee_salutation === 'MR.' ? 'Mrs. ' + data.employee_name.split(' ')[0] + '\'s Mother' : '';
-                    } else if (relation === 'Son of') {
-                        familyMemberName = 'Son of ' + data.employee_salutation + ' ' + data.employee_name;
-                    } else if (relation === 'Daughter of') {
-                        familyMemberName = 'Daughter of ' + data.employee_salutation + ' ' + data.employee_name;
-                    } else if (relation === 'Wife of') {
-                        familyMemberName = 'Mrs. ' + data.employee_name.split(' ')[0];
-                    } else if (relation === 'Husband of') {
-                        familyMemberName = 'Mr. ' + data.employee_name.split(' ')[0];
+                if (data.success) {
+                    if (data.exists) {
+                        console.log('Family member data:', data);
+                        // Family member exists, populate the fields with actual data
+                        document.getElementById('family_member_name').value = data.name;
+                        document.getElementById('family_member_cnic').value = data.cnic;
+                        
+                        // Update the display text
+                        updateFamilyMemberDetails();
+                        updateFamilyApprovalText();
+                        
+                        // Show status message
+                        statusElement.textContent = 'Family member data loaded';
+                        statusElement.className = 'ml-2 text-sm text-green-600';
+                    } else {
+                        // Family member doesn't exist, generate placeholder data
+                        fetch(`/get_employee/?sap_id=${sapId}`)
+                            .then(response => response.json())
+                            .then(employeeData => {
+                                if (employeeData.employee_name) {
+                                    // Auto-populate family member name field based on relation
+                                    let familyMemberName = '';
+                                    if (relation === 'Father of') {
+                                        familyMemberName = employeeData.employee_salutation === 'MR.' ? 'Mr. ' + employeeData.employee_name.split(' ')[0] + '\'s Father' : '';
+                                    } else if (relation === 'Mother of') {
+                                        familyMemberName = employeeData.employee_salutation === 'MR.' ? 'Mrs. ' + employeeData.employee_name.split(' ')[0] + '\'s Mother' : '';
+                                    } else if (relation === 'Son of') {
+                                        familyMemberName = 'Son of ' + employeeData.employee_salutation + ' ' + employeeData.employee_name;
+                                    } else if (relation === 'Daughter of') {
+                                        familyMemberName = 'Daughter of ' + employeeData.employee_salutation + ' ' + employeeData.employee_name;
+                                    } else if (relation === 'Wife of') {
+                                        familyMemberName = 'Mrs. ' + employeeData.employee_name.split(' ')[0];
+                                    } else if (relation === 'Husband of') {
+                                        familyMemberName = 'Mr. ' + employeeData.employee_name.split(' ')[0];
+                                    }
+                                    
+                                    // Set the family member name if we generated one
+                                    if (familyMemberName) {
+                                        document.getElementById('family_member_name').value = familyMemberName;
+                                    }
+                                    
+                                    // Clear other fields for new entry
+                                    document.getElementById('family_member_cnic').value = '';
+                                    
+                                    // Update the display text
+                                    updateFamilyMemberDetails();
+                                    updateFamilyApprovalText();
+                                    
+                                    // Show status message
+                                    statusElement.textContent = 'No saved data found. Please enter details and save.';
+                                    statusElement.className = 'ml-2 text-sm text-yellow-600';
+                                }
+                            })
+                            .catch(error => {
+                                showErrorToast('Failed to generate family member details.');
+                            });
                     }
-                    
-                    // Set the family member name if we generated one
-                    if (familyMemberName) {
-                        document.getElementById('family_member_name').value = familyMemberName;
-                    }
-                    
-                    // For now, we'll use a placeholder CNIC format since we don't have actual data
-                    // In a real implementation, you would fetch this from a database
-                    // This is just a demonstration of the auto-population feature
-                    const placeholderCNIC = '1234567890123';
-                    document.getElementById('family_member_cnic').value = placeholderCNIC;
-                    
-                    // Update the display text
-                    updateFamilyMemberDetails();
-                    updateFamilyApprovalText();
-                    
-                    showSuccessToast('Family member details auto-populated!');
+                } else {
+                    showErrorToast('Failed to fetch family member data: ' + data.error);
                 }
             })
             .catch(error => {
-                showErrorToast('Failed to auto-populate family member details.');
+                showErrorToast('Failed to fetch family member data.');
             });
     }
+});
+
+// Add event listener for the save family member button
+document.getElementById('save_family_member').addEventListener('click', function() {
+    // Always use the top-level SAP ID field
+    const sapId = document.getElementById('employee_sap_id').value.trim();
+    const relation = document.getElementById('family_member_relation').value;
+    const name = document.getElementById('family_member_name').value.trim();
+    const cnic = document.getElementById('family_member_cnic').value.trim();
+    const statusElement = document.getElementById('family_member_status');
+    
+    // Validate inputs - only SAP ID, Relationship, Name, and CNIC are required
+    if (!sapId || !relation || !name || !cnic) {
+        showErrorToast('Please fill in all required fields (SAP ID, Relationship, Name, CNIC)');
+        return;
+    }
+    
+    // Validate CNIC format (13 digits)
+    if (!/^\d{13}$/.test(cnic)) {
+        showErrorToast('CNIC must be exactly 13 digits');
+        return;
+    }
+    
+    // Save the family member data
+    fetch('/save_family_member/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            sap_id: sapId,
+            relation: relation,
+            name: name,
+            cnic: cnic
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showSuccessToast('Family member details saved successfully!');
+            statusElement.textContent = 'Family member data saved';
+            statusElement.className = 'ml-2 text-sm text-green-600';
+            
+            // Update the display text
+            updateFamilyMemberDetails();
+            updateFamilyApprovalText();
+        } else {
+            showErrorToast('Failed to save family member details: ' + data.error);
+            statusElement.textContent = 'Failed to save';
+            statusElement.className = 'ml-2 text-sm text-red-600';
+        }
+    })
+    .catch(error => {
+        showErrorToast('Failed to save family member details.');
+        statusElement.textContent = 'Failed to save';
+        statusElement.className = 'ml-2 text-sm text-red-600';
+    });
 });
 
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.js"></script>
+
+<!-- Modal and Form Handling Scripts -->
+<script>
+    // Purpose Modal Functionality
+    document.getElementById('add_purpose_btn').addEventListener('click', function() {
+        document.getElementById('purposeModal').classList.remove('hidden');
+    });
+    
+    document.getElementById('add_family_purpose_btn').addEventListener('click', function() {
+        document.getElementById('purposeModal').classList.remove('hidden');
+    });
+    
+    // Hospital Modal Functionality
+    document.getElementById('add_hospital_btn').addEventListener('click', function() {
+        document.getElementById('hospitalModal').classList.remove('hidden');
+    });
+    
+    document.getElementById('add_family_hospital_btn').addEventListener('click', function() {
+        document.getElementById('hospitalModal').classList.remove('hidden');
+    });
+    
+    // Close Modal Functionality
+    document.querySelectorAll('.close-modal').forEach(button => {
+        button.addEventListener('click', function() {
+            document.getElementById('purposeModal').classList.add('hidden');
+            document.getElementById('hospitalModal').classList.add('hidden');
+        });
+    });
+    
+    // Save New Purpose
+    document.getElementById('save_purpose_btn').addEventListener('click', function() {
+        const purposeName = document.getElementById('new_purpose_name').value.trim();
+        
+        if (!purposeName) {
+            showErrorToast('Please enter a purpose name');
+            return;
+        }
+        
+        // Send data to server
+        fetch('/save_purpose/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                purpose_name: purposeName
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Add new option to both purpose dropdowns
+                const selfPurpose = document.getElementById('self_purpose');
+                const familyPurpose = document.getElementById('family_purpose');
+                
+                const newOption = document.createElement('option');
+                newOption.value = purposeName;
+                newOption.text = purposeName;
+                
+                selfPurpose.appendChild(newOption.cloneNode(true));
+                familyPurpose.appendChild(newOption);
+                
+                // Select the new option in both dropdowns
+                selfPurpose.value = purposeName;
+                familyPurpose.value = purposeName;
+                
+                // Update the purpose text in the letter
+                document.getElementById('purpose_text').textContent = purposeName;
+                
+                // Clear the input field
+                document.getElementById('new_purpose_name').value = '';
+                
+                // Close the modal
+                document.getElementById('purposeModal').classList.add('hidden');
+                
+                showSuccessToast('Purpose added successfully!');
+            } else {
+                showErrorToast(data.error || 'Failed to add purpose');
+            }
+        })
+        .catch(error => {
+            showErrorToast('An error occurred while saving the purpose');
+            console.error('Error:', error);
+        });
+    });
+    
+    // Save New Hospital
+    document.getElementById('save_hospital_btn').addEventListener('click', function() {
+        const hospitalName = document.getElementById('new_hospital_name').value.trim();
+        
+        if (!hospitalName) {
+            showErrorToast('Please enter a hospital name');
+            return;
+        }
+        
+        // Send data to server
+        fetch('/save_hospital/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                hospital_name: hospitalName
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Add new option to both hospital dropdowns
+                const selfHospital = document.getElementById('self_hospital');
+                const familyHospital = document.getElementById('family_hospital');
+                
+                const newOption = document.createElement('option');
+                newOption.value = hospitalName;
+                newOption.text = hospitalName;
+                
+                selfHospital.appendChild(newOption.cloneNode(true));
+                familyHospital.appendChild(newOption);
+                
+                // Select the new option in both dropdowns
+                selfHospital.value = hospitalName;
+                familyHospital.value = hospitalName;
+                
+                // Update the hospital text in the letter
+                document.getElementById('hospital_text').textContent = hospitalName;
+                
+                // Clear the input field
+                document.getElementById('new_hospital_name').value = '';
+                
+                // Close the modal
+                document.getElementById('hospitalModal').classList.add('hidden');
+                
+                showSuccessToast('Hospital added successfully!');
+            } else {
+                showErrorToast(data.error || 'Failed to add hospital');
+            }
+        })
+        .catch(error => {
+            showErrorToast('An error occurred while saving the hospital');
+            console.error('Error:', error);
+        });
+    });
+    
+    // Helper function to get CSRF token from cookies
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
 {% endblock content %}
