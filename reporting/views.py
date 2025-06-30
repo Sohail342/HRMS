@@ -65,7 +65,9 @@ def save_pdf_to_cloudinary(request):
 
 def get_employee(request):
     sap_id = request.GET.get('sap_id')
+    print(f"Received SAP ID: {sap_id}")
     employee = get_object_or_404(Employee, SAP_ID=sap_id)
+    print(f"Found employee: {employee.name} with SAP ID: {employee.SAP_ID}")
     
 
     data = {
@@ -77,6 +79,7 @@ def get_employee(request):
         'employee_grade': str(employee.employee_grade),
         'employee_salutation': str(employee.employee_salutation),
     }
+    
     return JsonResponse(data)
 
 
@@ -455,6 +458,7 @@ def application_leave(request, sap_id):
         from_date_str = request.POST.get('effect_from')
         to_date_str = request.POST.get('effect_to')
         reason = request.POST.get('purpose')
+        mandatory_option = request.POST.get('is_mandatory')
 
         # Convert string date to datetime object first
         date_format = "%Y-%m-%d"
@@ -473,13 +477,20 @@ def application_leave(request, sap_id):
         try:
             leave_type_id = int(leave_type_value)
             leave_type = LeaveType.objects.get(id=leave_type_id)
+            
+            # Determine if this is a mandatory leave (only for Privileged leave type)
+            is_mandatory = False
+            if leave_type.name == 'Privileged' and mandatory_option == 'yes':
+                is_mandatory = True
+                
             # Apply for leave application
             apply_for_leave(
                 employee=employee,
                 leave_type=leave_type,
                 start_date=from_date,
                 end_date=to_date,
-                reason=reason
+                reason=reason,
+                is_mandatory=is_mandatory
             )
             
             # If the leave application is successful, redirect to the leave memorandum page

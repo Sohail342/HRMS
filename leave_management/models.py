@@ -7,13 +7,13 @@ class LeaveType(models.Model):
         ('Casual', 'Casual Leave'),
         ('Sick', 'Sick Leave'),
         ('Ex-Pakistan', 'Ex-Pakistan Leave'),
-        ('Mandatory', 'Mandatory Leave'),
     ]
     
     name = models.CharField(max_length=50, choices=LEAVE_TYPE_CHOICES)
     is_freezable = models.BooleanField(default=False)
     description = models.TextField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
+    is_mandatory_leave = models.BooleanField(default=False) 
     
     def __str__(self):
         return self.get_name_display()
@@ -50,7 +50,7 @@ class LeaveRule(models.Model):
     cadre = models.CharField(max_length=20, choices=EmployeeProfile.EMPLOYEE_CADRE_CHOICES)
     employment_type = models.CharField(max_length=20, choices=EmployeeProfile.EMPLOYMENT_TYPE_CHOICES)
     annual_quota = models.PositiveIntegerField()
-    mandatory_annual_quota = models.PositiveIntegerField(default=0)  # for mandatory leave
+    mandatory_annual_quota = models.PositiveIntegerField(default=0)
     can_freeze = models.BooleanField(default=False)
     carry_forward_deadline = models.DateField(null=True, blank=True)
 
@@ -65,11 +65,16 @@ class LeaveBalance(models.Model):
     year = models.PositiveIntegerField()
     annual_quota = models.PositiveIntegerField()
     remaining = models.PositiveIntegerField()
+    mandatory_annual_quota = models.PositiveIntegerField(default=0)
+    mandatory_remaining = models.PositiveIntegerField(default=0)
+    is_mandatory = models.BooleanField(default=False)  
 
     class Meta:
         unique_together = ('employee', 'leave_type', 'year')
 
     def __str__(self):
+        if self.leave_type.name == 'Privileged' and self.mandatory_annual_quota > 0:
+            return f"{self.employee.name} - {self.leave_type.name} ({self.remaining}/{self.annual_quota}) [Mandatory: {self.mandatory_remaining}/{self.mandatory_annual_quota}]"
         return f"{self.employee.name} - {self.leave_type.name} ({self.remaining}/{self.annual_quota})"
 
 
@@ -90,6 +95,7 @@ class LeaveManagement(models.Model):
     reason = models.TextField(blank=True, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
     applied_on = models.DateTimeField(auto_now_add=True)
+    is_mandatory = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.employee.name} - {self.leave_type.name} ({self.status})"
@@ -100,7 +106,7 @@ class LeaveManagement(models.Model):
     
 
 class FrozenLeaveBalance(models.Model):
-    employee = models.ForeignKey("HRIS_App.Employee", on_delete=models.CASCADE)
+    employee = models.ForeignKey("HRIS_App.Employee", on_delete=models.CASCADE, related_name='frozen_leave_balances', to_field='SAP_ID')
     leave_type = models.ForeignKey(LeaveType, on_delete=models.CASCADE)
     year = models.PositiveIntegerField()
     days = models.PositiveIntegerField()

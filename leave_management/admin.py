@@ -3,6 +3,7 @@ from import_export.admin import ImportExportModelAdmin
 from unfold.admin import ModelAdmin
 from unfold.contrib.import_export.forms import ExportForm, ImportForm
 
+from .resources import FrozenLeaveBalanceResource
 from .models import (
     LeaveType, EmployeeProfile, LeaveRule, LeaveEncashmentRecord,
     LeaveManagement, FrozenLeaveBalance, LeaveBalance
@@ -48,14 +49,15 @@ def show_encashment_eligibility(obj):
 class LeaveBalanceAdmin(ModelAdmin, ImportExportModelAdmin):
     import_form_class = ImportForm
     export_form_class = ExportForm
-    list_display = ('employee', 'leave_type', 'year', 'annual_quota', 'remaining')
-    search_fields = ('employee__name', 'leave_type__name')
+    list_display = ('employee', 'employee__SAP_ID', 'leave_type', 'year', 'annual_quota', 'remaining', 'mandatory_remaining')
+    search_fields = ('employee__name', 'leave_type__name', 'employee__SAP_ID')
     list_filter = ('leave_type', 'year')
     ordering = ('-year', 'employee')
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         return qs if request.user.is_superuser else qs.filter(employee=request.user)
+    
 
 
 @admin.register(EmployeeProfile)
@@ -101,7 +103,8 @@ class LeaveRuleAdmin(ModelAdmin, ImportExportModelAdmin):
 class FrozenLeaveBalanceAdmin(ModelAdmin, ImportExportModelAdmin):
     import_form_class = ImportForm
     export_form_class = ExportForm
-    list_display = ('employee', 'leave_type', 'year', 'days')
+    resource_class = FrozenLeaveBalanceResource
+    list_display = ('employee', 'employee__SAP_ID', 'leave_type', 'year', 'days')
     search_fields = ('employee__name', 'leave_type__name')
     list_filter = ('leave_type', 'year')
     ordering = ('-year', 'employee')
@@ -121,7 +124,7 @@ class LeaveEncashmentRecordAdmin(ModelAdmin, ImportExportModelAdmin):
 class LeaveTypeAdmin(ModelAdmin, ImportExportModelAdmin):
     import_form_class = ImportForm
     export_form_class = ExportForm
-    list_display = ('name', 'description', 'is_active')
+    list_display = ('name', 'is_mandatory_leave', 'is_active')
     search_fields = ('name',)
     list_filter = ('is_active',)
     ordering = ('name',)

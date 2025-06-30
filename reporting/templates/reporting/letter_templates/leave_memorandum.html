@@ -87,9 +87,24 @@
                         <select id="leave_type_option" name="leave_type_option" class="mt-1 p-2 w-10/12 border border-blue-500 rounded-md focus:outline-none focus:border-blue-700 transition-colors duration-300 shadow-sm text-sm" required>
                             <option value="">Select Leave Type</option>
                             {% for leave_type in leave_types %}
-                                <option value="{{ leave_type.id }}" data-code="{{ leave_type.code }}">{{ leave_type.name }}</option>
+                                <option value="{{ leave_type.id }}" data-code="{{ leave_type.code }}" data-is-mandatory="{{ leave_type.is_mandatory_leave|yesno:'true,false' }}">{{ leave_type.name }}</option>
                             {% endfor %}
                         </select>
+                    </div>
+                    
+                    <!-- Mandatory Leave Option (shows only when Privileged leave is selected) -->
+                    <div id="mandatory_leave_section" style="display: none;">
+                        <p class="text-sm font-medium text-gray-700">Is this Mandatory Leave?</p>
+                        <div class="flex items-center space-x-6 mt-2">
+                            <label class="flex items-center space-x-2">
+                                <input type="radio" name="is_mandatory" value="yes" class="focus:ring-2 focus:ring-blue-500">
+                                <span>Yes (counts toward 15-day Mandatory quota)</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="radio" name="is_mandatory" value="no" class="focus:ring-2 focus:ring-blue-500" checked>
+                                <span>No (regular Privileged leave)</span>
+                            </label>
+                        </div>
                     </div>
 
                     <div id="extension_policy_section">
@@ -780,7 +795,7 @@
             fetch(`/get_employee/?sap_id=${sapId}`)
                 .then(response => response.json())
                 .then(data => {
-                    if (data.employee_name && data.designation) {
+                    if (data.employee_name) {
                         // Update the letter preview with employee data
                         updateLetterWithEmployeeData(data, sapId);
                         // Fetch leave balances for the employee
@@ -802,6 +817,20 @@
     document.getElementById('leave_type_option').addEventListener('change', function() {
         // Get the selected leave type
         const selectedLeaveType = this.options[this.selectedIndex].text;
+        
+        // Update the leave type text in the letter
+        document.querySelectorAll('#leave_type_text').forEach(el => {
+            el.textContent = selectedLeaveType;
+        });
+        
+        // Show/hide mandatory leave section based on leave type
+        if (selectedLeaveType === 'Privileged') {
+            document.getElementById('mandatory_leave_section').style.display = 'block';
+        } else {
+            document.getElementById('mandatory_leave_section').style.display = 'none';
+            // Reset mandatory leave to 'no' when not Privileged leave
+            document.querySelector('input[name="is_mandatory"][value="no"]').checked = true;
+        }
         
         // Check if we have balance data and the selected leave type exists in our balances
         if (window.leaveBalances && window.leaveBalances[selectedLeaveType]) {
@@ -827,12 +856,30 @@
         // Get the number of days requested
         const grantedLeaves = parseInt(document.getElementById('granted_leaves').value) || 0;
         
+        // Check if this is a mandatory leave (only applies to Privileged leave)
+        const isMandatory = selectedLeaveType === 'Privileged' && 
+                           document.querySelector('input[name="is_mandatory"][value="yes"]').checked;
+        
         // Check if we have balance data and the selected leave type exists in our balances
         if (window.leaveBalances && window.leaveBalances[selectedLeaveType]) {
             const balance = window.leaveBalances[selectedLeaveType];
             
-            // If requested days exceed remaining balance, prevent submission
-            if (grantedLeaves > balance.remaining) {
+            // For mandatory leave, check against the mandatory leave balance (15 days)
+            if (isMandatory) {
+                // Assuming mandatory leave has a separate balance of 15 days
+                // If backend doesn't provide this, we can calculate: Math.min(15, balance.remaining)
+                const mandatoryBalance = window.leaveBalances['Mandatory'] ? 
+                                        window.leaveBalances['Mandatory'].remaining : 
+                                        Math.min(15, balance.remaining);
+                
+                if (grantedLeaves > mandatoryBalance) {
+                    event.preventDefault();
+                    showErrorToast(`Insufficient mandatory leave balance! You requested ${grantedLeaves} days but only have ${mandatoryBalance} mandatory days available.`);
+                    return false;
+                }
+            } 
+            // For regular leave, check against the normal balance
+            else if (grantedLeaves > balance.remaining) {
                 event.preventDefault();
                 showErrorToast(`Insufficient leave balance! You requested ${grantedLeaves} days but only have ${balance.remaining} days available.`);
                 return false;
@@ -934,7 +981,7 @@
             fetch(`/get_employee/?sap_id=${sapId}`)
                 .then(response => response.json())
                 .then(data => {
-                    if (data.employee_name && data.designation) {
+                    if (data.employee_name) {
                         document.getElementById('employee_backup_name').textContent = data.employee_name;
                         document.getElementById('employee_backup_designation').textContent = data.designation;
                         document.getElementById('employee_backup_sapID').textContent = sapId;
@@ -962,7 +1009,7 @@
             fetch(`/get_employee/?sap_id=${sapId2}`)
                 .then(response => response.json())
                 .then(data => {
-                    if (data.employee_name && data.designation) {
+                    if (data.employee_name) {
                         document.getElementById('employee_backup_name2').textContent = data.employee_name;
                         document.getElementById('employee_backup_designation2').textContent = data.designation;
                         document.getElementById('employee_backup_sapID2').textContent = sapId2;

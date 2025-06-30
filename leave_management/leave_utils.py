@@ -113,29 +113,55 @@ def get_leave_cycle(employee_profile: EmployeeProfile):
     return (start, end)
 
 
-def validate_leave_application(employee, leave_type, start_date, end_date):
+def validate_leave_application(employee, leave_type, start_date, end_date, is_mandatory=False):
+    """
+    Validate leave application based on rules for current year:  
+    - Leave dates must fall within the employee's leave cycle
+    - Sufficient leave balance for the requested type
+    - If mandatory leave, check mandatory balance
+    """
     profile = employee.employeeprofile
     cycle_start, cycle_end = get_leave_cycle(profile)
     if start_date < cycle_start or end_date > cycle_end + timedelta(days=30):
         raise ValidationError("Leave dates must fall within your leave cycle.")
 
     try:
-        leave_balance = LeaveBalance.objects.get(employee=employee, leave_type=leave_type)
+        leave_balance = LeaveBalance.objects.get(employee=employee, leave_type=leave_type, year=datetime.now().year)
     except LeaveBalance.DoesNotExist:
         raise ValidationError("Leave balance not set for this type.")
+    except LeaveBalance.MultipleObjectsReturned:
+        # Handle the case where multiple leave balances exist
+        leave_balance = LeaveBalance.objects.filter(employee=employee, leave_type=leave_type).last()
+        
+        if not leave_balance:
+            raise ValidationError("Leave balance not set for this type.")
         
     # Check if employee has zero balance
     if leave_balance.remaining == 0:
         raise ValidationError(f"You have 0 {leave_type.name} leaves remaining. Cannot apply for this leave type.")
 
     requested_days = (end_date - start_date).days + 1
-    if leave_balance.remaining < requested_days:
-        raise ValidationError("Insufficient leave balance.")
+    
+    # Handle mandatory leave validation for Privileged leave
+    if is_mandatory and leave_type.name == 'Privileged':
+        # Check if mandatory leave balance exists, if not, initialize it
+        if leave_balance.mandatory_annual_quota == 0:
+            leave_balance.mandatory_annual_quota = 15  
+            leave_balance.mandatory_remaining = min(15, leave_balance.remaining)
+            leave_balance.save()
+        
+        # Check if mandatory leave balance is sufficient
+        if leave_balance.mandatory_remaining < requested_days:
+            raise ValidationError(f"Insufficient mandatory leave balance. You have {leave_balance.mandatory_remaining} mandatory days remaining.")
+    else:
+        # Regular leave balance check
+        if leave_balance.remaining < requested_days:
+            raise ValidationError("Insufficient leave balance.")
 
 
-def apply_for_leave(employee, leave_type, start_date, end_date, reason):
+def apply_for_leave(employee, leave_type, start_date, end_date, reason, is_mandatory=False):
     # 1. Validate application rules (cycle range, sufficient balance, etc.)
-    validate_leave_application(employee, leave_type, start_date, end_date)
+    validate_leave_application(employee, leave_type, start_date, end_date, is_mandatory)
 
     # 2. Calculate number of leave days
     leave_days = (end_date - start_date).days + 1
@@ -147,7 +173,8 @@ def apply_for_leave(employee, leave_type, start_date, end_date, reason):
         start_date=start_date,
         end_date=end_date,
         reason=reason,
-        status='Pending'
+        status='Pending',
+        is_mandatory=is_mandatory if leave_type.name == 'Privileged' else False
     )
 
     return {
