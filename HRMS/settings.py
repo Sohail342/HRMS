@@ -201,7 +201,7 @@ if os.getenv("DATABASE_NAME"):
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Increase the maximum number of fields
-DATA_UPLOAD_MAX_NUMBER_FIELDS = 9000 
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 20000 
 
 
 # Cloudinary configuration
