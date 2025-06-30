@@ -65,12 +65,27 @@ class LeaveBalance(models.Model):
     year = models.PositiveIntegerField()
     annual_quota = models.PositiveIntegerField()
     remaining = models.PositiveIntegerField()
-    mandatory_annual_quota = models.PositiveIntegerField(default=0)
-    mandatory_remaining = models.PositiveIntegerField(default=0)
+    mandatory_annual_quota = models.PositiveIntegerField(default=None, null=True, blank=True)
+    mandatory_remaining = models.PositiveIntegerField(default=None, null=True, blank=True)
     is_mandatory = models.BooleanField(default=False)  
 
     class Meta:
         unique_together = ('employee', 'leave_type', 'year')
+
+    def save(self, *args, **kwargs):
+        if self.leave_type.is_mandatory_leave:
+
+            if self.mandatory_annual_quota is None:
+                self.mandatory_annual_quota = 15
+
+            if self.mandatory_remaining is None:
+                self.mandatory_remaining = 15
+
+        else:
+            self.is_mandatory = False
+
+        super().save(*args, **kwargs)
+
 
     def __str__(self):
         if self.leave_type.name == 'Privileged' and self.mandatory_annual_quota > 0:

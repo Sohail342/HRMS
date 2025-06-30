@@ -64,7 +64,7 @@ class LeaveBalanceAdmin(ModelAdmin, ImportExportModelAdmin):
 class EmployeeProfileAdmin(ModelAdmin, ImportExportModelAdmin):
     import_form_class = ImportForm
     export_form_class = ExportForm
-    list_display = ('employee', 'cadre', 'employment_type', 'contract_start_date', show_encashment_eligibility)
+    list_display = ('employee', "employee__SAP_ID", 'cadre', 'employment_type', 'contract_start_date', show_encashment_eligibility)
     search_fields = ('employee__name', 'cadre', 'employment_type')
     list_filter = ('cadre', 'employment_type')
     ordering = ('employee__name',)

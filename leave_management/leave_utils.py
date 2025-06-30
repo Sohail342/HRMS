@@ -146,9 +146,10 @@ def validate_leave_application(employee, leave_type, start_date, end_date, is_ma
     if is_mandatory and leave_type.name == 'Privileged':
         # Check if mandatory leave balance exists, if not, initialize it
         if leave_balance.mandatory_annual_quota == 0:
-            leave_balance.mandatory_annual_quota = 15  
-            leave_balance.mandatory_remaining = min(15, leave_balance.remaining)
-            leave_balance.save()
+            raise ValidationError("Mandatory leave balance reach out.")
+          
+        leave_balance.mandatory_remaining = min(15, leave_balance.mandatory_remaining)
+        leave_balance.save()
         
         # Check if mandatory leave balance is sufficient
         if leave_balance.mandatory_remaining < requested_days:
@@ -223,7 +224,8 @@ def is_eligible_for_encashment(employee):
         employee=employee,
         leave_type=privileged,
         status="Approved",
-        start_date__year=datetime.now().year
+        start_date__year=datetime.now().year, 
+        is_mandatory=True
     )
 
     total_days = sum([(leave.end_date - leave.start_date).days + 1 for leave in leaves])
