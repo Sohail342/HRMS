@@ -231,6 +231,12 @@ class Employee(AbstractBaseUser, PermissionsMixin):
     region = models.ForeignKey(
         'Region', on_delete=models.CASCADE, null=True, to_field="name",  blank=True, related_name='employees'
     )
+    wing = models.ForeignKey(
+        'Wing', on_delete=models.SET_NULL, null=True, blank=True, related_name='employees', to_field="name"
+    )
+    division = models.ForeignKey(
+        'Division', on_delete=models.SET_NULL, null=True, blank=True, related_name='employees', to_field="division_name"
+    )
     date_of_retirement  = models.CharField(max_length=100, blank=True, null=True)
     place_of_posting  = models.CharField(max_length=100, blank=True, null=True)
     birth_date = models.CharField(max_length=100, blank=True, null=True)
