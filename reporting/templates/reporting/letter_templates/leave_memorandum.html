@@ -1101,15 +1101,14 @@
                     if (data.employee_name) {
                         if (data.gender == "Female"){
 
-                            document.getElementById('employee_backup_name').textContent = "Ms. " + data.employee_name;
+                            document.getElementById('employee_backup_name2').textContent = "Ms. " + data.employee_name;
                         }
                         else if (data.gender == "Male"){
-                            document.getElementById('employee_backup_name').textContent = "Mr. " + data.employee_name;
+                            document.getElementById('employee_backup_name2').textContent = "Mr. " + data.employee_name;
                         }
                         else{
-                            document.getElementById('employee_backup_name').textContent = "Ms/Mr. " + data.employee_name;
+                            document.getElementById('employee_backup_name2').textContent = "Ms/Mr. " + data.employee_name;
                         }
-
                         document.getElementById('employee_backup_designation2').textContent = data.designation;
                         document.getElementById('employee_backup_sapID2').textContent = sapId2;
                         showSuccessToast("Employee found!");
