@@ -241,11 +241,11 @@
         <!-- Body Text -->
         <p class="mb-4" style="text-align: justify;">
             With reference to <span class="is_male_or_female"></span> application dated <b><span id="application_date_text">______________</span></b> <span class="employee-salutation">{{employee.employee_salutation | capitalize_words }}</span> <span class="employee-name">{{employee.name}}</span>, <span class="employee-grade">{{employee.employee_grade}}</span>/<span class="employee-type">{{employee.employee_type}}</span> SAP ID: <span class="employee-sapid">{{employee.SAP_ID}}</span>, 
-            NBP, <span class="employee_wing">{{employee.wing.name}}</span> <span class="employee_division">{{employee.division.division_name}}</span> <span class="employee-region">{{employee.region}}</span> is advised that <span class="is_male_or_female"> </span> has been granted <span id="granted_leaves_text">______________</span> <span id="leave_type_text">______________</span> leave effective from <span id="effect_from_text">______________</span> to <span id="effect_to_text">______________</span>.
+            NBP, <span class="employee_wing">{{employee.wing.name}}</span> <span class="employee_division">{{employee.division.division_name}}</span> <span class="employee-region">{{employee.region}}</span> is advised that <span class="he_or_she"> </span> has been granted <span id="granted_leaves_text">______________</span> <span id="leave_type_text">______________</span> leave effective from <span id="effect_from_text">______________</span> to <span id="effect_to_text">______________</span>.
         </p>
 
         <p class="mb-4" style="text-align: justify;">
-            <span class="employee-salutation">{{employee.employee_salutation | capitalize_words }}</span> <span class="employee-name">{{employee.name}}</span> will accordingly stand relieved to <span class="is_male_or_female"></span> duties as of close of office today i.e. <b>{{current_time | date:"F j, Y" }}</b> to avail sanctioned leave(s). <span id="extension_text"></span> {% if is_friday == True %}Accordingly <span class="employee-salutation">{{employee.employee_salutation | capitalize_words }}</span> <span class="employee-name">{{employee.name}}</span> is hereby relieved of his duties by the close of office hours today i.e.
+            <span class="employee-salutation"></span> <span class="employee-name">{{employee.name}}</span> will accordingly stand relieved to <span class="is_male_or_female"></span> duties as of close of office today i.e. <b>{{current_time | date:"F j, Y" }}</b> to avail sanctioned leave(s). <span id="extension_text"></span> {% if is_friday == True %}Accordingly <span class="employee-salutation">{{employee.employee_salutation | capitalize_words }}</span> <span class="employee-name">{{employee.name}}</span> is hereby relieved of his duties by the close of office hours today i.e.
             Friday, {{current_time | date:"F j, Y"}}. ({{next_day | date:"F, Y"}} & {{next_next_day | date:"F, Y"}} i.e. Saturday and Sunday being public holidays){% endif %}
         </p>
 
@@ -960,6 +960,7 @@
                 el.textContent = data.employee_division + ",";
             });
         }
+        
 
         if (data.gender || data.gender == null || data.gender == '') {
             const employeeRegionElements = document.querySelectorAll('.is_male_or_female');
@@ -976,6 +977,39 @@
                 }
             });
         }
+
+        if (data.gender || data.gender == null || data.gender == '') {
+            const employeeRegionElements = document.querySelectorAll('.employee-salutation');
+            employeeRegionElements.forEach(el => {
+                if (data.gender == "Female") {
+                    el.textContent = 'Ms';
+                } else if (data.gender == "Male") {
+                    el.textContent = 'Mr';}
+                else if (data.gender == null || data.gender == ''){
+                    el.textContent = 'Ms/Mr';
+                }
+                else {
+                    el.textContent = 'Ms/Mr';
+                }
+            });
+        }
+
+        if (data.gender || data.gender == null || data.gender == '') {
+            const employeeRegionElements = document.querySelectorAll('.he_or_she');
+            employeeRegionElements.forEach(el => {
+                if (data.gender == "Female") {
+                    el.textContent = 'she';
+                } else if (data.gender == "Male") {
+                    el.textContent = 'he';}
+                else if (data.gender == null || data.gender == ''){
+                    el.textContent = '(s)he';
+                }
+                else {
+                    el.textContent = '(s)he';
+                }
+            });
+        }
+
 
         if (!data.employee_division || data.employee_division == 'None' || data.employee_division == '') {
             const employeeRegionElements = document.querySelectorAll('.employee_division');
