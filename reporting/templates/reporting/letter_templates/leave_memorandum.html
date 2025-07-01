@@ -240,18 +240,18 @@
 
         <!-- Body Text -->
         <p class="mb-4" style="text-align: justify;">
-            With reference to his application dated <b><span id="application_date_text">______________</span></b> <span class="employee-salutation">{{employee.employee_salutation | capitalize_words }}</span> <span class="employee-name">{{employee.name}}</span>, <span class="employee-grade">{{employee.employee_grade}}</span>/<span class="employee-type">{{employee.employee_type}}</span> SAP ID: <span class="employee-sapid">{{employee.SAP_ID}}</span>, 
-            NBP, Regional Office, <span class="employee-region">{{employee.region}}</span> is advised that he has been granted <span id="granted_leaves_text">______________</span> <span id="leave_type_text">______________</span> leave effective from <span id="effect_from_text">______________</span> to <span id="effect_to_text">______________</span>.
+            With reference to <span class="is_male_or_female"></span> application dated <b><span id="application_date_text">______________</span></b> <span class="employee-salutation">{{employee.employee_salutation | capitalize_words }}</span> <span class="employee-name">{{employee.name}}</span>, <span class="employee-grade">{{employee.employee_grade}}</span>/<span class="employee-type">{{employee.employee_type}}</span> SAP ID: <span class="employee-sapid">{{employee.SAP_ID}}</span>, 
+            NBP, <span class="employee_wing">{{employee.wing.name}}</span> <span class="employee_division">{{employee.division.division_name}}</span> <span class="employee-region">{{employee.region}}</span> is advised that <span class="is_male_or_female"> </span> has been granted <span id="granted_leaves_text">______________</span> <span id="leave_type_text">______________</span> leave effective from <span id="effect_from_text">______________</span> to <span id="effect_to_text">______________</span>.
         </p>
 
         <p class="mb-4" style="text-align: justify;">
-            <span class="employee-salutation">{{employee.employee_salutation | capitalize_words }}</span> <span class="employee-name">{{employee.name}}</span> will accordingly stand relieved to his duties as of close of office today i.e. <b>{{current_time | date:"F j, Y" }}</b> to avail sanctioned leave(s). <span id="extension_text"></span> {% if is_friday == True %}Accordingly <span class="employee-salutation">{{employee.employee_salutation | capitalize_words }}</span> <span class="employee-name">{{employee.name}}</span> is hereby relieved of his duties by the close of office hours today i.e.
+            <span class="employee-salutation">{{employee.employee_salutation | capitalize_words }}</span> <span class="employee-name">{{employee.name}}</span> will accordingly stand relieved to <span class="is_male_or_female"></span> duties as of close of office today i.e. <b>{{current_time | date:"F j, Y" }}</b> to avail sanctioned leave(s). <span id="extension_text"></span> {% if is_friday == True %}Accordingly <span class="employee-salutation">{{employee.employee_salutation | capitalize_words }}</span> <span class="employee-name">{{employee.name}}</span> is hereby relieved of his duties by the close of office hours today i.e.
             Friday, {{current_time | date:"F j, Y"}}. ({{next_day | date:"F, Y"}} & {{next_next_day | date:"F, Y"}} i.e. Saturday and Sunday being public holidays){% endif %}
         </p>
 
 
         <p id="during_absence" class="mb-4" style="text-align: justify;">
-            During his/her absence, <span id="employee_backup_name">_____________</span>, <span id="employee_backup_designation">_____________</span>, SAP ID: <span id="employee_backup_sapID">_____________</span> 
+            During <span class="is_male_or_female"></span> absence, <span id="employee_backup_name">_____________</span>, <span id="employee_backup_designation">_____________</span>, SAP ID: <span id="employee_backup_sapID">_____________</span> 
             <span id="second_backup_section">and <span id="employee_backup_name2">_____________</span>, <span id="employee_backup_designation2">_____________</span>, SAP ID: <span id="employee_backup_sapID2">_____________</span></span>, will look after his assignment.
         </p>
         
@@ -939,6 +939,52 @@
                 el.textContent = data.region;
             });
         }
+
+        if (data.employee_wing) {
+            const employeeRegionElements = document.querySelectorAll('.employee_wing');
+            employeeRegionElements.forEach(el => {
+                el.textContent = data.employee_wing + ',';
+            });
+        }
+
+        if (!data.employee_wing || data.employee_wing == 'None' || data.employee_wing == '') {
+            const employeeRegionElements = document.querySelectorAll('.employee_wing');
+            employeeRegionElements.forEach(el => {
+                el.textContent = '';
+            });
+        }
+
+        if (data.employee_division) {
+            const employeeRegionElements = document.querySelectorAll('.employee_division');
+            employeeRegionElements.forEach(el => {
+                el.textContent = data.employee_division + ",";
+            });
+        }
+
+        if (data.gender || data.gender == null || data.gender == '') {
+            const employeeRegionElements = document.querySelectorAll('.is_male_or_female');
+            employeeRegionElements.forEach(el => {
+                if (data.gender == "Female") {
+                    el.textContent = 'her';
+                } else if (data.gender == "Male") {
+                    el.textContent = 'his';}
+                else if (data.gender == null || data.gender == ''){
+                    el.textContent = 'his/her';
+                }
+                else {
+                    el.textContent = 'his/her';
+                }
+            });
+        }
+
+        if (!data.employee_division || data.employee_division == 'None' || data.employee_division == '') {
+            const employeeRegionElements = document.querySelectorAll('.employee_division');
+            employeeRegionElements.forEach(el => {
+                el.textContent = '';
+            });
+        }
+
+        
         
         // Update recipient information section
         const recipientSection = document.getElementById('recipient-information-section');

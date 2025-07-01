@@ -65,15 +65,22 @@ def save_pdf_to_cloudinary(request):
 
 def get_employee(request):
     sap_id = request.GET.get('sap_id')
-    print(f"Received SAP ID: {sap_id}")
     employee = get_object_or_404(Employee, SAP_ID=sap_id)
-    print(f"Found employee: {employee.name} with SAP ID: {employee.SAP_ID}")
-    
+
+    if employee.cnic_no:
+        is_male_or_female = lambda x: x % 2 == 0
+        female = is_male_or_female(int(employee.cnic_no[-1]))
+        is_female = 'Female' if female else 'Male'
+        print(female, employee.cnic_no)
 
     data = {
         'employee_name': employee.name,
+        'gender':  is_female if employee.cnic_no else "",
+        'region': employee.region.name,
         'employee_type': str(employee.employee_type) if employee.employee_type else "",
         'employee_cnic':employee.cnic_no,
+        'employee_wing': employee.wing.name if employee.wing else "",
+        'employee_division': employee.division.division_name if employee.division else "",
         'designation': employee.designation_id,
         'sap_id': str(employee.SAP_ID) if employee.SAP_ID else "", 
         'employee_grade': str(employee.employee_grade),
@@ -216,7 +223,6 @@ class LeaveMemorandum(MemorandumMixin, DetailView):
         context['is_friday'] = weekday == 'Friday',
 
         context['hospital_name'] = HospitalName.objects.all()
-    
         return context
     
     def get_template_names(self):
@@ -350,8 +356,6 @@ class LetterForm(LoginRequiredMixin, ListView):
         'hospitalization': 'reporting:hospitalization',
         'request_for_issuance': 'reporting:request_for_issuance',
     }
-
-
 
     def post(self, request, *args, **kwargs):
         form_type = request.POST.get('form_type')
