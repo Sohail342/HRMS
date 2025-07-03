@@ -24,7 +24,7 @@ def get_filter_counts(request):
     user_group = request.user.user_group
 
     # Base queryset
-    employees = Employee.objects.exclude(region__isnull=True, SAP_ID__isnull=True)
+    employees = Employee.objects.exclude(region__isnull=True, SAP_ID__isnull=True, is_active=False)
     if user_group:
         employees = employees.filter(user_group=user_group)
 
@@ -141,7 +141,7 @@ def advanced_search(request):
     user_group = request.user.user_group
 
     # Base queryset
-    employees = Employee.objects.exclude(region__isnull=True, SAP_ID__isnull=True)
+    employees = Employee.objects.exclude(region__isnull=True, SAP_ID__isnull=True, is_active=False)
     if user_group:
         employees = employees.filter(user_group=user_group)
 
@@ -307,7 +307,7 @@ def export_csv(request):
         ]
 
     # Base queryset
-    employees = Employee.objects.exclude(region__isnull=True, SAP_ID__isnull=True)
+    employees = Employee.objects.exclude(region__isnull=True, SAP_ID__isnull=True, is_active=False)
     if request.user.user_group:
         employees = employees.filter(user_group=request.user.user_group)
 

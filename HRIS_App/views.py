@@ -205,9 +205,11 @@ def download_employees_csv(request):
 @login_required(login_url='account:login')
 @admin_or_admin_employee_required
 def index(request):
-    employees_count_region = Employee.objects.filter(region=request.user.region).count()
+    employees_count_region = Employee.objects.filter(region=request.user.region, is_active=True).count()
+
+    print(f"Employees count in region {request.user.region}: {employees_count_region}")
     # Get all products except those in category "Electronics"
-    employees_count = Employee.objects.exclude(is_admin=True).count()
+    employees_count = Employee.objects.exclude(is_admin=True, is_active=True).count()
     admin_employees = Employee.objects.filter(is_admin_employee=True).count()
     new_employees = Employee.objects.annotate(sap_id_length=Length(Cast('SAP_ID', output_field=CharField()))).filter(sap_id_length__gt=5).count()
 
