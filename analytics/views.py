@@ -22,8 +22,6 @@ def analytics_view(request):
     
     # Get BOMs
     bom_employees = Employee.objects.filter(designation__title__icontains='BOM', is_active=True)
-
-    print("BOM Employees:", bom_employees) 
     
     # Get regional employees
     re_ops_employees = Employee.objects.filter(designation__title__icontains='RE OPS', is_active=True)

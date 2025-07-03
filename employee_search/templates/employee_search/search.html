@@ -733,6 +733,14 @@
                 region: currentUrl.searchParams.get('region') || ''
             };
             
+            // Store count data for use in summary cards
+            window.employee_type_counts = data.employee_type_counts || {};
+            window.cadre_counts = data.cadre_counts || {};
+            window.region_counts = data.region_counts || {};
+            window.employee_grade_counts = data.employee_grade_counts || {};
+            window.branch_counts = data.branch_counts || {};
+            window.designation_counts = data.designation_counts || {};
+            
             // Check if any filters are active
             const hasActiveFilters = Object.values(currentFilters).some(value => value !== '');
             
@@ -776,22 +784,129 @@
             filterSummary.classList.remove('hidden');
         }
         
-        // Create a summary card for a single filter
+        // Create a summary card for a single filter with enhanced details
         function createSummaryCard(filterName, filterValue, count) {
             const filterSummaryContent = document.getElementById('filterSummaryContent');
             
             const card = document.createElement('div');
             card.className = 'bg-gray-50 rounded-lg p-3 border border-gray-200';
             
-            card.innerHTML = `
+            // Basic filter info
+            let cardContent = `
                 <div class="text-sm font-medium text-gray-700">${filterName}: ${filterValue}</div>
                 <div class="text-lg font-semibold text-blue-600 mt-1">${count} Employees</div>
             `;
             
+            // Add additional breakdown information based on filter type
+            if (filterName === 'Region') {
+                // Add employee type breakdown for this region
+                cardContent += `<div class="mt-2 border-t border-gray-200 pt-2">
+                    <div class="text-xs font-medium text-gray-600 mb-1">Employee Types in ${filterValue}:</div>
+                    <div class="flex flex-wrap gap-1">`;
+                
+                // Add employee type counts if available
+                if (Object.keys(employee_type_counts).length > 0) {
+                    Object.keys(employee_type_counts).forEach(type => {
+                        cardContent += `<span class="bg-green-50 text-green-700 text-xs px-2 py-0.5 rounded-full">${type}: ${employee_type_counts[type]}</span>`;
+                    });
+                } else {
+                    cardContent += `<span class="text-xs text-gray-500">No type data available</span>`;
+                }
+                
+                cardContent += `</div></div>`;
+                
+                // Add cadre breakdown for this region
+                cardContent += `<div class="mt-2 border-t border-gray-200 pt-2">
+                    <div class="text-xs font-medium text-gray-600 mb-1">Cadres in ${filterValue}:</div>
+                    <div class="flex flex-wrap gap-1">`;
+                
+                // Add cadre counts if available
+                if (Object.keys(cadre_counts).length > 0) {
+                    Object.keys(cadre_counts).forEach(cadre => {
+                        cardContent += `<span class="bg-indigo-50 text-indigo-700 text-xs px-2 py-0.5 rounded-full">${cadre}: ${cadre_counts[cadre]}</span>`;
+                    });
+                } else {
+                    cardContent += `<span class="text-xs text-gray-500">No cadre data available</span>`;
+                }
+                
+                cardContent += `</div></div>`;
+            }
+            
+            // For Employee Type filter, show distribution by region and grade
+            else if (filterName === 'Employee Type') {
+                // Add region distribution for this employee type
+                cardContent += `<div class="mt-2 border-t border-gray-200 pt-2">
+                    <div class="text-xs font-medium text-gray-600 mb-1">Regional Distribution:</div>
+                    <div class="flex flex-wrap gap-1">`;
+                
+                // Add region counts if available
+                if (Object.keys(region_counts).length > 0) {
+                    Object.keys(region_counts).forEach(region => {
+                        cardContent += `<span class="bg-teal-50 text-teal-700 text-xs px-2 py-0.5 rounded-full">${region}: ${region_counts[region]}</span>`;
+                    });
+                } else {
+                    cardContent += `<span class="text-xs text-gray-500">No region data available</span>`;
+                }
+                
+                cardContent += `</div></div>`;
+                
+                // Add grade distribution for this employee type
+                cardContent += `<div class="mt-2 border-t border-gray-200 pt-2">
+                    <div class="text-xs font-medium text-gray-600 mb-1">Grade Distribution:</div>
+                    <div class="flex flex-wrap gap-1">`;
+                
+                // Add grade counts if available
+                if (Object.keys(employee_grade_counts).length > 0) {
+                    Object.keys(employee_grade_counts).forEach(grade => {
+                        cardContent += `<span class="bg-yellow-50 text-yellow-700 text-xs px-2 py-0.5 rounded-full">${grade}: ${employee_grade_counts[grade]}</span>`;
+                    });
+                } else {
+                    cardContent += `<span class="text-xs text-gray-500">No grade data available</span>`;
+                }
+                
+                cardContent += `</div></div>`;
+            }
+            
+            // For Cadre filter, show distribution by region and employee type
+            else if (filterName === 'Cadre') {
+                // Add region distribution for this cadre
+                cardContent += `<div class="mt-2 border-t border-gray-200 pt-2">
+                    <div class="text-xs font-medium text-gray-600 mb-1">Regional Distribution:</div>
+                    <div class="flex flex-wrap gap-1">`;
+                
+                // Add region counts if available
+                if (Object.keys(region_counts).length > 0) {
+                    Object.keys(region_counts).forEach(region => {
+                        cardContent += `<span class="bg-teal-50 text-teal-700 text-xs px-2 py-0.5 rounded-full">${region}: ${region_counts[region]}</span>`;
+                    });
+                } else {
+                    cardContent += `<span class="text-xs text-gray-500">No region data available</span>`;
+                }
+                
+                cardContent += `</div></div>`;
+                
+                // Add employee type distribution for this cadre
+                cardContent += `<div class="mt-2 border-t border-gray-200 pt-2">
+                    <div class="text-xs font-medium text-gray-600 mb-1">Employee Types:</div>
+                    <div class="flex flex-wrap gap-1">`;
+                
+                // Add employee type counts if available
+                if (Object.keys(employee_type_counts).length > 0) {
+                    Object.keys(employee_type_counts).forEach(type => {
+                        cardContent += `<span class="bg-green-50 text-green-700 text-xs px-2 py-0.5 rounded-full">${type}: ${employee_type_counts[type]}</span>`;
+                    });
+                } else {
+                    cardContent += `<span class="text-xs text-gray-500">No type data available</span>`;
+                }
+                
+                cardContent += `</div></div>`;
+            }
+            
+            card.innerHTML = cardContent;
             filterSummaryContent.appendChild(card);
         }
         
-        // Create a combined summary card for multiple filters
+        // Create a combined summary card for multiple filters with enhanced details
         function createCombinedSummaryCard(filters, count) {
             const filterSummaryContent = document.getElementById('filterSummaryContent');
             
@@ -822,6 +937,67 @@
             
             filterText += '</div>';
             filterText += `<div class="text-lg font-semibold text-blue-600 mt-2">${count} Employees match all criteria</div>`;
+            
+            // Add detailed breakdowns for the combined filters
+            filterText += `<div class="mt-3 border-t border-blue-200 pt-2">
+                <div class="text-xs font-medium text-gray-700 mb-1">Employee Type Distribution:</div>
+                <div class="flex flex-wrap gap-1">`;
+            
+            // Add employee type breakdown
+            if (Object.keys(employee_type_counts).length > 0) {
+                Object.keys(employee_type_counts).forEach(type => {
+                    filterText += `<span class="bg-green-50 text-green-700 text-xs px-2 py-0.5 rounded-full">${type}: ${employee_type_counts[type]}</span>`;
+                });
+            } else {
+                filterText += `<span class="text-xs text-gray-500">No type data available</span>`;
+            }
+            
+            filterText += `</div></div>`;
+            
+            // Add cadre breakdown
+            filterText += `<div class="mt-2 border-t border-blue-200 pt-2">
+                <div class="text-xs font-medium text-gray-700 mb-1">Cadre Distribution:</div>
+                <div class="flex flex-wrap gap-1">`;
+            
+            if (Object.keys(cadre_counts).length > 0) {
+                Object.keys(cadre_counts).forEach(cadre => {
+                    filterText += `<span class="bg-indigo-50 text-indigo-700 text-xs px-2 py-0.5 rounded-full">${cadre}: ${cadre_counts[cadre]}</span>`;
+                });
+            } else {
+                filterText += `<span class="text-xs text-gray-500">No cadre data available</span>`;
+            }
+            
+            filterText += `</div></div>`;
+            
+            // Add region breakdown
+            filterText += `<div class="mt-2 border-t border-blue-200 pt-2">
+                <div class="text-xs font-medium text-gray-700 mb-1">Regional Distribution:</div>
+                <div class="flex flex-wrap gap-1">`;
+            
+            if (Object.keys(region_counts).length > 0) {
+                Object.keys(region_counts).forEach(region => {
+                    filterText += `<span class="bg-teal-50 text-teal-700 text-xs px-2 py-0.5 rounded-full">${region}: ${region_counts[region]}</span>`;
+                });
+            } else {
+                filterText += `<span class="text-xs text-gray-500">No region data available</span>`;
+            }
+            
+            filterText += `</div></div>`;
+            
+            // Add grade breakdown
+            filterText += `<div class="mt-2 border-t border-blue-200 pt-2">
+                <div class="text-xs font-medium text-gray-700 mb-1">Grade Distribution:</div>
+                <div class="flex flex-wrap gap-1">`;
+            
+            if (Object.keys(employee_grade_counts).length > 0) {
+                Object.keys(employee_grade_counts).forEach(grade => {
+                    filterText += `<span class="bg-yellow-50 text-yellow-700 text-xs px-2 py-0.5 rounded-full">${grade}: ${employee_grade_counts[grade]}</span>`;
+                });
+            } else {
+                filterText += `<span class="text-xs text-gray-500">No grade data available</span>`;
+            }
+            
+            filterText += `</div></div>`;
             
             card.innerHTML = filterText;
             
