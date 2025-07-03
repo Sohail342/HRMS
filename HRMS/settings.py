@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'employee_attendance',
     'employee_search',
     'leave_management',
+    'analytics',
 ]
 
 
