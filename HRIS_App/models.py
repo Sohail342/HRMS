@@ -210,6 +210,7 @@ class Employee(AbstractBaseUser, PermissionsMixin):
     cnic_no = models.CharField(max_length=13, blank=True, null=True)
     husband_or_father_name = models.CharField(max_length=100, blank=True, null=True)
     SAP_ID = models.IntegerField(default=None, unique=True, blank=True, null=True,)
+    iban = models.CharField(max_length=50, blank=True, null=True, help_text="International Bank Account Number")
     designation = models.ForeignKey(
         'Designation', on_delete=models.SET_NULL, null=True, blank=True, to_field='title'
     )

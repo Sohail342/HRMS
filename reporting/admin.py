@@ -1,9 +1,16 @@
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 from unfold.contrib.import_export.forms import ExportForm, ImportForm
-from .models import Signature, LetterTemplates, HospitalName, PermenantLetterTemplates, FamilyMember, Purpose, PulicHolidays
+from .models import Signature, LetterTemplates, HospitalName, PermenantLetterTemplates, FamilyMember, Purpose, PulicHolidays, ExpenditureHead
 from unfold.admin import ModelAdmin
 
+
+
+@admin.register(ExpenditureHead)
+class ExpenditureHeadAdmin(ImportExportModelAdmin, ModelAdmin):
+    list_display = ['name', 'description', 'created_at']
+    search_fields = ['name', 'description']
+    list_filter = ['created_at']
 
 
 @admin.register(PulicHolidays)

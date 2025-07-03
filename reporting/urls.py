@@ -7,6 +7,7 @@ app_name = 'reporting'
 urlpatterns = [
     #  Letter Templates
     path('leave_memorandum/', views.LeaveMemorandum.as_view(), name="leave_memorandum"),
+    path('financial_bills/', views.FinancialBills.as_view(), name="financial_bills"),
     path('privilege_leave_memorandum/', views.PrivilegeLeaveMemorandum.as_view(), name="privilege_leave_memorandum"),
     path('hospitalization/', views.Hospitilization.as_view(), name="hospitalization"),
     path('request_for_issuance/<str:sap_id>/', views.RequestForIssuanceOfficeMemorandum.as_view(), name="request_for_issuance"),
@@ -25,5 +26,7 @@ urlpatterns = [
     path('application_leave/<str:sap_id>/', views.application_leave, name="application_leave"),
     path('save_purpose/', views.save_purpose, name='save_purpose'),
     path('save_hospital/', views.save_hospital, name='save_hospital'),
+    path('save_expenditure_head/', views.save_expenditure_head, name='save_expenditure_head'),
+    path('get_expenditure_heads/', views.get_expenditure_heads, name='get_expenditure_heads'),
 ]
 

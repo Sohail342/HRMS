@@ -11,7 +11,7 @@ import cloudinary
 import json
 import base64
 from datetime import datetime, timedelta
-from .models import Signature, LetterTemplates, HospitalName, PermenantLetterTemplates, Purpose, PulicHolidays
+from .models import Signature, LetterTemplates, HospitalName, PermenantLetterTemplates, Purpose, PulicHolidays, ExpenditureHead
 from leave_management.models import LeaveType
 from django.views.generic import DetailView, ListView
 from HRIS_App.models import Employee
@@ -71,7 +71,6 @@ def get_employee(request):
         is_male_or_female = lambda x: x % 2 == 0
         female = is_male_or_female(int(employee.cnic_no[-1]))
         is_female = 'Female' if female else 'Male'
-        print(female, employee.cnic_no)
 
     data = {
         'employee_name': employee.name,
@@ -85,6 +84,7 @@ def get_employee(request):
         'sap_id': str(employee.SAP_ID) if employee.SAP_ID else "", 
         'employee_grade': str(employee.employee_grade),
         'employee_salutation': str(employee.employee_salutation),
+        'iban': employee.iban if employee.iban else "",
     }
     
     return JsonResponse(data)
@@ -103,7 +103,6 @@ def get_family_member(request):
     from .models import FamilyMember
     family_member = FamilyMember.objects.filter(employee=employee, relation=relation).first()
     
-    
     if family_member:
         data = {
             'success': True,
@@ -120,6 +119,44 @@ def get_family_member(request):
         }
     
     return JsonResponse(data)
+
+
+@csrf_exempt
+def save_expenditure_head(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            name = data.get('name')
+            description = data.get('description', '')
+            
+            # Validate the data
+            if not name:
+                return JsonResponse({'success': False, 'error': 'Name is required'}, status=400)
+            
+            # Check if expenditure head already exists
+            if ExpenditureHead.objects.filter(name=name).exists():
+                return JsonResponse({'success': False, 'error': 'Expenditure head already exists'}, status=400)
+            
+            # Create new expenditure head
+            expenditure_head = ExpenditureHead(name=name, description=description)
+            expenditure_head.save()
+            
+            return JsonResponse({
+                'success': True, 
+                'id': expenditure_head.id,
+                'name': expenditure_head.name
+            })
+            
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=405)
+
+
+def get_expenditure_heads(request):
+    expenditure_heads = ExpenditureHead.objects.all().order_by('name')
+    data = [{'id': head.id, 'name': head.name} for head in expenditure_heads]
+    return JsonResponse({'success': True, 'expenditure_heads': data})
 
 
 @csrf_exempt
@@ -203,7 +240,7 @@ class MemorandumMixin:
         context['employees'] = Employee.objects.all()
         context['current_time'] = timezone.now()
         return context
-    
+
 @method_decorator(is_letter_template_admin_required, name='dispatch')
 class LeaveMemorandum(MemorandumMixin, DetailView):
     def get_context_data(self, **kwargs):
@@ -234,6 +271,44 @@ class LeaveMemorandum(MemorandumMixin, DetailView):
             return ['reporting/letter_templates/leave_memorandum_2.html']
         else:
             return ['reporting/letter_templates/leave_memorandum.html']
+    
+    def dispatch(self, request, *args, **kwargs):
+        # Store form_type in session if it's in the request
+        form_type = request.GET.get('form_type')
+        if form_type:
+            request.session['form_type'] = form_type
+        return super().dispatch(request, *args, **kwargs)
+    # template_name is removed as we're using get_template_names() method
+
+
+@method_decorator(is_letter_template_admin_required, name='dispatch')
+class FinancialBills(MemorandumMixin, DetailView):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        current_time = timezone.now()
+        weekday = current_time.strftime('%A')
+
+        context['employees'] = Employee.objects.all()
+        context['current_time'] = timezone.now()
+        context['admin_signuture'] = Signature.objects.all()
+        context['current_time'] = current_time
+        context['next_day'] = current_time + timedelta(days=1)
+        context['next_next_day'] = current_time + timedelta(days=2)
+        context['leave_types'] = LeaveType.objects.all()
+        context['holidays'] = PulicHolidays.objects.all()
+        context['is_friday'] = weekday == 'Friday',
+
+        context['hospital_name'] = HospitalName.objects.all()
+        return context
+    
+    def get_template_names(self):
+        # Get the form_type from the session or use default
+        form_type = self.request.session.get('form_type', 'financial_bills')
+        
+        # Choose template based on form_type
+        if form_type == 'financial_bills':
+            return ['reporting/letter_templates/financial_bills.html']
     
     def dispatch(self, request, *args, **kwargs):
         # Store form_type in session if it's in the request
@@ -355,6 +430,7 @@ class LetterForm(LoginRequiredMixin, ListView):
         'privilege_leave_memorandum': 'reporting:privilege_leave_memorandum',
         'hospitalization': 'reporting:hospitalization',
         'request_for_issuance': 'reporting:request_for_issuance',
+        'financial_bills': 'reporting:financial_bills',
     }
 
     def post(self, request, *args, **kwargs):
@@ -408,7 +484,7 @@ class LetterForm(LoginRequiredMixin, ListView):
                 return redirect('reporting:lettername')
 
         # Special handling for leave_memorandum, privilege_leave_memorandum, and hospitalization which don't require SAP ID
-        if form_type in ['leave_memorandum', 'privilege_leave_memorandum', 'hospitalization']:
+        if form_type in ['leave_memorandum', 'privilege_leave_memorandum', 'hospitalization', "financial_bills"]:
             # For these form types, we don't need SAP ID
             redirect_view = self.FORM_TYPE_MAPPING.get(form_type)
             if redirect_view:
@@ -527,7 +603,8 @@ def get_letter_templates(request):
             {'id': 'leave_memorandum', 'name': 'Leave Memorandum'},
             {'id': 'privilege_leave_memorandum', 'name': 'Privilege Leave Memorandum'},
             {'id': 'request_for_issuance', 'name': 'Request For Issuance'},
-            {'id': 'hospitalization', 'name': 'Hospitalization'}
+            {'id': 'hospitalization', 'name': 'Hospitalization'},
+            {'id': 'financial_bills', 'name': 'Financial Bills'},
         ]
         return JsonResponse({'templates': templates})
     except Exception as e:

@@ -1,0 +1,1076 @@
+{% extends "sidebar.html" %}
+{% load static %}
+{% load custom_filters %}
+
+{% block content %}
+<head>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" defer></script>
+</head>
+<body class="p-8 bg-gray-100">
+    <!-- Django Messages -->
+    {% if messages %}
+    <div class="messages-container fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md">
+        {% for message in messages %}
+        <div class="message {% if message.tags %}{{ message.tags }}{% endif %} p-4 mb-2 rounded-lg shadow-lg text-white {% if message.tags == 'error' %}bg-red-500{% elif message.tags == 'success' %}bg-green-500{% elif message.tags == 'warning' %}bg-yellow-500{% elif message.tags == 'info' %}bg-blue-500{% endif %}">
+            {{ message }}
+            <button class="float-right ml-2 focus:outline-none" onclick="this.parentElement.remove()">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- Toast Messages -->
+    <div id="errorToast" class="fixed top-4 right-4 bg-red-500 text-white p-4 rounded-lg shadow-lg z-50 hidden">
+        Error message here
+    </div>
+    <div id="successToast" class="fixed top-4 right-4 bg-green-500 text-white p-4 rounded-lg shadow-lg z-50 hidden">
+        Success message here
+    </div>
+    
+    <!-- Main Container with Two-Column Layout -->
+    <div class="flex flex-col lg:flex-row gap-6 max-w-screen-xl mx-auto">
+        <!-- Left Column - Application Form -->
+        <div class="w-full lg:w-5/12 p-6 bg-white shadow-lg rounded-lg my-4">
+            <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Financial Bill Form</h2>
+            
+            <!-- Global Employee SAP ID field removed as each account holder now has their own SAP ID field -->
+            
+            <!-- Financial Bill Form -->
+            <form action="{% if employee and employee.SAP_ID %}{% url 'reporting:financial_bill' employee.SAP_ID %}{% else %}#{% endif %}" method="post" enctype="multipart/form-data" id="financial-bill-form">
+                {% csrf_token %}
+                <!-- Input Fields for User Data -->
+                <div class="space-y-4">
+                    <div>
+                        <label for="bill_date" class="block text-sm font-medium text-gray-700">Bill Date:</label>
+                        <input type="date" id="bill_date" name="bill_date" class="mt-1 p-2 w-10/12 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required>
+                    </div>
+
+                    <div>
+                        <label for="office_note_no" class="block text-sm font-medium text-gray-700">Office Note No:</label>
+                        <input type="text" id="office_note_no" name="office_note_no" class="mt-1 p-2 w-10/12 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required placeholder="e.g. COD/BBD/PSD">
+                    </div>
+
+                    <!-- Global Amount field removed as each account holder has its own Amount field -->
+                    <!-- Amount in Words field removed as it's now auto-generated -->
+
+                    <div>
+                        <label for="sanctioned_by" class="block text-sm font-medium text-gray-700">Sanctioned By:</label>
+                        <input type="text" id="sanctioned_by" name="sanctioned_by" class="mt-1 p-2 w-10/12 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required placeholder="e.g. SEVP / Group Chief, Operations Group">
+                    </div>
+
+                    <!-- Account Holders Section -->
+                    <div class="mt-4">
+                        <div class="flex items-center justify-between">
+                            <label class="block text-sm font-medium text-gray-700">Account Holders:</label>
+                            <button type="button" id="add-account-holder-btn" class="p-1 text-blue-500 hover:text-blue-700 focus:outline-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <!-- Account Holders Container -->
+                        <div id="account-holders-container" class="space-y-4 mt-2">
+                            <!-- Initial account holder entry -->
+                            <div class="account-holder-entry p-3 border border-gray-200 rounded-md bg-gray-50">
+                                <div class="accordion-header flex justify-between items-center mb-2 cursor-pointer">
+                                    <h4 class="font-medium text-gray-700">Account Holder #<span class="entry-number">1</span></h4>
+                                    <div class="flex items-center">
+                                        <button type="button" class="remove-account-holder p-1 text-red-500 hover:text-red-700 focus:outline-none hidden mr-2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </button>
+                                        <span class="accordion-icon transition-transform duration-300 transform rotate-0">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="accordion-summary hidden text-sm text-gray-600 mb-2 pl-2 border-l-2 border-blue-500"></div>
+                                <div class="accordion-content space-y-3">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Employee SAP ID:</label>
+                                        <div class="flex">
+                                            <input type="text" name="account_holder_sap_id[]" class="account-holder-sap-id mt-1 p-2 w-full border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" placeholder="Enter SAP ID">
+                                            <button type="button" class="fetch-employee-data ml-2 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Account Holder Name:</label>
+                                        <input type="text" name="account_holder[]" class="account-holder-name mt-1 p-2 w-full border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Expenditure Head:</label>
+                                        <select name="account_holder_expenditure[]" class="account-holder-expenditure mt-1 p-2 w-full border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required>
+                                            <option value="">Select Expenditure Head</option>
+                                            <!-- Options will be populated via JavaScript -->
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">IBAN#:</label>
+                                        <input type="text" name="account_holder_iban[]" class="account-holder-iban mt-1 p-2 w-full border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Amount (Rs.):</label>
+                                        <input type="number" name="account_holder_amount[]" class="account-holder-amount mt-1 p-2 w-full border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex items-center">
+                            <label for="expenditure_head" class="block text-sm font-medium text-gray-700">Expenditure Head:</label>
+                            <button type="button" id="add-expenditure-head-btn" class="ml-2 p-1 text-blue-500 hover:text-blue-700 focus:outline-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="relative">
+                            <select id="expenditure_head" name="expenditure_head" class="mt-1 p-2 w-10/12 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required>
+                                <option value="">Select Expenditure Head</option>
+                                <!-- Options will be populated via JavaScript -->
+                            </select>
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-8 pointer-events-none">
+                                <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Modal for adding new expenditure head -->
+                    <div id="expenditure-head-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center z-50">
+                        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-auto">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-medium text-gray-900">Add New Expenditure Head</h3>
+                                <button type="button" id="close-modal-btn" class="text-gray-400 hover:text-gray-500">
+                                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="new-expenditure-head" class="block text-sm font-medium text-gray-700">Name:</label>
+                                    <input type="text" id="new-expenditure-head" class="mt-1 p-2 w-full border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" placeholder="Enter expenditure head name">
+                                </div>
+                                <div>
+                                    <label for="expenditure-head-description" class="block text-sm font-medium text-gray-700">Description (optional):</label>
+                                    <textarea id="expenditure-head-description" class="mt-1 p-2 w-full border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" rows="3" placeholder="Enter description"></textarea>
+                                </div>
+                                <div class="flex justify-end space-x-3">
+                                    <button type="button" id="cancel-add-btn" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors duration-300">Cancel</button>
+                                    <button type="button" id="save-expenditure-head-btn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-300">Save</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Conveyance Type field removed -->
+
+                    <!-- IBAN field completely removed from form UI but kept as hidden input for functionality -->
+                    <input type="hidden" id="iban" name="iban">
+
+                     <!-- Admin Signature Selection -->
+                    <div class="mt-4">
+                        <label for="form_type" class="block text-sm font-medium text-gray-700">Admin Signature:</label>
+                        <select id="form_type" name="form_type" class="p-1.5 w-10/12 border border-blue-500 rounded-md focus:outline-none focus:border-blue-700 transition-colors duration-300 shadow-sm text-sm">
+                            <option value="">Select Admin Signature</option>
+                            {% for employee in admin_signuture %}
+                                <option value="{{ employee.SAP_ID }}">{{ employee.employee_name }} ({{ employee.SAP_ID }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <!-- Submit Button -->
+                    <div class="mt-6">
+                        {% comment %} <button type="submit" class="w-full py-3 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 ease-in-out transform hover:scale-105">
+                            Generate Financial Bill
+                        </button> {% endcomment %}
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Right Column - Preview -->
+        <div class="w-full lg:w-7/12 p-6 bg-white shadow-lg rounded-lg my-4">
+            <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Financial Bill</h2>
+            
+            <!-- Preview Container -->
+            <div id="download_letter" class="p-10" style="position: relative; min-height: 1123px; display: flex; flex-direction: column; page-break-inside: avoid;">
+                <!-- Financial Bill Preview Content -->
+                <div id="financial-bill-preview" class="text-black" style="page-break-inside: avoid;">
+                    <!-- Header Section -->
+                    <div class="mb-4">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <img src="{% static 'reporting/images/NBP.png' %}" alt="NBP Logo" class="h-21">
+                            </div>
+                            <div class="text-right mt-9">
+                                <p class="font-semibold pr-6">Operations Group</p>
+                            </div>
+                        </div>
+                        <!-- Full-width border under the header section -->
+                        <hr class="border-t border-gray-400">
+                        <div class="text-sm mt-2 flex justify-between items-center">
+                            <p class="font-semibold">National Bank of Pakistan</p>
+                            <p class="font-semibold pr-3">Administration Division</p>
+                        </div>
+                        <div class="text-sm mt-3 mb-6">
+                            <p class="font-semibold">{{current_time |date:"F j, Y" }}</p>  
+                        </div>
+                    </div>
+                    
+                    <!-- Original Financial Bill Header -->
+                    <div class="flex justify-between mb-6">
+                        <div>
+                            <p class="font-bold">The Senior Vice President</p>
+                            <p>Payment Section</p>
+                            <p>Financial Control Division,</p>
+                            <p>National Bank of Pakistan,</p>
+                            <p>Head Office Karachi.</p>
+                        </div>
+                        {% comment %} <div>
+                            <p>Dated: <span id="preview-date">06.05.2025</span></p>
+                        </div> {% endcomment %}
+                    </div>
+
+                    <!-- Salutation -->
+                    <p class="mb-4">Dear Sir,</p>
+
+                    <!-- Subject Line -->
+                    <u><p class="font-bold mb-4">PAYMENT OF <span id="preview-expenditure-head">COMPUTER ACCESSORIES</span>.</p></u>
+                    
+                    <!-- Individual account holder subject lines -->
+                    <div id="account-holder-subject-lines" class="mb-4 underline decoration-wavy decoration-blue-500 decoration-2">
+                        <!-- Subject lines will be added dynamically here -->
+                    </div>
+
+                    <!-- Main Content -->
+                    <p class="mb-8">Please find attached herewith <span id="preview-office-note">(01) approved Original Office Note No. (COD/BBD/PSD)</span> Amounting to Rs.<span id="preview-amount-numeric-2">90,230/-</span> (Rupees: <span id="preview-amount-words">ninety thousand two hundred thirty only</span>) duly sanctioned by the <span id="preview-sanctioned-by">SEVP / Group Chief, Operations Group</span> detail are as under: -</p>
+
+                    <!-- Table -->
+                    <table class="w-full border-collapse border border-black mb-8">
+                        <thead>
+                            <tr>
+                                <th class="border border-black p-2 text-center">Account Holder Name</th>
+                                <th class="border border-black p-2 text-center">Expenditure Head</th>
+                                <th class="border border-black p-2 text-center">IBAN#</th>
+                                <th class="border border-black p-2 text-center">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="preview-account-holders-table">
+                            <!-- Account holder rows will be dynamically added here -->
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3" class="border border-black p-2 text-right font-bold">Total Amount:</td>
+                                <td class="border border-black p-2 text-center font-bold"><span id="preview-total-amount">0/-</span></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+
+                    <!-- Closing -->
+                    <p class="mb-16">Yours faithfully,</p>
+
+                    <!-- Signature Section -->
+                    <div id="employee-details" class="w-full mt-12">
+                        <!-- Data will be inserted here dynamically-->
+                    </div>
+
+                    <div class="mb-6">
+                        <p>Encl: a.a</p>
+                    </div>
+
+                    <!-- Footer Section -->
+                    <div style="position: relative; margin-top: auto; left: 0; right: 0; width: 100%;" class="footer">
+                        <hr class="border-t border-gray-400 mb-8">
+                        <div class="text-center text-xs text-gray-600">
+                            <p class="font-semibold">National Bank of Pakistan</p>
+                            <p>Head Office: I.I. Chundrigar Road, Karachi. Ph: 9212100 (50 lines)</p>
+                            <p>Website: www.nbp.com.pk</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Print and Download Buttons -->
+            <div class="flex justify-center space-x-4 mt-6">
+                <button id="print-btn" class="px-6 py-2 bg-green-600 text-white font-semibold rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-300 ease-in-out transform hover:scale-105">
+                    <i class="fas fa-print mr-2"></i> Print
+                </button>
+                <button id="download-btn" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 ease-in-out transform hover:scale-105">
+                    <i class="fas fa-download mr-2"></i> Download PDF
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript for Dynamic Functionality -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        // Ensure jQuery is loaded before using it
+        function ensureJQuery(callback) {
+            if (window.jQuery) {
+                callback();
+            } else {
+                setTimeout(function() { ensureJQuery(callback); }, 100);
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load expenditure heads for dropdown
+            loadExpenditureHeads();
+            
+            // Initialize expenditure head modal
+            initExpenditureHeadModal();
+            
+            // Add change event listener to expenditure head dropdown
+            const expenditureHeadSelect = document.getElementById('expenditure_head');
+            expenditureHeadSelect.addEventListener('change', function() {
+                // Update preview elements
+                const previewElements = document.querySelectorAll('#preview-expenditure-head');
+                previewElements.forEach(element => {
+                    element.textContent = this.value;
+                });
+            });
+            
+            // Employee Search Functionality
+            // Global Employee SAP ID search functionality removed as each account holder now has its own SAP ID field
+            
+            // Function to fetch employee data - now only used by individual account holder entries
+            function fetchEmployeeData(sapId) {
+                fetch(`/get_employee/?sap_id=${sapId}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Employee not found');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Update form action URL
+                        const form = document.getElementById('financial-bill-form');
+                        form.action = `/reporting/financial_bill/${sapId}/`;
+                        
+                        showToast('successToast', 'Employee data loaded successfully');
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showToast('errorToast', error.message);
+                    });
+            }
+            
+            // Load expenditure heads for dropdown
+            function loadExpenditureHeads() {
+                fetch('/get_expenditure_heads/')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to load expenditure heads');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            // Store expenditure heads for later use
+                            window.expenditureHeads = data.expenditure_heads;
+                            
+                            // Populate all expenditure head dropdowns
+                            populateAllExpenditureHeadDropdowns();
+                        } else {
+                            showToast('errorToast', 'Failed to load expenditure heads');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showToast('errorToast', error.message);
+                    });
+            }
+            
+            // Populate all expenditure head dropdowns
+            function populateAllExpenditureHeadDropdowns() {
+                if (!window.expenditureHeads) return;
+                
+                // Get all expenditure head dropdowns
+                const dropdowns = document.querySelectorAll('.account-holder-expenditure');
+                
+                dropdowns.forEach(dropdown => {
+                    // Clear existing options except the first one
+                    while (dropdown.options.length > 1) {
+                        dropdown.remove(1);
+                    }
+                    
+                    // Add new options
+                    window.expenditureHeads.forEach(head => {
+                        const option = document.createElement('option');
+                        option.value = head.name;
+                        option.textContent = head.name;
+                        dropdown.appendChild(option);
+                    });
+                });
+            }
+            
+            // Initialize expenditure head modal functionality
+            function initExpenditureHeadModal() {
+                const modal = document.getElementById('expenditure-head-modal');
+                const addBtn = document.getElementById('add-expenditure-head-btn');
+                const closeBtn = document.getElementById('close-modal-btn');
+                const cancelBtn = document.getElementById('cancel-add-btn');
+                const saveBtn = document.getElementById('save-expenditure-head-btn');
+                const nameInput = document.getElementById('new-expenditure-head');
+                const descriptionInput = document.getElementById('expenditure-head-description');
+                
+                // Show modal
+                addBtn.addEventListener('click', () => {
+                    modal.classList.remove('hidden');
+                    nameInput.focus();
+                });
+                
+                // Initialize account holders functionality
+                initAccountHolders();
+                
+                // Hide modal
+                function hideModal() {
+                    modal.classList.add('hidden');
+                    nameInput.value = '';
+                    descriptionInput.value = '';
+                }
+                
+                closeBtn.addEventListener('click', hideModal);
+                cancelBtn.addEventListener('click', hideModal);
+                
+                // Close modal when clicking outside
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        hideModal();
+                    }
+                });
+                
+                // Save new expenditure head
+                saveBtn.addEventListener('click', () => {
+                    const name = nameInput.value.trim();
+                    const description = descriptionInput.value.trim();
+                    
+                    if (!name) {
+                        showToast('errorToast', 'Name is required');
+                        return;
+                    }
+                    
+                    // Disable save button to prevent multiple submissions
+                    saveBtn.disabled = true;
+                    saveBtn.textContent = 'Saving...';
+                    
+                    fetch('/save_expenditure_head/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ name, description }),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Add the new expenditure head to the global array
+                            if (!window.expenditureHeads) {
+                                window.expenditureHeads = [];
+                            }
+                            window.expenditureHeads.push({
+                                id: data.id,
+                                name: data.name
+                            });
+                            
+                            // Update all expenditure head dropdowns
+                            populateAllExpenditureHeadDropdowns();
+                            
+                            // Select the new option in all dropdowns
+                            document.querySelectorAll('.account-holder-expenditure').forEach(dropdown => {
+                                dropdown.value = data.name;
+                                // Trigger change event
+                                const changeEvent = new Event('change');
+                                dropdown.dispatchEvent(changeEvent);
+                            });
+                            
+                            hideModal();
+                            showToast('successToast', 'Expenditure head added successfully');
+                        } else {
+                            showToast('errorToast', data.error || 'Failed to add expenditure head');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showToast('errorToast', 'An error occurred while saving');
+                    })
+                    .finally(() => {
+                        saveBtn.disabled = false;
+                        saveBtn.textContent = 'Save';
+                    });
+                });
+                
+                // Allow pressing Enter to save
+                nameInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        saveBtn.click();
+                    }
+                });
+            }
+            
+            // Form input to preview mapping for non-account holder fields
+            const formMappings = [
+                { input: 'bill_date', preview: 'preview-date', formatter: formatDate },
+                { input: 'office_note_no', preview: 'preview-office-note', formatter: value => `(01) approved Original Office Note No. (${value})` },
+                { input: 'sanctioned_by', preview: 'preview-sanctioned-by' },
+                { input: 'signatory_name', preview: 'preview-signatory-name' },
+                { input: 'signatory_designation', preview: 'preview-signatory-designation' },
+                { input: 'signatory_department', preview: 'preview-signatory-department' },
+                { input: 'signatory_location', preview: 'preview-signatory-location' },
+                { input: 'signatory_ext', preview: 'preview-signatory-ext' }
+            ];
+            
+            // Add event listeners to form inputs for real-time preview
+            formMappings.forEach(mapping => {
+                const inputElement = document.getElementById(mapping.input);
+                if (inputElement) {
+                    inputElement.addEventListener('input', function() {
+                        // Get all elements with the same ID (for cases like preview-iban that appear multiple times)
+                        const previewElements = document.querySelectorAll('#' + mapping.preview);
+                        if (previewElements.length > 0) {
+                            let value = this.value;
+                            if (mapping.formatter) {
+                                value = mapping.formatter(value);
+                            }
+                            // Update all elements with the same ID
+                            previewElements.forEach(element => {
+                                element.textContent = value;
+                            });
+                        }
+                    });
+                }
+            });
+            
+            // Initialize account holders functionality
+            initAccountHolders();
+            
+            // Function to initialize account holders functionality
+            function initAccountHolders() {
+                const container = document.getElementById('account-holders-container');
+                const addButton = document.getElementById('add-account-holder-btn');
+                
+                if (!container || !addButton) return;
+                
+                // Add event listener to the add button
+                addButton.addEventListener('click', addAccountHolder);
+                
+                // Add event listeners to the initial account holder entry
+                setupAccountHolderEntry(container.querySelector('.account-holder-entry'));
+                
+                // Setup initial preview
+                updateAccountHoldersPreview();
+            }
+            
+            // Function to add a new account holder entry
+            function addAccountHolder() {
+                const container = document.getElementById('account-holders-container');
+                const template = container.querySelector('.account-holder-entry');
+                const newEntry = template.cloneNode(true);
+                
+                // Update entry number
+                const entryCount = container.querySelectorAll('.account-holder-entry').length + 1;
+                newEntry.querySelector('.entry-number').textContent = entryCount;
+                
+                // Clear input values
+                newEntry.querySelectorAll('input').forEach(input => {
+                    input.value = '';
+                });
+                
+                // Reset select values
+                newEntry.querySelectorAll('select').forEach(select => {
+                    select.selectedIndex = 0;
+                });
+                
+                // Show remove button for all entries except the first one
+                const removeButtons = document.querySelectorAll('.remove-account-holder');
+                removeButtons.forEach(button => {
+                    button.classList.remove('hidden');
+                });
+                newEntry.querySelector('.remove-account-holder').classList.remove('hidden');
+                
+                // Collapse all existing entries
+                const existingEntries = container.querySelectorAll('.account-holder-entry');
+                existingEntries.forEach(entry => {
+                    collapseEntry(entry);
+                    updateAccordionSummary(entry);
+                });
+                
+                // Setup event listeners for the new entry
+                setupAccountHolderEntry(newEntry);
+                
+                // Ensure the new entry is expanded
+                expandEntry(newEntry);
+                
+                // Append the new entry to the container
+                container.appendChild(newEntry);
+                
+                // Update the preview
+                updateAccountHoldersPreview();
+            }
+            
+            // Function to collapse an account holder entry
+            function collapseEntry(entry) {
+                const content = entry.querySelector('.accordion-content');
+                const icon = entry.querySelector('.accordion-icon');
+                const summary = entry.querySelector('.accordion-summary');
+                
+                if (content && icon && summary) {
+                    content.style.display = 'none';
+                    icon.classList.remove('rotate-180');
+                    summary.classList.remove('hidden');
+                }
+            }
+            
+            // Function to expand an account holder entry
+            function expandEntry(entry) {
+                const content = entry.querySelector('.accordion-content');
+                const icon = entry.querySelector('.accordion-icon');
+                const summary = entry.querySelector('.accordion-summary');
+                
+                if (content && icon && summary) {
+                    content.style.display = 'block';
+                    icon.classList.add('rotate-180');
+                    summary.classList.add('hidden');
+                }
+            }
+            
+            // Function to toggle an account holder entry
+            function toggleEntry(entry) {
+                const content = entry.querySelector('.accordion-content');
+                
+                if (content.style.display === 'none') {
+                    expandEntry(entry);
+                } else {
+                    collapseEntry(entry);
+                    updateAccordionSummary(entry);
+                }
+            }
+            
+            // Function to update the accordion summary
+            function updateAccordionSummary(entry) {
+                const summary = entry.querySelector('.accordion-summary');
+                const name = entry.querySelector('.account-holder-name').value || 'Not specified';
+                const amount = entry.querySelector('.account-holder-amount').value || '0';
+                const iban = entry.querySelector('.account-holder-iban').value || 'Not specified';
+                
+                summary.textContent = `${name} - Rs. ${formatCurrency(amount)} - IBAN: ${iban}`;
+            }
+            
+            // Function to setup event listeners for an account holder entry
+            function setupAccountHolderEntry(entry) {
+                if (!entry) return;
+                
+                // Add event listener to remove button
+                const removeButton = entry.querySelector('.remove-account-holder');
+                if (removeButton) {
+                    removeButton.addEventListener('click', function(e) {
+                        // Prevent the click from triggering the accordion toggle
+                        e.stopPropagation();
+                        
+                        // Don't remove if it's the only entry
+                        const container = document.getElementById('account-holders-container');
+                        if (container.querySelectorAll('.account-holder-entry').length <= 1) {
+                            showToast('errorToast', 'Cannot remove the only account holder entry');
+                            return;
+                        }
+                        
+                        // Remove the entry
+                        entry.remove();
+                        
+                        // Update entry numbers
+                        const entries = container.querySelectorAll('.account-holder-entry');
+                        entries.forEach((entry, index) => {
+                            entry.querySelector('.entry-number').textContent = index + 1;
+                        });
+                        
+                        // Hide remove button for the first entry if it's the only one
+                        if (entries.length === 1) {
+                            entries[0].querySelector('.remove-account-holder').classList.add('hidden');
+                        }
+                        
+                        // Update the preview
+                        updateAccountHoldersPreview();
+                    });
+                }
+                
+                // Add event listeners to inputs for real-time preview updates and summary updates
+                const inputs = entry.querySelectorAll('input, select');
+                inputs.forEach(input => {
+                    input.addEventListener('input', function() {
+                        updateAccountHoldersPreview();
+                        updateAccordionSummary(entry);
+                    });
+                });
+                
+                // Setup fetch employee data button
+                const fetchButton = entry.querySelector('.fetch-employee-data');
+                if (fetchButton) {
+                    fetchButton.addEventListener('click', function(e) {
+                        // Prevent the click from triggering the accordion toggle
+                        e.stopPropagation();
+                        
+                        const sapIdField = entry.querySelector('.account-holder-sap-id');
+                        if (sapIdField && sapIdField.value.trim() !== '') {
+                            fetchAccountHolderData(sapIdField.value, entry);
+                        } else {
+                            showToast('Please enter a valid SAP ID', 'error');
+                        }
+                    });
+                }
+                
+                // Add event listener to accordion header for toggling
+                const accordionHeader = entry.querySelector('.accordion-header');
+                if (accordionHeader) {
+                    accordionHeader.addEventListener('click', function() {
+                        toggleEntry(entry);
+                    });
+                }
+                
+                // Initialize the accordion state
+                // For the first entry or a newly added entry, expand it
+                // For existing entries when adding a new one, they will be collapsed by the addAccountHolder function
+                const container = document.getElementById('account-holders-container');
+                const isFirstEntry = container.querySelectorAll('.account-holder-entry').length === 1;
+                if (isFirstEntry) {
+                    expandEntry(entry);
+                } else {
+                    // Initialize the summary for collapsed entries
+                    updateAccordionSummary(entry);
+                }
+            }
+            
+            // Function to update the account holders preview table
+            function updateAccountHoldersPreview() {
+                const container = document.getElementById('account-holders-container');
+                const tableBody = document.getElementById('preview-account-holders-table');
+                const subjectLinesContainer = document.getElementById('account-holder-subject-lines');
+                const totalAmountElement = document.getElementById('preview-total-amount');
+                const amountInWordsElement = document.getElementById('preview-amount-words');
+                const officeNoteElement = document.getElementById('preview-office-note');
+                
+                if (!container || !tableBody || !totalAmountElement || !amountInWordsElement || !subjectLinesContainer) return;
+                
+                // Clear the table body and subject lines container
+                tableBody.innerHTML = '';
+                subjectLinesContainer.innerHTML = '';
+                
+                // Get all account holder entries
+                const entries = container.querySelectorAll('.account-holder-entry');
+                
+                // Calculate total amount
+                let totalAmount = 0;
+                
+                // Add a row for each account holder
+                entries.forEach(entry => {
+                    const name = entry.querySelector('.account-holder-name').value || '';
+                    const expenditure = entry.querySelector('.account-holder-expenditure').value || '';
+                    const iban = entry.querySelector('.account-holder-iban').value || '';
+                    const amount = entry.querySelector('.account-holder-amount').value || 0;
+                    
+                    // Add to total amount
+                    totalAmount += parseFloat(amount) || 0;
+                    
+                    // Create a subject line for each account holder
+                    const subjectLine = document.createElement('p');
+                    subjectLine.className = 'font-bold mb-2';
+                    subjectLine.textContent = `Mr. ${name}, Rs. ${formatCurrency(amount)} IBAN# ${iban}.`;
+                    
+                    // Add the subject line to the subject lines container
+                    subjectLinesContainer.appendChild(subjectLine);
+                    
+                    // Create a data row
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="border border-black p-2 text-center">${name}</td>
+                        <td class="border border-black p-2 text-center">${expenditure}</td>
+                        <td class="border border-black p-2 text-center">${iban}</td>
+                        <td class="border border-black p-2 text-center">${formatCurrency(amount)}</td>
+                    `;
+                    
+                    // Append the data row to the table body
+                    tableBody.appendChild(row);
+                });
+                
+                // Update total amount
+                totalAmountElement.textContent = formatCurrency(totalAmount);
+                
+                // Update amount in words
+                amountInWordsElement.textContent = numberToWords(totalAmount);
+                
+                // Create or update hidden field for form submission
+                let hiddenInput = document.getElementById('amount_in_words');
+                if (!hiddenInput) {
+                    hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.id = 'amount_in_words';
+                    hiddenInput.name = 'amount_in_words';
+                    document.getElementById('financial-bill-form').appendChild(hiddenInput);
+                }
+                hiddenInput.value = numberToWords(totalAmount);
+                
+                // Update other amount preview elements
+                const amountElements = document.querySelectorAll('#preview-amount-numeric, #preview-amount-numeric-2');
+                amountElements.forEach(element => {
+                    element.textContent = formatCurrency(totalAmount);
+                });
+                
+                // Update the office note text to reflect the number of account holders
+                if (officeNoteElement) {
+                    const count = entries.length;
+                    const formattedCount = count < 10 ? `(0${count})` : `(${count})`;
+                    const officeNoteText = officeNoteElement.textContent;
+                    officeNoteElement.textContent = officeNoteText.replace(/\(\d+\)/, formattedCount);
+                }
+            }
+            
+            // Function to fetch account holder data based on SAP ID
+            function fetchAccountHolderData(sapId, entry) {
+                // Show loading indicator
+                const fetchButton = entry.querySelector('.fetch-employee-data');
+                if (fetchButton) {
+                    fetchButton.innerHTML = '<svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
+                }
+
+                // Fetch employee data
+                fetch(`/get_employee?sap_id=${sapId}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Employee not found');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Update account holder fields
+                        const nameField = entry.querySelector('.account-holder-name');
+                        const ibanField = entry.querySelector('.account-holder-iban');
+                        
+                        if (nameField) {
+                            nameField.value = data.employee_name || '';
+                        }
+                        
+                        if (ibanField && data.iban) {
+                            ibanField.value = data.iban;
+                        }
+                        
+                        // Update preview and accordion summary
+                        updateAccountHoldersPreview();
+                        updateAccordionSummary(entry);
+                        
+                        // Show success message
+                        showToast('Employee data loaded successfully', 'success');
+                    })
+                    .catch(error => {
+                        console.error('Error fetching employee data:', error);
+                        showToast('Error fetching employee data. Please check the SAP ID.', 'error');
+                    })
+                    .finally(() => {
+                        // Reset button
+                        if (fetchButton) {
+                            fetchButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>';
+                        }
+                    });
+            }
+            
+            // Format date as DD.MM.YYYY
+            function formatDate(dateString) {
+                if (!dateString) return '';
+                const date = new Date(dateString);
+                return `${String(date.getDate()).padStart(2, '0')}.${String(date.getMonth() + 1).padStart(2, '0')}.${date.getFullYear()}`;
+            }
+            
+            // Format currency with commas and /- suffix
+            function formatCurrency(value) {
+                if (!value) return '0/-';
+                return parseFloat(value).toLocaleString('en-IN') + '/-';
+            }
+            
+            // Convert number to words
+            function numberToWords(num) {
+                if (!num) return '';
+                
+                const ones = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
+                const tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+                const scales = ['', 'thousand', 'lakh', 'crore'];
+                
+                // Function to convert a 3-digit group to words
+                function convertGroup(n) {
+                    let result = '';
+                    
+                    // Handle hundreds place
+                    if (n >= 100) {
+                        result += ones[Math.floor(n / 100)] + ' hundred';
+                        if (n % 100 !== 0) result += ' ';
+                    }
+                    
+                    // Handle tens and ones places
+                    n = n % 100;
+                    if (n > 0) {
+                        if (n < 20) {
+                            result += ones[n];
+                        } else {
+                            result += tens[Math.floor(n / 10)];
+                            if (n % 10 !== 0) result += '-' + ones[n % 10];
+                        }
+                    }
+                    
+                    return result;
+                }
+                
+                // Convert the number to a string and remove commas
+                num = parseFloat(num.toString().replace(/,/g, ''));
+                
+                if (num === 0) return 'zero';
+                
+                let result = '';
+                let scaleIndex = 0;
+                
+                // Process the number in groups of 2 digits (for thousands) or 3 digits
+                while (num > 0) {
+                    let groupSize = (scaleIndex === 0) ? 3 : 2; // Use 3 for hundreds, 2 for others
+                    let divisor = Math.pow(10, groupSize);
+                    let group = num % divisor;
+                    num = Math.floor(num / divisor);
+                    
+                    if (group > 0) {
+                        let groupText = convertGroup(group);
+                        if (scaleIndex > 0) groupText += ' ' + scales[scaleIndex];
+                        
+                        if (result) result = groupText + ' ' + result;
+                        else result = groupText;
+                    }
+                    
+                    scaleIndex++;
+                }
+                
+                return result + ' only';
+            }
+            
+            // Print functionality
+            const printBtn = document.getElementById('print-btn');
+            if (printBtn) {
+                printBtn.addEventListener('click', function() {
+                    const printContent = document.getElementById('download_letter');
+                    const originalContents = document.body.innerHTML;
+                    
+                    document.body.innerHTML = printContent.innerHTML;
+                    window.print();
+                    document.body.innerHTML = originalContents;
+                    location.reload();
+                });
+            }
+            
+            // Function to prepare document for PDF generation
+            function prepareDocumentForPDF() {
+                // Get the element to convert to PDF
+                const element = document.getElementById('download_letter');
+                if (!element) {
+                    showToast('errorToast', 'Preview element not found');
+                    return null;
+                }
+                
+                // Store original values that might need to be modified for PDF
+                const originalValues = {};
+                
+                // Return the prepared document state
+                return {
+                    element: element,
+                    originalValues: originalValues
+                };
+            }
+            
+            // Function to restore document after PDF generation
+            function restoreDocumentAfterPDF(docState) {
+                if (!docState) return;
+                
+                // After PDF is processed, restore original values if needed
+            }
+            
+            // Download PDF functionality
+            const downloadBtn = document.getElementById('download-btn');
+            if (downloadBtn) {
+                downloadBtn.addEventListener('click', function() {
+                    const docState = prepareDocumentForPDF();
+                    if (!docState) return;
+                    
+                    const opt = {
+                        margin: [10, 10, 10, 10],
+                        filename: 'financial_bill.pdf',
+                        image: { type: 'jpeg', quality: 0.98 },
+                        html2canvas: { scale: 2 },
+                        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+                    };
+                    
+                    html2pdf().from(docState.element).set(opt).save().then(() => {
+                        restoreDocumentAfterPDF(docState);
+                    });
+                });
+            }
+            
+            // Toast message function
+            function showToast(toastId, message) {
+                const toast = document.getElementById(toastId);
+                if (toast) {
+                    toast.textContent = message;
+                    toast.classList.remove('hidden');
+                    setTimeout(() => {
+                        toast.classList.add('hidden');
+                    }, 3000);
+                }
+            }
+        });
+
+        // Update employee signature details
+        ensureJQuery(function() {
+            $(document).ready(function() {
+                $('#form_type').on('change', function() {
+                    var sapId = $(this).val();
+                    if (sapId) {
+                        $.ajax({
+                            url: "{% url 'reporting:get_employee_data' %}", 
+                            data: {
+                                'sap_id': sapId
+                            },
+                            dataType: 'json',
+                            success: function(data) {
+
+                                // Update the employee details section with retrieved data
+                                $('#employee-details').html(`
+                                    <p>_________________________</p>
+                                    <p class="font-semibold">${data.employee_name}</p>
+                                    <p class="text-sm">${data.grade}/${data.designation}</p>
+                                    <p class="text-sm">${data.wing} ${data.division} (${data.group})</p>
+                                `);
+                            },
+                            error: function() {
+                                $('#employee-details').html('<p class="text-red-500">Error loading data.</p>');
+                            }
+                        });
+                    } else {
+                        $('#employee-details').empty();
+                    }
+                });
+            });
+        });
+
+    </script>
+</body>
+{% endblock %}
