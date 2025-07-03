@@ -142,7 +142,6 @@ def advanced_search(request):
 
     # Base queryset
     employees = Employee.objects.exclude(region__isnull=True, SAP_ID__isnull=True, is_active=False)
-    print(Employee.objects.filter(region__isnull=True, SAP_ID__isnull=True))
     if user_group:
         employees = employees.filter(user_group=user_group)
 

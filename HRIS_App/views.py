@@ -207,7 +207,6 @@ def download_employees_csv(request):
 def index(request):
     employees_count_region = Employee.objects.filter(region=request.user.region, is_active=True).count()
 
-    print(f"Employees count in region {request.user.region}: {employees_count_region}{Employee.objects.filter(region=request.user.region, is_active=True)}")
     # Get all products except those in category "Electronics"
     employees_count = Employee.objects.exclude(is_admin=True, is_active=True).count()
     admin_employees = Employee.objects.filter(is_admin_employee=True).count()
