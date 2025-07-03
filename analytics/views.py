@@ -20,8 +20,8 @@ def analytics_view(request):
     # Get designation counts
     designation_counts = Employee.objects.filter(is_active=True).values('designation__title').annotate(count=Count('id'))
     
-    # Get branch operations managers
-    bom_employees = Employee.objects.filter(designation__title__icontains='Branch Operations Manager', is_active=True)
+    # Get BOMs
+    bom_employees = Employee.objects.filter(designation__title__icontains='BOM', is_active=True)
     
     # Get regional employees
     re_ops_employees = Employee.objects.filter(designation__title__icontains='RE OPS', is_active=True)
@@ -49,7 +49,7 @@ def bom_report_view(request):
     selected_branch = request.GET.get('branch')
     
     # Base queryset for BOM employees
-    bom_queryset = Employee.objects.filter(designation__title__icontains='Branch Operations Manager', is_active=True)
+    bom_queryset = Employee.objects.filter(designation__title__icontains='BOM', is_active=True)
     
     # Base queryset for branches
     branches_queryset = Branch.objects.all()
