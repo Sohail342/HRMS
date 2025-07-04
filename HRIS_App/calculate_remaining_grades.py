@@ -9,7 +9,11 @@ def calculate_remaining_grades(region):
         return {}
 
     # Fetch the Region instance
-    region_instance = Region.objects.get(name=region)
+    try:
+        region_instance = Region.objects.get(name=region)
+    except Region.DoesNotExist:
+        # Return empty dict if region doesn't exist
+        return {}
 
     # Define the number of employees allowed per grade based on percentage
     grade_limits = {

@@ -6,7 +6,7 @@ app_name = 'HRMS'
 
 urlpatterns = [
     path('', views.index, name="home"),
-    path('employees/', views.employees_view, name="employees_view"),
+    path('employees/data/', views.employees_view, name="employees_view"),
     path('download_csv/', views.download_employees_csv, name='download_employees_csv'),
     path('employee/<int:sap_id>/', views.employee_detail_view, name='employee_detail'),
     path('remaining_grades/', views.calculate_remaining_grades, name="remaining_grades"),

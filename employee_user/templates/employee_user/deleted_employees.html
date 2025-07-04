@@ -1,0 +1,229 @@
+{% extends "sidebar.html" %}
+{% load static %}
+
+{% block title %}Deleted Employees{% endblock title %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-6 max-w-7xl">
+    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+        <div class="w-full md:w-1/2">
+            <h2 class="text-2xl font-bold text-gray-800">Deleted Employees</h2>
+        </div>
+        <div class="w-full md:w-1/2">
+            <form method="GET" action="{% url 'employee_user:deleted_employees' %}" class="w-full">
+                <div class="flex">
+                    <input type="text" class="flex-grow px-4 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                           placeholder="Search deleted employees..." name="search" value="{{ search_query }}">
+                    <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-r-lg transition duration-200 ease-in-out flex items-center justify-center" type="submit">
+                        <i class="fas fa-search mr-2"></i> Search
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if messages %}
+    <div class="w-full mb-6">
+        {% for message in messages %}
+        <div class="{% if message.tags == 'success' %}bg-green-100 border-l-4 border-green-500 text-green-700{% elif message.tags == 'error' %}bg-red-100 border-l-4 border-red-500 text-red-700{% elif message.tags == 'warning' %}bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700{% else %}bg-blue-100 border-l-4 border-blue-500 text-blue-700{% endif %} p-4 mb-2 rounded-md shadow-sm">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    {% if message.tags == 'success' %}
+                    <i class="fas fa-check-circle text-green-500"></i>
+                    {% elif message.tags == 'error' %}
+                    <i class="fas fa-exclamation-circle text-red-500"></i>
+                    {% elif message.tags == 'warning' %}
+                    <i class="fas fa-exclamation-triangle text-yellow-500"></i>
+                    {% else %}
+                    <i class="fas fa-info-circle text-blue-500"></i>
+                    {% endif %}
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium">{{ message }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
+        <div class="bg-red-600 text-white px-6 py-4 flex items-center justify-between">
+            <h5 class="text-lg font-semibold">Deleted Employee Records</h5>
+            <a href="{% url 'employee_user:employee_list' %}" class="inline-flex items-center px-3 py-1.5 bg-white text-red-600 hover:bg-gray-100 text-sm font-medium rounded-md transition duration-200 ease-in-out">
+                <i class="fas fa-users mr-1.5"></i> Active Employees
+            </a>
+        </div>
+        <div class="p-6">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SAP ID</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Designation</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Branch</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Region</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deleted At</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Details</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for employee in page_obj %}
+                        <tr class="{% cycle 'bg-white' 'bg-gray-50' %}">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ employee.sap_id }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ employee.name }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ employee.designation }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ employee.branch }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ employee.region }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ employee.deleted_at|date:"M d, Y" }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <button type="button" onclick="showDetails('{{ employee.id }}')" class="inline-flex items-center px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition duration-200 ease-in-out">
+                                    <i class="fas fa-info-circle mr-1.5"></i> View
+                                </button>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="px-6 py-10 text-center text-sm text-gray-500 bg-gray-50">
+                                <div class="flex flex-col items-center justify-center">
+                                    <svg class="h-10 w-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    <p class="mt-2 font-medium">No deleted employees found.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+            <div class="flex justify-center mt-6">
+                <nav class="inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                    {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                        <span class="sr-only">Previous</span>
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                    {% else %}
+                    <span class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-gray-100 text-sm font-medium text-gray-400 cursor-not-allowed">
+                        <span class="sr-only">Previous</span>
+                        <i class="fas fa-chevron-left"></i>
+                    </span>
+                    {% endif %}
+                    
+                    {% for i in page_obj.paginator.page_range %}
+                        {% if page_obj.number == i %}
+                        <span class="relative inline-flex items-center px-4 py-2 border border-blue-500 bg-blue-50 text-sm font-medium text-blue-600">
+                            {{ i }}
+                        </span>
+                        {% elif i > page_obj.number|add:'-3' and i < page_obj.number|add:'3' %}
+                        <a href="?page={{ i }}{% if search_query %}&search={{ search_query }}{% endif %}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                            {{ i }}
+                        </a>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                        <span class="sr-only">Next</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                    {% else %}
+                    <span class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-gray-100 text-sm font-medium text-gray-400 cursor-not-allowed">
+                        <span class="sr-only">Next</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </span>
+                    {% endif %}
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal for employee details -->
+<div id="detailsModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
+        <div class="flex justify-between items-center border-b pb-3">
+            <h3 class="text-xl font-semibold text-gray-900" id="modalTitle">Employee Deletion Details</h3>
+            <button type="button" onclick="closeModal()" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        <div class="mt-4" id="modalContent">
+            <!-- Content will be loaded dynamically -->
+            <div class="animate-pulse">
+                <div class="h-4 bg-gray-200 rounded w-3/4 mb-2.5"></div>
+                <div class="h-4 bg-gray-200 rounded w-1/2 mb-2.5"></div>
+                <div class="h-4 bg-gray-200 rounded w-5/6 mb-2.5"></div>
+                <div class="h-4 bg-gray-200 rounded w-2/3 mb-2.5"></div>
+            </div>
+        </div>
+        <div class="mt-6 border-t pt-3 flex justify-end">
+            <button type="button" onclick="closeModal()" class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-md transition duration-200 ease-in-out">
+                <i class="fas fa-times mr-2"></i> Close
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showDetails(employeeId) {
+        // Show modal
+        document.getElementById('detailsModal').classList.remove('hidden');
+        
+        // Fetch employee details
+        fetch(`{% url 'employee_user:deleted_employee_details' %}?id=${employeeId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const employee = data.employee;
+                    let content = `
+                        <div class="bg-gray-50 p-4 rounded-md mb-4">
+                            <h4 class="font-semibold text-lg mb-2">${employee.name} <span class="text-sm text-gray-500">(SAP ID: ${employee.sap_id})</span></h4>
+                            <p class="text-sm text-gray-600 mb-1"><span class="font-medium">Email:</span> ${employee.email || 'N/A'}</p>
+                            <p class="text-sm text-gray-600 mb-1"><span class="font-medium">Designation:</span> ${employee.designation || 'N/A'}</p>
+                            <p class="text-sm text-gray-600 mb-1"><span class="font-medium">Branch:</span> ${employee.branch || 'N/A'}</p>
+                            <p class="text-sm text-gray-600 mb-1"><span class="font-medium">Region:</span> ${employee.region || 'N/A'}</p>
+                            <p class="text-sm text-gray-600 mb-1"><span class="font-medium">Grade:</span> ${employee.employee_grade || 'N/A'}</p>
+                            <p class="text-sm text-gray-600 mb-1"><span class="font-medium">Type:</span> ${employee.employee_type || 'N/A'}</p>
+                            <p class="text-sm text-gray-600 mb-1"><span class="font-medium">Date of Joining:</span> ${employee.date_of_joining || 'N/A'}</p>
+                        </div>
+                        <div class="border-t pt-4">
+                            <h4 class="font-semibold mb-2">Deletion Information</h4>
+                            <p class="text-sm text-gray-600 mb-1"><span class="font-medium">Deleted At:</span> ${employee.deleted_at}</p>
+                            <p class="text-sm text-gray-600 mb-1"><span class="font-medium">Deleted By:</span> ${employee.deleted_by || 'N/A'}</p>
+                            <div class="mt-3 p-3 bg-red-50 rounded-md border border-red-100">
+                                <p class="text-sm font-medium text-gray-700 mb-1">Reason for Deletion:</p>
+                                <p class="text-sm text-gray-600">${employee.deletion_reason || 'No reason provided'}</p>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('modalContent').innerHTML = content;
+                } else {
+                    document.getElementById('modalContent').innerHTML = '<p class="text-red-500">Error loading employee details</p>';
+                }
+            })
+            .catch(error => {
+                document.getElementById('modalContent').innerHTML = '<p class="text-red-500">Error loading employee details</p>';
+                console.error('Error:', error);
+            });
+    }
+
+    function closeModal() {
+        document.getElementById('detailsModal').classList.add('hidden');
+    }
+
+    // Close modal when clicking outside of it
+    window.onclick = function(event) {
+        const modal = document.getElementById('detailsModal');
+        if (event.target === modal) {
+            closeModal();
+        }
+    }
+</script>
+{% endblock content %}

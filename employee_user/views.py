@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from HRIS_App.models import Region, Employee
 from django.contrib import messages
 from group_head.decorators import employee_user_required
@@ -7,10 +7,13 @@ from .forms import CreatePasswordForm
 from django.contrib.auth import login
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_protect
-from django.shortcuts import get_object_or_404
-from .models import RicpData, RicpKPI
+from .models import RicpData, RicpKPI, DeletedEmployees
 from django.utils.dateformat import DateFormat
 import json
+from django.core.paginator import Paginator
+from group_head.decorators import admin_or_admin_employee_required
+from django.db import transaction, models
+from django.db.models import Q
 
 
 # User Login
@@ -411,4 +414,148 @@ def delete_kpi(request, kpi_id, form_type):
     kpi.delete()
     messages.success(request, "KPI deleted successfully!")
     return redirect('employee_user:update_kpis', form_type=form_type)
+
+
+# Admin views for employee management
+@admin_or_admin_employee_required
+def employee_list(request):
+    """
+    View for admin users to list all employees with pagination
+    """
+    employees = Employee.objects.filter(is_active=True).order_by('name')
+    
+    # Search functionality
+    search_query = request.GET.get('search', '')
+    if search_query:
+        employees = employees.filter(
+            models.Q(name__icontains=search_query) | 
+            models.Q(SAP_ID__icontains=search_query) | 
+            models.Q(email__icontains=search_query) | 
+            models.Q(designation__title__icontains=search_query) | 
+            models.Q(branch__branch_name__icontains=search_query) | 
+            models.Q(region__name__icontains=search_query)
+        )
+    
+    # Pagination
+    paginator = Paginator(employees, 20) 
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'page_obj': page_obj,
+        'search_query': search_query,
+    }
+    
+    return render(request, 'employee_user/employee_list.html', context)
+
+
+@admin_or_admin_employee_required
+def delete_employee(request, employee_id):
+    """
+    View for admin users to delete an employee and record the deletion
+    """
+    employee = get_object_or_404(Employee, id=employee_id)
+    
+    if request.method == 'POST':
+        deletion_reason = request.POST.get('deletion_reason', '')
+        
+        with transaction.atomic():
+            # Create a record in DeletedEmployees model
+            DeletedEmployees.objects.create(
+                sap_id=employee.SAP_ID,
+                name=employee.name,
+                email=employee.email,
+                designation=str(employee.designation) if employee.designation else None,
+                branch=str(employee.branch) if employee.branch else None,
+                region=str(employee.region) if employee.region else None,
+                employee_grade=str(employee.employee_grade) if employee.employee_grade else None,
+                employee_type=str(employee.employee_type) if employee.employee_type else None,
+                date_of_joining=employee.date_of_joining,
+                deletion_reason=deletion_reason,
+                deleted_by=request.user
+            )
+            
+            # Delete the employee
+            employee.delete()
+            
+            messages.success(request, f"Employee {employee.name} has been deleted successfully.")
+            return redirect('employee_user:employee_list')
+    
+    context = {
+        'employee': employee,
+    }
+    
+    return render(request, 'employee_user/delete_employee.html', context)
+
+
+@admin_or_admin_employee_required
+def deleted_employees(request):
+    """
+    View for admin users to see deleted employees
+    """
+    search_query = request.GET.get('search', '')
+    
+    if search_query:
+        deleted_employees_list = DeletedEmployees.objects.filter(
+            Q(name__icontains=search_query) |
+            Q(sap_id__icontains=search_query) |
+            Q(designation__icontains=search_query) |
+            Q(branch__icontains=search_query) |
+            Q(region__icontains=search_query)
+        )
+    else:
+        deleted_employees_list = DeletedEmployees.objects.all()
+    
+    # Pagination
+    paginator = Paginator(deleted_employees_list, 10)  # Show 10 employees per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'page_obj': page_obj,
+        'search_query': search_query,
+    }
+    
+    return render(request, 'employee_user/deleted_employees.html', context)
+
+
+@admin_or_admin_employee_required
+def deleted_employee_details(request):
+    """
+    AJAX view to get details of a deleted employee
+    """
+    employee_id = request.GET.get('id')
+    
+    try:
+        employee = DeletedEmployees.objects.get(id=employee_id)
+        data = {
+            'success': True,
+            'employee': {
+                'id': employee.id,
+                'sap_id': employee.sap_id,
+                'name': employee.name,
+                'email': employee.email or 'N/A',
+                'designation': employee.designation or 'N/A',
+                'branch': employee.branch or 'N/A',
+                'region': employee.region or 'N/A',
+                'employee_grade': employee.employee_grade or 'N/A',
+                'employee_type': employee.employee_type or 'N/A',
+                'date_of_joining': employee.date_of_joining or 'N/A',
+                'deletion_reason': employee.deletion_reason or 'No reason provided',
+                'deleted_at': employee.deleted_at.strftime('%B %d, %Y at %I:%M %p'),
+                'deleted_by': employee.deleted_by.name if employee.deleted_by else 'Unknown',
+            }
+        }
+    except DeletedEmployees.DoesNotExist:
+        data = {
+            'success': False,
+            'error': 'Employee not found'
+        }
+    except Exception as e:
+        data = {
+            'success': False,
+            'error': str(e)
+        }
+    
+    return JsonResponse(data)
 

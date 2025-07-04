@@ -36,3 +36,29 @@ class RicpKPI(models.Model):
     
     class Meta:
         verbose_name = "Balance ScoreCard Form"
+
+
+class DeletedEmployees(models.Model):
+    """
+    This model stores information about employees that have been deleted from the system.
+    """
+    sap_id = models.IntegerField(unique=True, verbose_name="SAP ID")
+    name = models.CharField(max_length=200)
+    email = models.EmailField(max_length=255, blank=True, null=True)
+    designation = models.CharField(max_length=100, blank=True, null=True)
+    branch = models.CharField(max_length=500, blank=True, null=True)
+    region = models.CharField(max_length=100, blank=True, null=True)
+    employee_grade = models.CharField(max_length=100, blank=True, null=True)
+    employee_type = models.CharField(max_length=100, blank=True, null=True)
+    date_of_joining = models.CharField(max_length=100, blank=True, null=True)
+    deletion_reason = models.TextField(blank=True, null=True)
+    deleted_at = models.DateTimeField(auto_now_add=True)
+    deleted_by = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, related_name="deleted_employees")
+
+    def __str__(self):
+        return f"Deleted Employee: {self.name} (SAP ID: {self.sap_id})"
+    
+    class Meta:
+        verbose_name = "Deleted Employee"
+        verbose_name_plural = "Deleted Employees"
+        ordering = ["-deleted_at"]
