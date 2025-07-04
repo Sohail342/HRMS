@@ -76,6 +76,16 @@ class EmployeeResource(resources.ModelResource):
         attribute='designation',
         widget=ForeignKeyWidget(Designation, 'title')
     )
+    wing = fields.Field(
+        column_name='wing',
+        attribute='wing',
+        widget=ForeignKeyWidget(Wing, 'name')
+    )
+    division = fields.Field(
+        column_name='division',
+        attribute='division',
+        widget=ForeignKeyWidget(Division, 'division_name')
+    )
     cadre = fields.Field(
         column_name='cadre',
         attribute='cadre',
