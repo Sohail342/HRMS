@@ -183,10 +183,10 @@ class EmployeeResource(resources.ModelResource):
             'employee_grade', 'branch', 'region', 'qualifications', 'date_of_joining',
             'mobile_number', 'date_of_last_promotion', 'remarks', 'grade_assignment',
             'date_of_retirement', 'birth_date', 'date_of_contract_expiry', 'date_current_posting',
-            'date_current_assignment', 'cnic_no'
+            'date_current_assignment', 'cnic_no', 'wing', 'division'
         )
         export_order = (
-            'SAP_ID', 'email', 'name', 'designation', 'cadre', 'employee_type',
+            'SAP_ID', 'email', 'name', 'division', 'wing' , 'designation', 'cadre', 'employee_type',
             'employee_grade', 'branch', 'region', 'qualifications',
             'mobile_number', 'date_of_last_promotion', 'remarks', 'grade_assignment',
             'date_of_joining', 'date_of_contract_expiry', 'date_current_posting',
