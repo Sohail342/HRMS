@@ -1439,7 +1439,17 @@
             scale: 2, // Higher scale for better quality
             logging: false,
             useCORS: true,
-            allowTaint: true
+            allowTaint: true,
+            backgroundColor: '#ffffff',
+            onclone: function(clonedDoc) {
+                // Fix for oklch color function issue
+                Array.from(clonedDoc.querySelectorAll('[class*="bg-"], [class*="text-"]')).forEach(el => {
+                    // Force standard colors by applying inline styles
+                    const computedStyle = window.getComputedStyle(el);
+                    el.style.backgroundColor = computedStyle.backgroundColor;
+                    el.style.color = computedStyle.color;
+                });
+            }
         }).then(canvas => {
             // Remove the clone from the DOM
             document.body.removeChild(filterSummaryClone);

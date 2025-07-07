@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from HRIS_App.models import Region, Employee
+from HRIS_App.models import Region, Employee, Designation, Branch, EmployeeGrade, EmployeeType
 from django.contrib import messages
 from group_head.decorators import employee_user_required
 from django.contrib.auth.decorators import login_required
@@ -488,6 +488,61 @@ def delete_employee(request, employee_id):
     return render(request, 'employee_user/delete_employee.html', context)
 
 
+
+@admin_or_admin_employee_required
+def restore_employee(request, employee_id):
+    """
+    View for admin users to restore a deleted employee
+    """
+    deleted_employee = get_object_or_404(DeletedEmployees, id=employee_id)
+
+    try:
+        # Get related model instances instead of using string values directly
+        designation_obj = None
+        if deleted_employee.designation:
+            designation_obj = Designation.objects.filter(title=deleted_employee.designation).first()
+        
+        branch_obj = None
+        if deleted_employee.branch:
+            branch_obj = Branch.objects.filter(branch_name=deleted_employee.branch).first()
+        
+        region_obj = None
+        if deleted_employee.region:
+            region_obj = Region.objects.filter(name=deleted_employee.region).first()
+        
+        employee_grade_obj = None
+        if deleted_employee.employee_grade:
+            employee_grade_obj = EmployeeGrade.objects.filter(grade_name=deleted_employee.employee_grade).first()
+        
+        employee_type_obj = None
+        if deleted_employee.employee_type:
+            employee_type_obj = EmployeeType.objects.filter(name=deleted_employee.employee_type).first()
+        
+        # Create a new Employee object from the deleted employee data
+        Employee.objects.create(
+            SAP_ID=deleted_employee.sap_id if deleted_employee.sap_id else None,
+            name=deleted_employee.name if deleted_employee.name else None,
+            email=deleted_employee.email if deleted_employee.email else None,
+            designation=designation_obj,
+            branch=branch_obj,
+            region=region_obj,
+            employee_grade=employee_grade_obj,
+            employee_type=employee_type_obj,
+            date_of_joining=deleted_employee.date_of_joining if deleted_employee.date_of_joining else None,
+        )
+
+        # Delete the record from DeletedEmployees
+        deleted_employee.delete()
+
+        messages.success(request, f"Employee {deleted_employee.name} has been restored successfully.")
+        return redirect('employee_user:deleted_employees')
+
+    except Exception as e:
+        messages.error(request, f"Error restoring employee: {str(e)}")
+        return redirect('employee_user:deleted_employees')
+
+
+
 @admin_or_admin_employee_required
 def deleted_employees(request):
     """
@@ -507,7 +562,7 @@ def deleted_employees(request):
         deleted_employees_list = DeletedEmployees.objects.all()
     
     # Pagination
-    paginator = Paginator(deleted_employees_list, 10)  # Show 10 employees per page
+    paginator = Paginator(deleted_employees_list, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     

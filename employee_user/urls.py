@@ -22,6 +22,7 @@ urlpatterns = [
     path('employees/delete/<int:employee_id>/', views.delete_employee, name="delete_employee"),
     path('employees/deleted/', views.deleted_employees, name="deleted_employees"),
     path('employees/deleted/details/', views.deleted_employee_details, name="deleted_employee_details"),
+    path('employees/restore/<int:employee_id>/', views.restore_employee, name="restore_employee"),
     
     # Ajax
     path("submit-ricp-data/", views.submit_form_data, name="submit_ricp_data"),

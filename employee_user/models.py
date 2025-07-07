@@ -42,12 +42,22 @@ class DeletedEmployees(models.Model):
     """
     This model stores information about employees that have been deleted from the system.
     """
+    resign_choices = [
+        ("Resigned", "Resigned"),
+        ("Transfered out of Group", "Transfered out of Group"),
+        ("Deceased", "Deceased"),
+        ("Retired", "Retired"),
+        ("Terminated", "Terminated"),
+        ("Suspended", "Suspended"),
+        ("Contract Expired", "Contract Expired"),
+        ("Other", "Other"),
+    ]
     sap_id = models.IntegerField(unique=True, verbose_name="SAP ID")
     name = models.CharField(max_length=200)
     email = models.EmailField(max_length=255, blank=True, null=True)
     designation = models.CharField(max_length=100, blank=True, null=True)
     branch = models.CharField(max_length=500, blank=True, null=True)
-    region = models.CharField(max_length=100, blank=True, null=True)
+    region = models.CharField(max_length=100, blank=True, null=True, choices=resign_choices)
     employee_grade = models.CharField(max_length=100, blank=True, null=True)
     employee_type = models.CharField(max_length=100, blank=True, null=True)
     date_of_joining = models.CharField(max_length=100, blank=True, null=True)

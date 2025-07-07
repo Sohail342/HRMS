@@ -82,6 +82,14 @@
                                     <i class="fas fa-info-circle mr-1.5"></i> View
                                 </button>
                             </td>
+                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <a href="{% url 'employee_user:restore_employee' employee.id %}"
+                                class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-lg shadow-md transition duration-200 ease-in-out transform hover:scale-105">
+                                <i class="fas fa-undo-alt"></i>
+                                Restore
+                                </a>
+                            </td>
+
                         </tr>
                         {% empty %}
                         <tr>
