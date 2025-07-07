@@ -64,7 +64,7 @@
                         <div>
                             <label for="deletion_reason" class="block text-sm font-medium text-gray-700 mb-2">Reason for Deletion:</label>
                             <select 
-                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ease-in-out" 
+                                class="w-full px-4 py-2 border border-yellow-500 bg-yellow-100 text-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-600 transition duration-150 ease-in-out" 
                                 id="deletion_reason" 
                                 name="deletion_reason" 
                                 required
@@ -79,18 +79,21 @@
                                 <option value="Contract Expired">Contract Expired</option>
                                 <option value="Other">Other</option>
                             </select>
+
                             <div id="other_reason_container" class="mt-3 hidden">
                                 <label for="other_reason" class="block text-sm font-medium text-gray-700 mb-2">Please specify:</label>
                                 <textarea 
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ease-in-out" 
+                                    class="w-full px-4 py-2 border border-yellow-500 bg-yellow-100 text-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-600 transition duration-150 ease-in-out" 
                                     id="other_reason" 
                                     name="other_reason" 
                                     rows="3" 
                                     placeholder="Please provide details..."
                                 ></textarea>
                             </div>
-                            <p class="mt-1 text-sm text-gray-500">Select a reason for deleting this employee. This information will be stored for record-keeping purposes.</p>
+
+                            <p class="mt-1 text-sm text-gray-600">Select a reason for deleting this employee. This information will be stored for record-keeping purposes.</p>
                         </div>
+
                         
                         <script>
                             document.addEventListener('DOMContentLoaded', function() {
