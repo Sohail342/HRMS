@@ -63,16 +63,63 @@
                         {% csrf_token %}
                         <div>
                             <label for="deletion_reason" class="block text-sm font-medium text-gray-700 mb-2">Reason for Deletion:</label>
-                            <textarea 
+                            <select 
                                 class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ease-in-out" 
                                 id="deletion_reason" 
                                 name="deletion_reason" 
-                                rows="4" 
                                 required
-                                placeholder="Please provide a detailed reason..."
-                            ></textarea>
-                            <p class="mt-1 text-sm text-gray-500">Please provide a reason for deleting this employee. This information will be stored for record-keeping purposes.</p>
+                            >
+                                <option value="" disabled selected>Select a reason...</option>
+                                <option value="Resigned">Resigned</option>
+                                <option value="Transfered out of Group">Transferred out of Group</option>
+                                <option value="Deceased">Deceased</option>
+                                <option value="Retired">Retired</option>
+                                <option value="Terminated">Terminated</option>
+                                <option value="Suspended">Suspended</option>
+                                <option value="Contract Expired">Contract Expired</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <div id="other_reason_container" class="mt-3 hidden">
+                                <label for="other_reason" class="block text-sm font-medium text-gray-700 mb-2">Please specify:</label>
+                                <textarea 
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ease-in-out" 
+                                    id="other_reason" 
+                                    name="other_reason" 
+                                    rows="3" 
+                                    placeholder="Please provide details..."
+                                ></textarea>
+                            </div>
+                            <p class="mt-1 text-sm text-gray-500">Select a reason for deleting this employee. This information will be stored for record-keeping purposes.</p>
                         </div>
+                        
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                const reasonSelect = document.getElementById('deletion_reason');
+                                const otherReasonContainer = document.getElementById('other_reason_container');
+                                const otherReasonTextarea = document.getElementById('other_reason');
+                                const form = reasonSelect.closest('form');
+                                
+                                reasonSelect.addEventListener('change', function() {
+                                    if (this.value === 'Other') {
+                                        otherReasonContainer.classList.remove('hidden');
+                                        otherReasonTextarea.setAttribute('required', 'required');
+                                    } else {
+                                        otherReasonContainer.classList.add('hidden');
+                                        otherReasonTextarea.removeAttribute('required');
+                                    }
+                                });
+                                
+                                form.addEventListener('submit', function(e) {
+                                    if (reasonSelect.value === 'Other') {
+                                        const otherReason = otherReasonTextarea.value.trim();
+                                        if (!otherReason) {
+                                            e.preventDefault();
+                                            alert('Please specify the other reason');
+                                        }
+                                    }
+                                });
+                            });
+                        </script>
                         
                         <div class="flex justify-center space-x-4 pt-4">
                             <a href="{% url 'employee_user:employee_list' %}" class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-md transition duration-200 ease-in-out">

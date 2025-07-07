@@ -459,6 +459,12 @@ def delete_employee(request, employee_id):
     if request.method == 'POST':
         deletion_reason = request.POST.get('deletion_reason', '')
         
+        # Handle 'Other' reason with additional details
+        if deletion_reason == 'Other':
+            other_reason = request.POST.get('other_reason', '').strip()
+            if other_reason:
+                deletion_reason = f"Other: {other_reason}"
+        
         with transaction.atomic():
             # Create a record in DeletedEmployees model
             DeletedEmployees.objects.create(
