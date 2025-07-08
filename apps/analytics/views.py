@@ -105,15 +105,68 @@ def bom_report_view(request):
     branches_with_bom = [branch for branch in branches_list if branch.branch_name in branch_names_with_bom]
     branches_with_bom_count = len(branches_with_bom)
 
-    # More calculations...
+    # Calculate gender distribution
     gender_distribution = calculate_gender_distribution(bom_list)
+    
+    # Calculate BM as BOM count
+    bm_as_bom = 0
+    for bom in bom_list:
+        if bom.designation and 'Branch Manager' in bom.designation.title and 'Operations' in bom.designation.title:
+            bm_as_bom += 1
+    
+    # Calculate upgraded and downgraded staff counts
+    # This is a placeholder implementation - adjust based on your actual business logic
+    upgraded_to_bom = 0
+    downgraded_from_bom = 0
+    
+    # Calculate average years as BOM
+    # This is a placeholder implementation - adjust based on your actual business logic
+    avg_years_as_bom = 0
+    if total_bom > 0:
+        total_years = 0
+        for bom in bom_list:
+            # Assuming there's a field that tracks years in position
+            # Replace with actual field or calculation
+            years_as_bom = 1  # Default placeholder value
+            total_years += years_as_bom
+        avg_years_as_bom = round(total_years / total_bom, 1)
+    
+    # Calculate age distribution
+    age_distribution = {}
+    for bom in bom_list:
+        if bom.date_of_birth:
+            today = timezone.now().date()
+            age = today.year - bom.date_of_birth.year - ((today.month, today.day) < (bom.date_of_birth.month, bom.date_of_birth.day))
+            
+            if age < 30:
+                age_group = 'Under 30'
+            elif age < 40:
+                age_group = '30-39'
+            elif age < 50:
+                age_group = '40-49'
+            else:
+                age_group = '50+'
+                
+            if age_group in age_distribution:
+                age_distribution[age_group] += 1
+            else:
+                age_distribution[age_group] = 1
+    
+    # Ensure all age groups are represented even if count is 0
+    for age_group in ['Under 30', '30-39', '40-49', '50+']:
+        if age_group not in age_distribution:
+            age_distribution[age_group] = 0
 
     context = {
         'total_bom': total_bom,
         'branches_with_bom': branches_with_bom_count,
         'branches_without_bom': len(branches_list) - branches_with_bom_count,
+        'bm_as_bom': bm_as_bom,
+        'upgraded_to_bom': upgraded_to_bom,
+        'downgraded_from_bom': downgraded_from_bom,
+        'avg_years_as_bom': avg_years_as_bom,
+        'age_distribution': age_distribution,
         'gender_distribution': gender_distribution,
-        # More context variables...
     }
 
     return render(request, 'analytics/bom_report.html', context)
