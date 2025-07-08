@@ -15,5 +15,4 @@ urlpatterns = [
     path('ho-report/', views.ho_report_view, name='ho_report'),
     path('api/regions/', views.api_regions, name='api_regions'),
     path('api/branches/', views.api_branches, name='api_branches'),
-    path('api/wings/', views.api_wings, name='api_wings'),
 ]
