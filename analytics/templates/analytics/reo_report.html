@@ -1,0 +1,850 @@
+{% extends 'sidebar.html' %}
+{% load custom_filters %}
+
+{% block content %}
+<div class="py-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            <!-- Header -->
+            <div class="p-6 bg-white border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <h1 class="text-2xl font-semibold text-gray-900">Regional Executive Operations (REO) Report</h1>
+                    <a href="{% url 'analytics:analytics' %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        Back to Analytics
+                    </a>
+                </div>
+                <p class="mt-2 text-sm text-gray-600">Comprehensive overview of Regional Executive Operations across the organization.</p>
+            </div>
+            
+            <!-- Filters -->
+            <div class="p-6 bg-white border-b border-gray-200">
+                <h2 class="text-lg font-medium text-gray-900 mb-4">Filters</h2>
+                <form id="filter-form" method="get" action="{% url 'analytics:reo_report' %}">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Division Filter -->
+                        <div class="filter-card rounded-lg shadow-sm p-4 border border-gray-200 hover:shadow-md transition-all duration-300">
+                            <label for="division" class="block text-sm font-medium text-gray-700 mb-2">Division</label>
+                            <select id="division" name="division" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                                <option value="">All Divisions</option>
+                                {% for division in divisions %}
+                                <option value="{{ division.id }}" {% if selected_division == division.id %}selected{% endif %}>{{ division.division_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <!-- Region Filter -->
+                        <div class="filter-card rounded-lg shadow-sm p-4 border border-gray-200 hover:shadow-md transition-all duration-300">
+                            <label for="region" class="block text-sm font-medium text-gray-700 mb-2">Region</label>
+                            <select id="region" name="region" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                                <option value="">All Regions</option>
+                                {% for region in regions %}
+                                <option value="{{ region.id }}" {% if selected_region == region.id %}selected{% endif %}>{{ region.region_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <!-- Branch Filter -->
+                        <div class="filter-card rounded-lg shadow-sm p-4 border border-gray-200 hover:shadow-md transition-all duration-300">
+                            <label for="branch" class="block text-sm font-medium text-gray-700 mb-2">Branch</label>
+                            <select id="branch" name="branch" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                                <option value="">All Branches</option>
+                                {% for branch in branches %}
+                                <option value="{{ branch.id }}" {% if selected_branch == branch.id %}selected{% endif %}>{{ branch.branch_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 flex justify-end">
+                        <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                            </svg>
+                            Apply Filters
+                        </button>
+                        <a href="{% url 'analytics:reo_report' %}" class="ml-3 inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            Reset
+                        </a>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- KPI Cards -->
+            <div class="p-6 bg-white border-b border-gray-200">
+                <h2 class="text-lg font-medium text-gray-900 mb-4">Key Performance Indicators</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Total REO -->
+                    <div class="bg-blue-100 rounded-lg shadow-md p-6 border border-blue-200 hover:shadow-lg transition-all duration-300">
+                        <div class="text-center">
+                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-200 mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-800">Total REO</h3>
+                            <p class="text-2xl font-bold text-blue-600 mt-2">{{ total_reo }}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Regions with REO -->
+                    <div class="bg-green-100 rounded-lg shadow-md p-6 border border-green-200 hover:shadow-lg transition-all duration-300">
+                        <div class="text-center">
+                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-200 mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-800">Regions with REO</h3>
+                            <p class="text-2xl font-bold text-green-600 mt-2">{{ regions_with_reo_count }}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Regions without REO -->
+                    <div class="bg-red-100 rounded-lg shadow-md p-6 border border-red-200 hover:shadow-lg transition-all duration-300">
+                        <div class="text-center">
+                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-200 mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-800">Regions without REO</h3>
+                            <p class="text-2xl font-bold text-red-600 mt-2">{{ regions_without_reo_count }}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Staff Upgraded to REO -->
+                    <div class="bg-purple-100 rounded-lg shadow-md p-6 border border-purple-200 hover:shadow-lg transition-all duration-300">
+                        <div class="text-center">
+                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-purple-200 mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-800">Staff Upgraded to REO</h3>
+                            <p class="text-2xl font-bold text-purple-600 mt-2">{{ upgraded_to_reo }}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Average # of Years as REO -->
+                    <div class="bg-yellow-100 rounded-lg shadow-md p-6 border border-yellow-200 hover:shadow-lg transition-all duration-300">
+                        <div class="text-center">
+                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-yellow-200 mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-800">Average # of Years as REO</h3>
+                            <p class="text-2xl font-bold text-yellow-600 mt-2">{{ avg_years_as_reo }} years</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Age-wise REO Report -->
+                    <div class="bg-pink-100 rounded-lg shadow-md p-6 border border-pink-200 hover:shadow-lg transition-all duration-300">
+                        <div class="text-center mb-4">
+                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-pink-200 mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-800">Age-wise REO Report</h3>
+                            <div class="mt-2">
+                                {% for age_group, count in age_distribution.items %}
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="text-sm text-gray-600">{{ age_group }}</span>
+                                    <span class="text-sm font-medium text-gray-800">{{ count }}</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div class="bg-pink-600 h-2.5 rounded-full" style="width: {{ count|percentage_of:total_reo }}%"></div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Gender-wise REO Report -->
+                    <div class="bg-amber-100 rounded-lg shadow-md p-6 border border-amber-200 hover:shadow-lg transition-all duration-300">
+                        <div class="text-center mb-4">
+                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-amber-200 mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-800">Gender-wise REO Report</h3>
+                            <div class="mt-4 flex justify-around">
+                                {% for gender, count in gender_distribution.items %}
+                                <div class="text-center">
+                                    <p class="text-lg font-bold {% if gender == 'Male' %}text-blue-600{% elif gender == 'Female' %}text-pink-600{% else %}text-gray-600{% endif %}">{{ count }}</p>
+                                    <p class="text-sm text-gray-600">{{ gender }}</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Detailed Data Table -->
+            <div class="p-6 bg-white border-t border-gray-200">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800">Detailed REO Data</h2>
+                    <div class="flex space-x-2">
+                        <!-- Scroll to Table button removed as requested -->
+                        <button id="reset-filters" class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            Reset Filters
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Selected Filters Display -->
+                <div id="selected-filters" class="mb-4 p-2 bg-blue-50 border border-blue-100 rounded-md text-sm text-blue-700 hidden">
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span id="selected-filters-text">No filters selected</span>
+                    </div>
+                </div>
+                
+                <!-- Filter Status Message -->
+                <div id="filter-status" class="mb-4 p-2 bg-blue-50 border border-blue-100 rounded-md text-sm text-blue-700 hidden">
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span id="filter-status-text">Showing all REO data</span>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Region Code</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Region Name</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Division</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">REO Assigned</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assigned Person</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Age</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gender</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Years as REO</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {% for region_data in region_reo_data %}
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ region_data.region_code }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ region_data.region_name }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ region_data.division }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if region_data.reo_assigned %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                                        {{ region_data.reo_assigned|yesno:"Yes,No" }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ region_data.assigned_person }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ region_data.role }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ region_data.age }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ region_data.gender }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ region_data.years_as_reo }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if region_data.status == 'Upgraded' %}bg-green-100 text-green-800{% elif region_data.status == 'Downgraded' %}bg-red-100 text-red-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                                        {{ region_data.status|default:"N/A" }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="10" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No data available</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for Dynamic Filtering -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const divisionSelect = document.getElementById('division');
+        const regionSelect = document.getElementById('region');
+        const branchSelect = document.getElementById('branch');
+        const filterCards = document.querySelectorAll('.filter-card');
+        const dataTable = document.querySelector('.overflow-x-auto');
+        const reoSummaryCards = document.querySelectorAll('.bg-blue-100, .bg-green-100, .bg-red-100, .bg-purple-100, .bg-yellow-100, .bg-indigo-100, .bg-teal-100, .bg-pink-100, .bg-amber-100');
+        
+        // Make filter cards clickable to show data in table
+        filterCards.forEach(card => {
+            card.addEventListener('click', function(e) {
+                // Prevent default behavior to avoid scrolling
+                e.preventDefault();
+                
+                // Add highlight effect to the clicked card
+                filterCards.forEach(c => c.classList.remove('ring-2', 'ring-blue-500'));
+                this.classList.add('ring-2', 'ring-blue-500');
+                
+                // Focus on the select element inside the clicked card
+                const select = this.querySelector('select');
+                if (select) {
+                    select.focus();
+                }
+            });
+        });
+        
+        // Make REO summary cards clickable
+        reoSummaryCards.forEach(card => {
+            card.classList.add('cursor-pointer', 'relative', 'transition-all', 'duration-300');
+            
+            // No click indicator needed
+
+            
+            // Add hover effect
+            card.addEventListener('mouseenter', function() {
+                this.classList.add('transform', 'scale-102', 'shadow-lg');
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.classList.remove('transform', 'scale-102', 'shadow-lg');
+            });
+            
+            card.addEventListener('click', function(e) {
+                // Prevent default behavior
+                e.preventDefault();
+                
+                // Get the card title and value
+                const cardTitle = this.querySelector('h3').textContent.trim();
+                const cardValue = this.querySelector('p.text-2xl, div.mt-2, div.mt-4').textContent.trim();
+                
+                // Highlight the clicked card
+                reoSummaryCards.forEach(c => c.classList.remove('ring-2', 'ring-blue-500'));
+                this.classList.add('ring-2', 'ring-blue-500');
+                
+                // Filter table based on card type
+                filterTableByCard(cardTitle, cardValue);
+            });
+        });
+        
+        // Add CSS for scale-102 class
+        const style = document.createElement('style');
+        style.textContent = '.scale-102 { transform: scale(1.02); }';
+        document.head.appendChild(style);
+        
+        const filterStatus = document.getElementById('filter-status');
+        const filterStatusText = document.getElementById('filter-status-text');
+        
+        // Function to filter table based on card type
+        function filterTableByCard(cardTitle, cardValue) {
+            const rows = document.querySelectorAll('tbody tr');
+            
+            // Reset all rows visibility
+            rows.forEach(row => row.style.display = '');
+            
+            // Show filter status
+            filterStatus.classList.remove('hidden');
+            
+            // Apply filter based on card title
+            if (cardTitle.includes('Total REO')) {
+                // No filtering needed, show all rows
+                filterStatusText.textContent = 'Showing all REO data';
+                filterStatus.classList.add('hidden');
+            } else if (cardTitle.includes('Regions with REO')) {
+                filterStatusText.textContent = 'Filtered: Showing only regions with REO assigned';
+                rows.forEach(row => {
+                    const reoAssigned = row.querySelector('td:nth-child(4)').textContent.trim();
+                    if (!reoAssigned.includes('Yes')) {
+                        row.style.display = 'none';
+                    }
+                });
+            } else if (cardTitle.includes('Regions without REO')) {
+                filterStatusText.textContent = 'Filtered: Showing only regions without REO assigned';
+                rows.forEach(row => {
+                    const reoAssigned = row.querySelector('td:nth-child(4)').textContent.trim();
+                    if (!reoAssigned.includes('No')) {
+                        row.style.display = 'none';
+                    }
+                });
+            } else if (cardTitle.includes('Staff Upgraded to REO')) {
+                filterStatusText.textContent = 'Filtered: Showing only staff upgraded to REO this year';
+                rows.forEach(row => {
+                    const status = row.querySelector('td:nth-child(10)').textContent.trim();
+                    if (!status.includes('Upgraded')) {
+                        row.style.display = 'none';
+                    }
+                });
+            } else if (cardTitle.includes('Average # of Years as REO')) {
+                // For average years, we'll filter to show people with years of experience close to the average
+                // Extract the number from the card value (e.g., "3.5 years")
+                const avgYearsMatch = cardValue.match(/\d+(\.\d+)?/);
+                const avgYears = avgYearsMatch ? parseFloat(avgYearsMatch[0]) : 0;
+                const lowerBound = Math.floor(avgYears) - 1;
+                const upperBound = Math.ceil(avgYears) + 1;
+                
+                // Show filter status
+                filterStatus.classList.remove('hidden');
+                filterStatusText.textContent = `Filtered: Showing REO with ${lowerBound}-${upperBound} years of experience (near average)`;
+                
+                rows.forEach(row => {
+                    const yearsAsReo = parseFloat(row.querySelector('td:nth-child(9)').textContent.trim());
+                    if (yearsAsReo < lowerBound || yearsAsReo > upperBound) {
+                        row.style.display = 'none';
+                    }
+                });
+            } else if (cardTitle.includes('Age-wise REO Report')) {
+                // Get all age group elements from the card
+                const ageGroupElements = document.querySelectorAll('.bg-pink-100 .flex.justify-between');
+                let selectedAgeRange = null;
+                
+                // Find the highlighted or first age group
+                ageGroupElements.forEach(el => {
+                    if (el.classList.contains('bg-pink-200') || !selectedAgeRange) {
+                        const ageText = el.querySelector('.text-sm.text-gray-600').textContent.trim();
+                        selectedAgeRange = ageText;
+                    }
+                });
+                
+                if (selectedAgeRange) {
+                    // Show filter status
+                    filterStatusText.textContent = `Filtered: Showing REO in age group ${selectedAgeRange}`;
+                    
+                    rows.forEach(row => {
+                        const age = parseInt(row.querySelector('td:nth-child(7)').textContent.trim());
+                        let inRange = false;
+                        
+                        if (selectedAgeRange.includes('-')) {
+                            const [min, max] = selectedAgeRange.split('-').map(num => parseInt(num.trim()));
+                            inRange = age >= min && age <= max;
+                        } else if (selectedAgeRange.includes('+')) {
+                            const min = parseInt(selectedAgeRange);
+                            inRange = age >= min;
+                        } else if (selectedAgeRange.includes('Under')) {
+                            const max = parseInt(selectedAgeRange.replace('Under', '').trim());
+                            inRange = age < max;
+                        }
+                        
+                        if (!inRange) {
+                            row.style.display = 'none';
+                        }
+                    });
+                } else {
+                    // If no specific age group is selected, add click handlers to age group elements
+                    document.querySelectorAll('.bg-pink-100 .flex.justify-between').forEach(ageGroup => {
+                        ageGroup.style.cursor = 'pointer';
+                        ageGroup.addEventListener('click', function(e) {
+                            // Prevent default behavior
+                            e.preventDefault();
+                            
+                            const ageText = this.querySelector('.text-sm.text-gray-600').textContent.trim();
+                            
+                            // Reset all rows
+                            rows.forEach(row => row.style.display = '');
+                            
+                            // Show filter status
+                            filterStatus.classList.remove('hidden');
+                            filterStatusText.textContent = `Filtered: Showing REO in age group ${ageText}`;
+                            
+                            // Filter by selected age group
+                            rows.forEach(row => {
+                                const age = parseInt(row.querySelector('td:nth-child(7)').textContent.trim());
+                                let inRange = false;
+                                
+                                if (ageText.includes('-')) {
+                                    const [min, max] = ageText.split('-').map(num => parseInt(num.trim()));
+                                    inRange = age >= min && age <= max;
+                                } else if (ageText.includes('+')) {
+                                    const min = parseInt(ageText);
+                                    inRange = age >= min;
+                                } else if (ageText.includes('Under')) {
+                                    const max = parseInt(ageText.replace('Under', '').trim());
+                                    inRange = age < max;
+                                }
+                                
+                                if (!inRange) {
+                                    row.style.display = 'none';
+                                }
+                            });
+                            
+                            // Highlight this age group
+                            document.querySelectorAll('.bg-pink-100 .flex.justify-between').forEach(el => {
+                                el.classList.remove('bg-pink-200');
+                            });
+                            this.classList.add('bg-pink-200');
+                        });
+                    });
+                }
+            } else if (cardTitle.includes('Gender-wise REO Report')) {
+                // Extract gender from the card value
+                let selectedGender = '';
+                
+                if (cardValue.includes('Male')) {
+                    selectedGender = 'Male';
+                } else if (cardValue.includes('Female')) {
+                    selectedGender = 'Female';
+                }
+                
+                if (selectedGender) {
+                    // Show filter status
+                    filterStatus.classList.remove('hidden');
+                    filterStatusText.textContent = `Filtered: Showing ${selectedGender} REO only`;
+                    
+                    rows.forEach(row => {
+                        const gender = row.querySelector('td:nth-child(8)').textContent.trim();
+                        if (gender !== selectedGender) {
+                            row.style.display = 'none';
+                        }
+                    });
+                } else {
+                    // If no specific gender is selected, add click handlers to gender elements
+                    const genderCard = document.querySelector('.bg-amber-100');
+                    const genderElements = genderCard.querySelectorAll('.text-center');
+                    
+                    genderElements.forEach(genderElement => {
+                        genderElement.style.cursor = 'pointer';
+                        genderElement.addEventListener('click', function(e) {
+                            // Prevent default behavior
+                            e.preventDefault();
+                            
+                            const gender = this.querySelector('.text-sm.text-gray-600').textContent.trim();
+                            
+                            // Reset all rows
+                            rows.forEach(row => row.style.display = '');
+                            
+                            // Show filter status
+                            filterStatus.classList.remove('hidden');
+                            filterStatusText.textContent = `Filtered: Showing ${gender} REO only`;
+                            
+                            // Filter by selected gender
+                            rows.forEach(row => {
+                                const rowGender = row.querySelector('td:nth-child(8)').textContent.trim();
+                                if (rowGender !== gender) {
+                                    row.style.display = 'none';
+                                }
+                            });
+                            
+                            // Highlight this gender element
+                            genderElements.forEach(el => {
+                                el.classList.remove('ring-2', 'ring-amber-500');
+                            });
+                            this.classList.add('ring-2', 'ring-amber-500');
+                            
+                            // Highlight the card
+                            reoSummaryCards.forEach(c => c.classList.remove('ring-2', 'ring-blue-500'));
+                            genderCard.classList.add('ring-2', 'ring-blue-500');
+                        });
+                    });
+                }
+            }
+            
+            // Show message if no rows are visible
+            let visibleRows = 0;
+            rows.forEach(row => {
+                if (row.style.display !== 'none') {
+                    visibleRows++;
+                }
+            });
+            
+            const noDataRow = document.querySelector('tbody tr td[colspan="10"]')?.parentElement;
+            if (noDataRow) {
+                noDataRow.style.display = visibleRows === 0 ? '' : 'none';
+            }
+        }
+        
+        // Update regions when division changes
+        divisionSelect.addEventListener('change', function() {
+            const divisionId = this.value;
+            
+            // Clear region and branch selections
+            regionSelect.innerHTML = '<option value="">All Regions</option>';
+            branchSelect.innerHTML = '<option value="">All Branches</option>';
+            
+            if (divisionId) {
+                // Fetch regions for selected division
+                fetch(`/analytics/api/regions/?division=${divisionId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        data.forEach(region => {
+                            const option = document.createElement('option');
+                            option.value = region.id;
+                            option.textContent = region.name;
+                            regionSelect.appendChild(option);
+                        });
+                    });
+            }
+            
+            // Update selected filters display
+            updateSelectedFiltersDisplay();
+        });
+        
+        // Update branches when region changes
+        regionSelect.addEventListener('change', function() {
+            const regionId = this.value;
+            
+            // Clear branch selection
+            branchSelect.innerHTML = '<option value="">All Branches</option>';
+            
+            if (regionId) {
+                // Fetch branches for selected region
+                fetch(`/analytics/api/branches/?region=${regionId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        data.forEach(branch => {
+                            const option = document.createElement('option');
+                            option.value = branch.id;
+                            option.textContent = branch.branch_name;
+                            branchSelect.appendChild(option);
+                        });
+                        // Submit form after branches are loaded
+                        document.getElementById('filter-form').submit();
+                    });
+            } else {
+                // If no region selected, submit form immediately
+                document.getElementById('filter-form').submit();
+            }
+            
+            // Update selected filters display
+            updateSelectedFiltersDisplay();
+        });
+        
+        // Update filters display when branch selection changes
+        branchSelect.addEventListener('change', function() {
+            updateSelectedFiltersDisplay();
+            // Submit form when branch selection changes
+            document.getElementById('filter-form').submit();
+        });
+        
+        // Update filter status when form is submitted
+        document.getElementById('filter-form').addEventListener('submit', function() {
+            // Show filter status message based on selections
+            const divisionText = divisionSelect.options[divisionSelect.selectedIndex].text;
+            const regionText = regionSelect.options[regionSelect.selectedIndex].text;
+            const branchText = branchSelect.options[branchSelect.selectedIndex].text;
+            
+            let filterMessage = 'Filtered:';
+            
+            if (divisionSelect.value) filterMessage += ` Division: ${divisionText},`;
+            if (regionSelect.value) filterMessage += ` Region: ${regionText},`;
+            if (branchSelect.value) filterMessage += ` Branch: ${branchText},`;
+            
+            // Remove trailing comma
+            filterMessage = filterMessage.replace(/,$/, '');
+            
+            if (filterMessage !== 'Filtered:') {
+                filterStatus.classList.remove('hidden');
+                filterStatusText.textContent = filterMessage;
+            } else {
+                filterStatus.classList.add('hidden');
+            }
+        });
+        
+        // Add a reset button for card filters
+        const resetButton = document.querySelector('a[href*="reo_report"]');
+        const resetFiltersButton = document.getElementById('reset-filters');
+        
+        function resetAllFilters() {
+            // Reset form fields
+            document.getElementById('division').value = '';
+            document.getElementById('region').value = '';
+            document.getElementById('branch').value = '';
+            
+            // Reset card highlights
+            reoSummaryCards.forEach(c => c.classList.remove('ring-2', 'ring-blue-500'));
+            filterCards.forEach(c => c.classList.remove('ring-2', 'ring-blue-500'));
+            
+            // Reset age group highlights
+            document.querySelectorAll('.bg-pink-100 .flex.justify-between').forEach(el => {
+                el.classList.remove('bg-pink-200');
+            });
+            
+            // Reset gender highlights
+            document.querySelectorAll('.bg-amber-100 .text-center').forEach(el => {
+                el.classList.remove('ring-2', 'ring-amber-500');
+            });
+            
+            // Reset table filters (show all rows)
+            const rows = document.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                // Make sure to reset the display style completely
+                row.style.display = '';
+            });
+            
+            // If there's a no-data row, hide it if we have data
+            const noDataRow = document.querySelector('tbody tr td[colspan="10"]')?.parentElement;
+            if (noDataRow && rows.length > 1) {
+                noDataRow.style.display = 'none';
+            }
+            
+            // Hide filter status message
+            filterStatus.classList.add('hidden');
+            filterStatusText.textContent = 'Showing all REO data';
+            
+            // Update selected filters display
+            updateSelectedFiltersDisplay();
+            
+            // Force a reflow to ensure the table updates
+            dataTable.style.opacity = '0.99';
+            setTimeout(() => {
+                dataTable.style.opacity = '1';
+            }, 10);
+        }
+        
+        // Use click event for the main reset button
+        resetButton.addEventListener('click', function(e) {
+            // Don't prevent default as we want the page to reload
+            resetAllFilters();
+        });
+        
+        // Use click event for the reset filters button in the detailed REO data section
+        resetFiltersButton.addEventListener('click', function(e) {
+            // Prevent default to avoid any page navigation
+            e.preventDefault();
+            
+            // Reset all filters
+            resetAllFilters();
+            
+            // Make sure all rows are visible
+            const rows = document.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                row.style.display = '';
+            });
+            
+            // Update selected filters display
+            updateSelectedFiltersDisplay();
+            
+            // Submit the form to apply the reset
+            document.getElementById('filter-form').submit();
+            
+            // Add visual feedback
+            this.classList.add('bg-gray-100');
+            setTimeout(() => {
+                this.classList.remove('bg-gray-100');
+            }, 200);
+        });
+        
+        // Scroll to table button event listener removed as requested
+        
+        // Function to update selected filters display
+        function updateSelectedFiltersDisplay() {
+            const divisionSelect = document.getElementById('division');
+            const regionSelect = document.getElementById('region');
+            const branchSelect = document.getElementById('branch');
+            const selectedFilters = document.getElementById('selected-filters');
+            const selectedFiltersText = document.getElementById('selected-filters-text');
+            
+            // Get selected values - handle case when no option is selected
+            let divisionText = '';
+            let regionText = '';
+            let branchText = '';
+            
+            if (divisionSelect.selectedIndex >= 0) {
+                divisionText = divisionSelect.options[divisionSelect.selectedIndex].text;
+            }
+            
+            if (regionSelect.selectedIndex >= 0) {
+                regionText = regionSelect.options[regionSelect.selectedIndex].text;
+            }
+            
+            if (branchSelect.selectedIndex >= 0) {
+                branchText = branchSelect.options[branchSelect.selectedIndex].text;
+            }
+            
+            let filterMessage = '';
+            
+            if (divisionSelect.value) {
+                filterMessage += `<a href="#" class="filter-link" data-filter="division" data-value="${divisionSelect.value}">Division: ${divisionText} <span class="ml-1 text-blue-600">×</span></a>, `;
+            }
+            if (regionSelect.value) {
+                filterMessage += `<a href="#" class="filter-link" data-filter="region" data-value="${regionSelect.value}">Region: ${regionText} <span class="ml-1 text-blue-600">×</span></a>, `;
+            }
+            if (branchSelect.value) {
+                filterMessage += `<a href="#" class="filter-link" data-filter="branch" data-value="${branchSelect.value}">Branch: ${branchText} <span class="ml-1 text-blue-600">×</span></a>, `;
+            }
+            
+            // Remove trailing comma and space
+            filterMessage = filterMessage.replace(/, $/, '');
+            
+            if (filterMessage) {
+                selectedFilters.classList.remove('hidden');
+                selectedFiltersText.innerHTML = filterMessage;
+                
+                // Add click event listeners to filter links
+                document.querySelectorAll('.filter-link').forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const filterType = this.getAttribute('data-filter');
+                        
+                        // Reset the appropriate filter
+                        document.getElementById(filterType).value = '';
+                        
+                        // If clearing division, also clear region and branch
+                        if (filterType === 'division') {
+                            document.getElementById('region').value = '';
+                            document.getElementById('branch').value = '';
+                        }
+                        // If clearing region, also clear branch
+                        else if (filterType === 'region') {
+                            document.getElementById('branch').value = '';
+                        }
+                        
+                        // Submit the form to apply the filter changes
+                        document.getElementById('filter-form').submit();
+                    });
+                });
+            } else {
+                selectedFilters.classList.add('hidden');
+            }
+        }
+        
+        // Initialize selected filters display
+        updateSelectedFiltersDisplay();
+        
+        // Fix division dropdown visibility issue
+        if (divisionSelect) {
+            // Ensure all option text is visible
+            const options = divisionSelect.querySelectorAll('option');
+            options.forEach(option => {
+                option.style.color = '#000'; // Set text color to black
+                option.style.backgroundColor = '#fff'; // Set background to white
+            });
+            
+            // Add event listener to update filters display when division changes
+            divisionSelect.addEventListener('change', function() {
+                // Existing code for updating regions
+                
+                // Update selected filters display and submit form
+                setTimeout(function() {
+                    updateSelectedFiltersDisplay();
+                    document.getElementById('filter-form').submit();
+                }, 100);
+            });
+        }
+        
+        // Update filter status when form is submitted
+        document.getElementById('filter-form').addEventListener('submit', function() {
+            // Existing code for filter status
+            
+            // Update selected filters display
+            updateSelectedFiltersDisplay();
+        });
+        
+        // Modify resetAllFilters function to update selected filters display
+        const originalResetAllFilters = resetAllFilters;
+        resetAllFilters = function() {
+            originalResetAllFilters();
+            
+            // Update selected filters display
+            updateSelectedFiltersDisplay();
+        };
+    });
+</script>
+{% endblock %}

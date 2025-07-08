@@ -1,0 +1,831 @@
+{% extends "sidebar.html" %}
+{% load custom_filters %}
+
+{% block content %}
+<div class="p-8 bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen">
+    <div class="max-w-7xl mx-auto">
+        <div class="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200 transition-all duration-300 hover:shadow-2xl">
+            <!-- Header Section -->
+            <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-6 flex justify-between items-center">
+                <div>
+                    <h1 class="text-2xl font-bold text-white">Regional Executive IC (RE IC) Report</h1>
+                    <p class="text-blue-100 mt-2">Comprehensive overview of Regional Executive IC data</p>
+                </div>
+                <a href="{% url 'analytics:analytics' %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-blue-600 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                    Dashboard
+                </a>
+            </div>
+            
+            <!-- Filters Section -->
+            <div class="p-6 bg-gray-50 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">Filters</h2>
+                <form method="GET" id="filter-form">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <!-- Division Filter Card -->
+                        <div class="bg-white rounded-lg shadow-md p-5 border border-gray-200 hover:shadow-lg transition-all duration-300 cursor-pointer filter-card">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-md font-semibold text-gray-800">Division</h3>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </div>
+                           <select id="division" name="division" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                        <option value="">All Divisions</option>
+                            {% for division in divisions %}
+                                <option value="{{ division.id }}" {% if selected_division == division.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ division.division_name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        </div>
+                        
+                        <!-- Region Filter Card -->
+                        <div class="bg-white rounded-lg shadow-md p-5 border border-gray-200 hover:shadow-lg transition-all duration-300 cursor-pointer filter-card">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-md font-semibold text-gray-800">Region</h3>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </div>
+                            <select id="region" name="region" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                                <option value="">All Regions</option>
+                                {% for region in regions %}
+                                    <option value="{{ region.id }}" {% if selected_region == region.id %}selected{% endif %}>{{ region.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <!-- Branch Filter Card -->
+                        <div class="bg-white rounded-lg shadow-md p-5 border border-gray-200 hover:shadow-lg transition-all duration-300 cursor-pointer filter-card">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-md font-semibold text-gray-800">Branch</h3>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </div>
+                            <select id="branch" name="branch" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                                <option value="">All Branches</option>
+                                {% for branch in branches %}
+                                    <option value="{{ branch.id }}" {% if selected_branch == branch.id %}selected{% endif %}>{{ branch.branch_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end">
+                        <button type="submit" id="apply-filters" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                            </svg>
+                            Apply Filters
+                        </button>
+                        <button type="button" id="reset-form" class="ml-3 inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            Reset
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- KPI Cards Section -->
+            <div class="p-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-6 border-b pb-3 relative after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:w-24 after:h-1 after:bg-blue-500 after:rounded-full">RE IC Summary</h2>
+                <div id="selected-filters" class="mb-4 p-2 bg-blue-50 border border-blue-100 rounded-md text-sm text-blue-700 hidden">
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span id="selected-filters-text">No filters selected</span>
+                    </div>
+                </div>
+                
+                <!-- KPI Cards Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="kpi-cards-container">
+                    <!-- Total RE IC Card -->
+                    <div class="bg-blue-100 rounded-lg shadow-md p-6 border border-blue-200 hover:shadow-lg transition-all duration-300 cursor-pointer reic-summary-card" data-filter-type="total">
+                        <div class="text-center mb-4">
+                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-200 mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-800">Total RE IC</h3>
+                            <p class="text-2xl font-bold text-blue-600 mt-2">{{ total_reic }}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Regions with RE IC Card -->
+                    <div class="bg-green-100 rounded-lg shadow-md p-6 border border-green-200 hover:shadow-lg transition-all duration-300 cursor-pointer reic-summary-card" data-filter-type="withReic">
+                        <div class="text-center mb-4">
+                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-200 mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-800">Regions with RE IC</h3>
+                            <p class="text-2xl font-bold text-green-600 mt-2">{{ regions_with_reic }}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Regions without RE IC Card -->
+                    <div class="bg-red-100 rounded-lg shadow-md p-6 border border-red-200 hover:shadow-lg transition-all duration-300 cursor-pointer reic-summary-card" data-filter-type="withoutReic">
+                        <div class="text-center mb-4">
+                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-200 mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-800">Regions without RE IC</h3>
+                            <p class="text-2xl font-bold text-red-600 mt-2">{{ regions_without_reic }}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Staff Upgraded to RE IC Card -->
+                    <div class="bg-purple-100 rounded-lg shadow-md p-6 border border-purple-200 hover:shadow-lg transition-all duration-300 cursor-pointer reic-summary-card" data-filter-type="upgraded">
+                        <div class="text-center mb-4">
+                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-purple-200 mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-800">Staff Upgraded to RE IC</h3>
+                            <p class="text-2xl font-bold text-purple-600 mt-2">{{ staff_upgraded_to_reic }}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Staff Downgraded from RE IC Card -->
+                    <div class="bg-yellow-100 rounded-lg shadow-md p-6 border border-yellow-200 hover:shadow-lg transition-all duration-300 cursor-pointer reic-summary-card" data-filter-type="downgraded">
+                        <div class="text-center mb-4">
+                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-yellow-200 mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-800">Staff Downgraded from RE IC</h3>
+                            <p class="text-2xl font-bold text-yellow-600 mt-2">{{ staff_downgraded_from_reic }}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Average Years as RE IC Card -->
+                    <div class="bg-teal-100 rounded-lg shadow-md p-6 border border-teal-200 hover:shadow-lg transition-all duration-300 cursor-pointer reic-summary-card" data-filter-type="avgYears">
+                        <div class="text-center mb-4">
+                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-teal-200 mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-800">Average # of Years as RE IC</h3>
+                            <p class="text-2xl font-bold text-teal-600 mt-2">{{ avg_years_as_reic }} years</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Age-wise RE IC Report Card -->
+                    <div class="bg-pink-100 rounded-lg shadow-md p-6 border border-pink-200 hover:shadow-lg transition-all duration-300 cursor-pointer reic-summary-card">
+                        <div class="text-center mb-4">
+                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-pink-200 mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-800">Age-wise RE IC Report</h3>
+                            <div class="mt-2" id="age-distribution-container">
+                                {% for age_group, count in age_distribution.items %}
+                                <div class="age-group flex justify-between items-center mb-1" data-age-group="{{ age_group }}">
+                                    <span class="text-sm text-gray-600">{{ age_group }}</span>
+                                    <span class="text-sm font-medium text-gray-800">{{ count }}</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5 mb-3">
+                                    <div class="bg-pink-600 h-2.5 rounded-full" style="width: {{ count|percentage_of:total_reic }}%"></div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Gender-wise RE IC Report Card -->
+                    <div class="bg-amber-100 rounded-lg shadow-md p-6 border border-amber-200 hover:shadow-lg transition-all duration-300 cursor-pointer reic-summary-card">
+                        <div class="text-center mb-4">
+                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-amber-200 mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-800">Gender-wise RE IC Report</h3>
+                            <div class="mt-4 flex justify-around" id="gender-distribution-container">
+                                {% for gender, count in gender_distribution.items %}
+                                <div class="gender-group text-center" data-gender="{{ gender }}">
+                                    <p class="text-lg font-bold {% if gender == 'Male' %}text-blue-600{% elif gender == 'Female' %}text-pink-600{% else %}text-gray-600{% endif %}">{{ count }}</p>
+                                    <p class="text-sm text-gray-600">{{ gender }}</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Detailed Data Table -->
+            <div class="p-6 bg-white border-t border-gray-200">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800">Detailed RE IC Data</h2>
+                    <div class="flex space-x-2">
+                        <button id="scroll-to-table" class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                            </svg>
+                            Scroll to Table
+                        </button>
+                        <button id="reset-filters" class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            Reset Filters
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Filter Status Message -->
+                <div id="filter-status" class="mb-4 p-2 bg-blue-50 border border-blue-100 rounded-md text-sm text-blue-700 hidden">
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span id="filter-status-text">Showing all RE IC data</span>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Region Code</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Region Name</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Division</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">RE IC Assigned</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assigned Person</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Age</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gender</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Years as RE IC</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {% for region_data in region_reic_data %}
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ region_data.region_code }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ region_data.region_name }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ region_data.division }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if region_data.reic_assigned %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                                        {{ region_data.reic_assigned|yesno:"Yes,No" }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ region_data.assigned_person }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ region_data.role }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ region_data.age }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ region_data.gender }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ region_data.years_as_reic }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if region_data.status == 'Upgraded' %}bg-green-100 text-green-800{% elif region_data.status == 'Downgraded' %}bg-red-100 text-red-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                                        {{ region_data.status|default:"N/A" }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="10" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No data available</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <!-- Add this right after the closing </table> tag -->
+{% if is_paginated %}
+<div class="px-6 py-4 bg-white border-t border-gray-200 flex items-center justify-between">
+    <div class="flex-1 flex justify-between sm:hidden">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% if selected_division %}&division={{ selected_division }}{% endif %}{% if selected_region %}&region={{ selected_region }}{% endif %}{% if selected_branch %}&branch={{ selected_branch }}{% endif %}" 
+           class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+            Previous
+        </a>
+        {% endif %}
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if selected_division %}&division={{ selected_division }}{% endif %}{% if selected_region %}&region={{ selected_region }}{% endif %}{% if selected_branch %}&branch={{ selected_branch }}{% endif %}" 
+           class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+            Next
+        </a>
+        {% endif %}
+    </div>
+    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+        <div>
+            <p class="text-sm text-gray-700">
+                Showing <span class="font-medium">{{ page_obj.start_index }}</span> to <span class="font-medium">{{ page_obj.end_index }}</span> of <span class="font-medium">{{ page_obj.paginator.count }}</span> results
+            </p>
+        </div>
+        <div>
+            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                {% if page_obj.has_previous %}
+                <a href="?page=1{% if selected_division %}&division={{ selected_division }}{% endif %}{% if selected_region %}&region={{ selected_region }}{% endif %}{% if selected_branch %}&branch={{ selected_branch }}{% endif %}" 
+                   class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                    <span class="sr-only">First</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M15.707 15.707a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 010 1.414zm-6 0a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 011.414 1.414L5.414 10l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                    </svg>
+                </a>
+                <a href="?page={{ page_obj.previous_page_number }}{% if selected_division %}&division={{ selected_division }}{% endif %}{% if selected_region %}&region={{ selected_region }}{% endif %}{% if selected_branch %}&branch={{ selected_branch }}{% endif %}" 
+                   class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                    <span class="sr-only">Previous</span>
+                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                </a>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <a href="?page={{ num }}{% if selected_division %}&division={{ selected_division }}{% endif %}{% if selected_region %}&region={{ selected_region }}{% endif %}{% if selected_branch %}&branch={{ selected_branch }}{% endif %}" 
+                       class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-blue-500 text-white text-sm font-medium">
+                        {{ num }}
+                    </a>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a href="?page={{ num }}{% if selected_division %}&division={{ selected_division }}{% endif %}{% if selected_region %}&region={{ selected_region }}{% endif %}{% if selected_branch %}&branch={{ selected_branch }}{% endif %}" 
+                       class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        {{ num }}
+                    </a>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if selected_division %}&division={{ selected_division }}{% endif %}{% if selected_region %}&region={{ selected_region }}{% endif %}{% if selected_branch %}&branch={{ selected_branch }}{% endif %}" 
+                   class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                    <span class="sr-only">Next</span>
+                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                    </svg>
+                </a>
+                <a href="?page={{ page_obj.paginator.num_pages }}{% if selected_division %}&division={{ selected_division }}{% endif %}{% if selected_region %}&region={{ selected_region }}{% endif %}{% if selected_branch %}&branch={{ selected_branch }}{% endif %}" 
+                   class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                    <span class="sr-only">Last</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10.293 15.707a1 1 0 010-1.414L14.586 10l-4.293-4.293a1 1 0 111.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                        <path fill-rule="evenodd" d="M4.293 15.707a1 1 0 010-1.414L8.586 10 4.293 5.707a1 1 0 011.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                    </svg>
+                </a>
+                {% endif %}
+            </nav>
+        </div>
+    </div>
+</div>
+{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for Dynamic Functionality -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // DOM Elements
+    const elements = {
+        divisionSelect: document.getElementById('division'),
+        regionSelect: document.getElementById('region'),
+        branchSelect: document.getElementById('branch'),
+        filterForm: document.getElementById('filter-form'),
+        applyFiltersBtn: document.getElementById('apply-filters'),
+        resetFormBtn: document.getElementById('reset-form'),
+        resetFiltersBtn: document.getElementById('reset-filters'),
+        scrollToTableBtn: document.getElementById('scroll-to-table'),
+        selectedFilters: document.getElementById('selected-filters'),
+        selectedFiltersText: document.getElementById('selected-filters-text'),
+        filterStatus: document.getElementById('filter-status'),
+        filterStatusText: document.getElementById('filter-status-text'),
+        kpiCardsContainer: document.getElementById('kpi-cards-container'),
+        dataTableBody: document.getElementById('data-table-body'),
+        tableRows: document.querySelectorAll('#data-table-body tr')
+    };
+
+    // Setup event listeners
+    function setupEventListeners() {
+        // Form submission
+        elements.filterForm.addEventListener('submit', handleFormSubmit);
+
+        // Reset buttons
+        elements.resetFormBtn.addEventListener('click', resetFilters);
+        elements.resetFiltersBtn.addEventListener('click', resetFilters);
+
+        // Scroll to table
+        if (elements.scrollToTableBtn) {
+            elements.scrollToTableBtn.addEventListener('click', scrollToTable);
+        }
+
+        // Division change - update regions
+        elements.divisionSelect.addEventListener('change', function() {
+            const divisionId = this.value;
+            
+            // Clear dependent filters
+            elements.regionSelect.innerHTML = '<option value="">All Regions</option>';
+            elements.branchSelect.innerHTML = '<option value="">All Branches</option>';
+
+            if (divisionId) {
+                fetch(`/analytics/api/regions/?division=${divisionId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        data.forEach(region => {
+                            const option = document.createElement('option');
+                            option.value = region.id;
+                            option.textContent = region.name;
+                            elements.regionSelect.appendChild(option);
+                        });
+                    })
+                    .catch(console.error);
+            }
+
+            updateSelectedFiltersDisplay();
+        });
+
+        // Region change - update branches
+        elements.regionSelect.addEventListener('change', function() {
+            const regionId = this.value;
+            
+            // Clear dependent filter
+            elements.branchSelect.innerHTML = '<option value="">All Branches</option>';
+
+            if (regionId) {
+                fetch(`/analytics/api/branches/?region=${regionId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        data.forEach(branch => {
+                            const option = document.createElement('option');
+                            option.value = branch.id;
+                            option.textContent = branch.branch_name;
+                            elements.branchSelect.appendChild(option);
+                        });
+                    })
+                    .catch(console.error);
+            }
+
+            updateSelectedFiltersDisplay();
+        });
+
+        // KPI card clicks
+        document.addEventListener('click', function(e) {
+            const card = e.target.closest('.reic-summary-card');
+            if (card) {
+                e.preventDefault();
+                
+                // Remove highlights from all cards
+                document.querySelectorAll('.reic-summary-card').forEach(c => {
+                    c.classList.remove('ring-2', 'ring-blue-500');
+                });
+                
+                // Highlight clicked card
+                card.classList.add('ring-2', 'ring-blue-500');
+                
+                // Get filter type from card
+                const filterType = card.dataset.filterType;
+                
+                if (filterType) {
+                    filterTable(filterType);
+                }
+            }
+
+            // Age group clicks
+            const ageGroup = e.target.closest('.age-group');
+            if (ageGroup) {
+                e.preventDefault();
+                
+                // Reset card filter
+                document.querySelectorAll('.reic-summary-card').forEach(c => {
+                    c.classList.remove('ring-2', 'ring-blue-500');
+                });
+                
+                // Highlight age group
+                document.querySelectorAll('.age-group').forEach(el => el.classList.remove('bg-pink-200'));
+                ageGroup.classList.add('bg-pink-200');
+                
+                // Filter by age group
+                const ageGroupValue = ageGroup.dataset.ageGroup;
+                filterTable(null, ageGroupValue);
+            }
+
+            // Gender group clicks
+            const genderGroup = e.target.closest('.gender-group');
+            if (genderGroup) {
+                e.preventDefault();
+                
+                // Reset card filter
+                document.querySelectorAll('.reic-summary-card').forEach(c => {
+                    c.classList.remove('ring-2', 'ring-blue-500');
+                });
+                
+                // Highlight gender group
+                document.querySelectorAll('.gender-group').forEach(el => el.classList.remove('ring-2', 'ring-amber-500'));
+                genderGroup.classList.add('ring-2', 'ring-amber-500');
+                
+                // Filter by gender
+                const genderValue = genderGroup.dataset.gender;
+                filterTable(null, null, genderValue);
+            }
+        });
+    }
+
+    // Handle form submission
+    function handleFormSubmit(e) {
+        e.preventDefault();
+        updateSelectedFiltersDisplay();
+    }
+
+    // Filter table based on active filters
+    function filterTable(cardFilter = null, ageFilter = null, genderFilter = null) {
+        elements.tableRows.forEach(row => {
+            let showRow = true;
+            
+            // Division filter
+            if (elements.divisionSelect.value) {
+                const divisionText = elements.divisionSelect.options[elements.divisionSelect.selectedIndex].text;
+                const rowDivision = row.querySelector('td:nth-child(3)').textContent.trim();
+                if (rowDivision !== divisionText) {
+                    showRow = false;
+                }
+            }
+            
+            // Region filter
+            if (elements.regionSelect.value) {
+                const regionText = elements.regionSelect.options[elements.regionSelect.selectedIndex].text;
+                const rowRegion = row.querySelector('td:nth-child(2)').textContent.trim();
+                if (rowRegion !== regionText) {
+                    showRow = false;
+                }
+            }
+            
+            // Branch filter
+            if (elements.branchSelect.value) {
+                const branchText = elements.branchSelect.options[elements.branchSelect.selectedIndex].text;
+                const rowBranch = row.querySelector('td:nth-child(2)').textContent.trim();
+                if (rowBranch !== branchText) {
+                    showRow = false;
+                }
+            }
+            
+            // Card filters
+            if (cardFilter) {
+                switch (cardFilter) {
+                    case 'withReic':
+                        const reicAssigned = row.querySelector('td:nth-child(4)').textContent.trim();
+                        if (!reicAssigned.includes('Yes')) showRow = false;
+                        break;
+                    case 'withoutReic':
+                        const reicNotAssigned = row.querySelector('td:nth-child(4)').textContent.trim();
+                        if (!reicNotAssigned.includes('No')) showRow = false;
+                        break;
+                    case 'upgraded':
+                        const statusUpgraded = row.querySelector('td:nth-child(10)').textContent.trim();
+                        if (!statusUpgraded.includes('Upgraded')) showRow = false;
+                        break;
+                    case 'downgraded':
+                        const statusDowngraded = row.querySelector('td:nth-child(10)').textContent.trim();
+                        if (!statusDowngraded.includes('Downgraded')) showRow = false;
+                        break;
+                    case 'avgYears':
+                        const yearsAsReic = parseFloat(row.querySelector('td:nth-child(9)').textContent.trim());
+                        const avgYears = parseFloat('{{ avg_years_as_reic }}');
+                        const lowerBound = Math.floor(avgYears) - 1;
+                        const upperBound = Math.ceil(avgYears) + 1;
+                        if (yearsAsReic < lowerBound || yearsAsReic > upperBound) showRow = false;
+                        break;
+                }
+            }
+            
+            // Age filter
+            if (ageFilter) {
+                const age = parseInt(row.querySelector('td:nth-child(7)').textContent.trim());
+                const ageGroup = ageFilter;
+                
+                let inRange = false;
+                if (ageGroup.includes('-')) {
+                    const [min, max] = ageGroup.split('-').map(num => parseInt(num.trim()));
+                    inRange = age >= min && age <= max;
+                } else if (ageGroup.includes('+')) {
+                    const min = parseInt(ageGroup);
+                    inRange = age >= min;
+                } else if (ageGroup.includes('Under')) {
+                    const max = parseInt(ageGroup.replace('Under', '').trim());
+                    inRange = age < max;
+                }
+                
+                if (!inRange) showRow = false;
+            }
+            
+            // Gender filter
+            if (genderFilter) {
+                const gender = row.querySelector('td:nth-child(8)').textContent.trim();
+                if (gender !== genderFilter) showRow = false;
+            }
+            
+            // Apply visibility
+            row.style.display = showRow ? '' : 'none';
+        });
+        
+        updateFilterStatus(cardFilter, ageFilter, genderFilter);
+    }
+
+    // Update selected filters display
+    function updateSelectedFiltersDisplay() {
+        let filterMessage = '';
+        
+        if (elements.divisionSelect.value) {
+            const divisionText = elements.divisionSelect.options[elements.divisionSelect.selectedIndex].text;
+            filterMessage += `Division: ${divisionText}, `;
+        }
+        if (elements.regionSelect.value) {
+            const regionText = elements.regionSelect.options[elements.regionSelect.selectedIndex].text;
+            filterMessage += `Region: ${regionText}, `;
+        }
+        if (elements.branchSelect.value) {
+            const branchText = elements.branchSelect.options[elements.branchSelect.selectedIndex].text;
+            filterMessage += `Branch: ${branchText}, `;
+        }
+        
+        // Remove trailing comma and space
+        filterMessage = filterMessage.replace(/, $/, '');
+        
+        if (filterMessage) {
+            elements.selectedFilters.classList.remove('hidden');
+            elements.selectedFiltersText.textContent = filterMessage;
+        } else {
+            elements.selectedFilters.classList.add('hidden');
+        }
+    }
+
+    // Update filter status message
+    function updateFilterStatus(cardFilter, ageFilter, genderFilter) {
+        let filterMessage = 'Filtered:';
+        
+        if (elements.divisionSelect.value) {
+            const divisionText = elements.divisionSelect.options[elements.divisionSelect.selectedIndex].text;
+            filterMessage += ` Division: ${divisionText},`;
+        }
+        if (elements.regionSelect.value) {
+            const regionText = elements.regionSelect.options[elements.regionSelect.selectedIndex].text;
+            filterMessage += ` Region: ${regionText},`;
+        }
+        if (elements.branchSelect.value) {
+            const branchText = elements.branchSelect.options[elements.branchSelect.selectedIndex].text;
+            filterMessage += ` Branch: ${branchText},`;
+        }
+        if (cardFilter) {
+            const card = document.querySelector(`.reic-summary-card[data-filter-type="${cardFilter}"]`);
+            if (card) {
+                const cardTitle = card.querySelector('h3').textContent.trim();
+                filterMessage += ` ${cardTitle},`;
+            }
+        }
+        if (ageFilter) {
+            filterMessage += ` Age: ${ageFilter},`;
+        }
+        if (genderFilter) {
+            filterMessage += ` Gender: ${genderFilter},`;
+        }
+        
+        // Remove trailing comma
+        filterMessage = filterMessage.replace(/,$/, '');
+        
+        if (filterMessage !== 'Filtered:') {
+            elements.filterStatus.classList.remove('hidden');
+            elements.filterStatusText.textContent = filterMessage;
+        } else {
+            elements.filterStatus.classList.add('hidden');
+        }
+    }
+
+    // Reset all filters
+    function resetFilters() {
+        // Reset form elements
+        elements.divisionSelect.value = '';
+        elements.regionSelect.innerHTML = '<option value="">All Regions</option>';
+        elements.branchSelect.innerHTML = '<option value="">All Branches</option>';
+        
+        // Reset UI highlights
+        document.querySelectorAll('.reic-summary-card').forEach(c => {
+            c.classList.remove('ring-2', 'ring-blue-500');
+        });
+        document.querySelectorAll('.age-group').forEach(el => el.classList.remove('bg-pink-200'));
+        document.querySelectorAll('.gender-group').forEach(el => el.classList.remove('ring-2', 'ring-amber-500'));
+        
+        // Reset filter status
+        elements.filterStatus.classList.add('hidden');
+        
+        // Show all rows
+        elements.tableRows.forEach(row => {
+            row.style.display = '';
+        });
+        
+        // Update displays
+        updateSelectedFiltersDisplay();
+    }
+
+    // Scroll to table
+    function scrollToTable() {
+        document.querySelector('.overflow-x-auto').scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+        });
+    }
+
+    // Initialize the application
+    setupEventListeners();
+
+    // In the handleFormSubmit function, modify it to reset to page 1 when filters change
+function handleFormSubmit(e) {
+    e.preventDefault();
+    // Reset to first page when filters change
+    const url = new URL(window.location.href);
+    url.searchParams.set('page', '1');
+    window.location.href = url.toString();
+    updateSelectedFiltersDisplay();
+}
+
+// In the resetFilters function, add page reset
+function resetFilters() {
+    // Reset form elements
+    elements.divisionSelect.value = '';
+    elements.regionSelect.innerHTML = '<option value="">All Regions</option>';
+    elements.branchSelect.innerHTML = '<option value="">All Branches</option>';
+    
+    // Reset UI highlights
+    document.querySelectorAll('.reic-summary-card').forEach(c => {
+        c.classList.remove('ring-2', 'ring-blue-500');
+    });
+    document.querySelectorAll('.age-group').forEach(el => el.classList.remove('bg-pink-200'));
+    document.querySelectorAll('.gender-group').forEach(el => el.classList.remove('ring-2', 'ring-amber-500'));
+    
+    // Reset filter status
+    elements.filterStatus.classList.add('hidden');
+    
+    // Redirect to page 1 without filters
+    window.location.href = window.location.pathname + '?page=1';
+}
+});
+
+</script>
+
+<!-- Custom CSS for dropdown visibility -->
+<style>
+    /* Ensure dropdown options are visible */
+    select option {
+        color: #000 !important;
+        background-color: #fff !important;
+    }
+    
+    /* Fix for dropdown menu z-index issues */
+    .filter-card select {
+        z-index: 10;
+        position: relative;
+    }
+    
+    /* Ensure dropdown menus appear above other elements */
+    select {
+        z-index: 1000;
+    }
+    
+    /* Style for filter links */
+    .filter-link {
+        transition: all 0.2s ease;
+    }
+    
+    .filter-link:hover {
+        text-decoration: underline;
+    }
+    /* Add this to your existing style section */
+.pagination .active {
+    background-color: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+}
+
+.pagination a:hover:not(.active) {
+    background-color: #f3f4f6;
+}
+
+.pagination a {
+    margin: 0 4px;
+    border: 1px solid #d1d5db;
+    padding: 8px 16px;
+    text-decoration: none;
+    border-radius: 4px;
+    color: #4b5563;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,480 @@
+{% extends "sidebar.html" %}
+{% load custom_filters %}
+
+{% block content %}
+<div class="p-8 bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen">
+    <div class="max-w-7xl mx-auto">
+        <div class="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200 transition-all duration-300 hover:shadow-2xl">
+            <!-- Header Section -->
+            <div class="bg-gradient-to-r from-green-500 to-green-600 p-6 flex justify-between items-center">
+                <div>
+                    <h1 class="text-2xl font-bold text-white">Region Wise Report</h1>
+                    <p class="text-green-100 mt-2">Comprehensive overview of region-specific data</p>
+                </div>
+                <a href="{% url 'analytics:analytics' %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-green-600 bg-white hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                    Dashboard
+                </a>
+            </div>
+            
+            <!-- Filters Section -->
+            <div class="p-6 bg-gray-50 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">Filters</h2>
+                <form method="GET" id="filter-form">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <!-- Division Filter Card -->
+                        <div class="bg-white rounded-lg shadow-md p-5 border border-gray-200 hover:shadow-lg transition-all duration-300 cursor-pointer filter-card">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-md font-semibold text-gray-800">Division</h3>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </div>
+                           <select id="division" name="division" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md">
+                                <option value="">All Divisions</option>
+                                {% for division in divisions %}
+                                    <option value="{{ division.id }}" {% if selected_division == division.id|stringformat:"s" %}selected{% endif %}>
+                                        {{ division.division_name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <!-- Region Filter Card -->
+                        <div class="bg-white rounded-lg shadow-md p-5 border border-gray-200 hover:shadow-lg transition-all duration-300 cursor-pointer filter-card">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-md font-semibold text-gray-800">Region</h3>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </div>
+                            <select id="region" name="region" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md">
+                                <option value="">All Regions</option>
+                                {% for region in regions %}
+                                    <option value="{{ region.id }}" {% if selected_region == region.id %}selected{% endif %}>{{ region.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end">
+                        <button type="submit" id="apply-filters" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                            </svg>
+                            Apply Filters
+                        </button>
+                        <button type="button" id="reset-form" class="ml-3 inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            Reset
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- KPI Cards Section -->
+            <div class="p-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-6 border-b pb-3 relative after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:w-24 after:h-1 after:bg-green-500 after:rounded-full">Region Summary</h2>
+                <div id="selected-filters" class="mb-4 p-2 bg-green-50 border border-green-100 rounded-md text-sm text-green-700 hidden">
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span id="selected-filters-text">No filters selected</span>
+                    </div>
+                </div>
+                
+                <!-- KPI Cards Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="kpi-cards-container">
+                    <!-- Total Regions Card -->
+                    <div class="bg-green-100 rounded-lg shadow-md p-6 border border-green-200 hover:shadow-lg transition-all duration-300 cursor-pointer region-summary-card" data-filter-type="total">
+                        <div class="text-center mb-4">
+                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-200 mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-800">Total Regions</h3>
+                            <p class="text-2xl font-bold text-green-600 mt-2">{{ total_regions }}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Total Employees Card -->
+                    <div class="bg-blue-100 rounded-lg shadow-md p-6 border border-blue-200 hover:shadow-lg transition-all duration-300 cursor-pointer region-summary-card" data-filter-type="employees">
+                        <div class="text-center mb-4">
+                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-200 mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-800">Total Employees</h3>
+                            <p class="text-2xl font-bold text-blue-600 mt-2">{{ total_employees }}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Total Branches Card -->
+                    <div class="bg-purple-100 rounded-lg shadow-md p-6 border border-purple-200 hover:shadow-lg transition-all duration-300 cursor-pointer region-summary-card" data-filter-type="branches">
+                        <div class="text-center mb-4">
+                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-purple-200 mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-800">Total Branches</h3>
+                            <p class="text-2xl font-bold text-purple-600 mt-2">{{ total_branches }}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Regions with REO Card -->
+                    <div class="bg-yellow-100 rounded-lg shadow-md p-6 border border-yellow-200 hover:shadow-lg transition-all duration-300 cursor-pointer region-summary-card" data-filter-type="withREO">
+                        <div class="text-center mb-4">
+                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-yellow-200 mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-800">Regions with REO</h3>
+                            <p class="text-2xl font-bold text-yellow-600 mt-2">{{ regions_with_reo }}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Regions with REIC Card -->
+                    <div class="bg-red-100 rounded-lg shadow-md p-6 border border-red-200 hover:shadow-lg transition-all duration-300 cursor-pointer region-summary-card" data-filter-type="withREIC">
+                        <div class="text-center mb-4">
+                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-200 mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-800">Regions with REIC</h3>
+                            <p class="text-2xl font-bold text-red-600 mt-2">{{ regions_with_reic }}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Designation Distribution Card -->
+                    <div class="bg-teal-100 rounded-lg shadow-md p-6 border border-teal-200 hover:shadow-lg transition-all duration-300 cursor-pointer region-summary-card">
+                        <div class="text-center mb-4">
+                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-teal-200 mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-800">Designation Distribution</h3>
+                            <div class="mt-2" id="designation-distribution-container">
+                                {% for designation, count in designation_distribution.items %}
+                                <div class="designation-group flex justify-between items-center mb-1" data-designation="{{ designation }}">
+                                    <span class="text-sm text-gray-600">{{ designation }}</span>
+                                    <span class="text-sm font-medium text-gray-800">{{ count }}</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5 mb-3">
+                                    <div class="bg-teal-600 h-2.5 rounded-full" style="width: {{ count|percentage_of:total_employees }}%"></div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Grade Distribution Card -->
+                    <div class="bg-pink-100 rounded-lg shadow-md p-6 border border-pink-200 hover:shadow-lg transition-all duration-300 cursor-pointer region-summary-card">
+                        <div class="text-center mb-4">
+                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-pink-200 mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-800">Grade Distribution</h3>
+                            <div class="mt-2" id="grade-distribution-container">
+                                {% for grade, count in grade_distribution.items %}
+                                <div class="grade-group flex justify-between items-center mb-1" data-grade="{{ grade }}">
+                                    <span class="text-sm text-gray-600">{{ grade }}</span>
+                                    <span class="text-sm font-medium text-gray-800">{{ count }}</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5 mb-3">
+                                    <div class="bg-pink-600 h-2.5 rounded-full" style="width: {{ count|percentage_of:total_employees }}%"></div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Gender Distribution Card -->
+                    <div class="bg-amber-100 rounded-lg shadow-md p-6 border border-amber-200 hover:shadow-lg transition-all duration-300 cursor-pointer region-summary-card">
+                        <div class="text-center mb-4">
+                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-amber-200 mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-800">Gender Distribution</h3>
+                            <div class="mt-4 flex justify-around" id="gender-distribution-container">
+                                {% for gender, count in gender_distribution.items %}
+                                <div class="gender-group text-center" data-gender="{{ gender }}">
+                                    <p class="text-lg font-bold {% if gender == 'Male' %}text-blue-600{% elif gender == 'Female' %}text-pink-600{% else %}text-gray-600{% endif %}">{{ count }}</p>
+                                    <p class="text-sm text-gray-600">{{ gender }}</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Detailed Data Table -->
+            <div class="p-6 bg-white border-t border-gray-200">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800">Region Employee Data</h2>
+                    <div class="flex space-x-2">
+                        <button id="scroll-to-table" class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                            </svg>
+                            Scroll to Table
+                        </button>
+                        <button id="reset-filters" class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            Reset Filters
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Filter Status Message -->
+                <div id="filter-status" class="mb-4 p-2 bg-green-50 border border-green-100 rounded-md text-sm text-green-700 hidden">
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span id="filter-status-text">Showing all region data</span>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Region ID</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Region Name</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Division</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Employees</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Branches</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">REO Assigned</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">REIC Assigned</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Male Employees</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Female Employees</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {% for region_data in region_employee_data %}
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ region_data.region_id }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ region_data.region_name }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ region_data.division }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ region_data.total_employees }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ region_data.total_branches }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if region_data.reo_assigned %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                                        {{ region_data.reo_assigned|yesno:"Yes,No" }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if region_data.reic_assigned %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                                        {{ region_data.reic_assigned|yesno:"Yes,No" }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ region_data.male_employees }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ region_data.female_employees }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="9" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No data available</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    
+                    <!-- Pagination -->
+                    {% if is_paginated %}
+                    <div class="px-6 py-4 bg-white border-t border-gray-200 flex items-center justify-between">
+                        <div class="flex-1 flex justify-between sm:hidden">
+                            {% if page_obj.has_previous %}
+                            <a href="?page={{ page_obj.previous_page_number }}{% if selected_division %}&division={{ selected_division }}{% endif %}{% if selected_region %}&region={{ selected_region }}{% endif %}" 
+                               class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                Previous
+                            </a>
+                            {% endif %}
+                            {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}{% if selected_division %}&division={{ selected_division }}{% endif %}{% if selected_region %}&region={{ selected_region }}{% endif %}" 
+                               class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                Next
+                            </a>
+                            {% endif %}
+                        </div>
+                        <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                            <div>
+                                <p class="text-sm text-gray-700">
+                                    Showing <span class="font-medium">{{ page_obj.start_index }}</span> to <span class="font-medium">{{ page_obj.end_index }}</span> of <span class="font-medium">{{ page_obj.paginator.count }}</span> results
+                                </p>
+                            </div>
+                            <div>
+                                <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                                    {% if page_obj.has_previous %}
+                                    <a href="?page=1{% if selected_division %}&division={{ selected_division }}{% endif %}{% if selected_region %}&region={{ selected_region }}{% endif %}" 
+                                       class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                        <span class="sr-only">First</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M15.707 15.707a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 010 1.414zm-6 0a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 011.414 1.414L5.414 10l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                        </svg>
+                                    </a>
+                                    <a href="?page={{ page_obj.previous_page_number }}{% if selected_division %}&division={{ selected_division }}{% endif %}{% if selected_region %}&region={{ selected_region }}{% endif %}" 
+                                       class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                        <span class="sr-only">Previous</span>
+                                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                        </svg>
+                                    </a>
+                                    {% endif %}
+
+                                    {% for num in page_obj.paginator.page_range %}
+                                        {% if page_obj.number == num %}
+                                        <a href="?page={{ num }}{% if selected_division %}&division={{ selected_division }}{% endif %}{% if selected_region %}&region={{ selected_region }}{% endif %}" 
+                                           class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-green-500 text-white text-sm font-medium">
+                                            {{ num }}
+                                        </a>
+                                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                        <a href="?page={{ num }}{% if selected_division %}&division={{ selected_division }}{% endif %}{% if selected_region %}&region={{ selected_region }}{% endif %}" 
+                                           class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                            {{ num }}
+                                        </a>
+                                        {% endif %}
+                                    {% endfor %}
+
+                                    {% if page_obj.has_next %}
+                                    <a href="?page={{ page_obj.next_page_number }}{% if selected_division %}&division={{ selected_division }}{% endif %}{% if selected_region %}&region={{ selected_region }}{% endif %}" 
+                                       class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                        <span class="sr-only">Next</span>
+                                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                                        </svg>
+                                    </a>
+                                    <a href="?page={{ page_obj.paginator.num_pages }}{% if selected_division %}&division={{ selected_division }}{% endif %}{% if selected_region %}&region={{ selected_region }}{% endif %}" 
+                                       class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                        <span class="sr-only">Last</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M10.293 15.707a1 1 0 010-1.414L14.586 10l-4.293-4.293a1 1 0 111.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                                            <path fill-rule="evenodd" d="M4.293 15.707a1 1 0 010-1.414L8.586 10 4.293 5.707a1 1 0 011.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                                        </svg>
+                                    </a>
+                                    {% endif %}
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for Dynamic Functionality -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // DOM Elements
+    const elements = {
+        divisionSelect: document.getElementById('division'),
+        regionSelect: document.getElementById('region'),
+        filterForm: document.getElementById('filter-form'),
+        applyFiltersBtn: document.getElementById('apply-filters'),
+        resetFormBtn: document.getElementById('reset-form'),
+        resetFiltersBtn: document.getElementById('reset-filters'),
+        scrollToTableBtn: document.getElementById('scroll-to-table'),
+        selectedFilters: document.getElementById('selected-filters'),
+        selectedFiltersText: document.getElementById('selected-filters-text'),
+        filterStatus: document.getElementById('filter-status'),
+        filterStatusText: document.getElementById('filter-status-text')
+    };
+    
+    // Event Listeners
+    if (elements.resetFormBtn) {
+        elements.resetFormBtn.addEventListener('click', function() {
+            elements.divisionSelect.value = '';
+            elements.regionSelect.value = '';
+            elements.filterForm.submit();
+        });
+    }
+    
+    if (elements.resetFiltersBtn) {
+        elements.resetFiltersBtn.addEventListener('click', function() {
+            window.location.href = window.location.pathname;
+        });
+    }
+    
+    if (elements.scrollToTableBtn) {
+        elements.scrollToTableBtn.addEventListener('click', function() {
+            const tableSection = document.querySelector('.overflow-x-auto');
+            if (tableSection) {
+                tableSection.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    }
+    
+    // Division change event to update regions
+    if (elements.divisionSelect) {
+        elements.divisionSelect.addEventListener('change', function() {
+            const divisionId = this.value;
+            if (divisionId) {
+                fetch(`/analytics/api/regions/?division=${divisionId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Clear current options
+                        elements.regionSelect.innerHTML = '<option value="">All Regions</option>';
+                        
+                        // Add new options
+                        data.regions.forEach(region => {
+                            const option = document.createElement('option');
+                            option.value = region.id;
+                            option.textContent = region.name;
+                            elements.regionSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.error('Error fetching regions:', error));
+            } else {
+                // Reset region select if no division selected
+                elements.regionSelect.innerHTML = '<option value="">All Regions</option>';
+            }
+        });
+    }
+    
+    // Update filter status display
+    function updateFilterStatus() {
+        const divisionValue = elements.divisionSelect.value;
+        const regionValue = elements.regionSelect.value;
+        const divisionText = divisionValue ? elements.divisionSelect.options[elements.divisionSelect.selectedIndex].text : '';
+        const regionText = regionValue ? elements.regionSelect.options[elements.regionSelect.selectedIndex].text : '';
+        
+        if (divisionValue || regionValue) {
+            elements.selectedFilters.classList.remove('hidden');
+            elements.filterStatus.classList.remove('hidden');
+            
+            let filterText = 'Filters: ';
+            if (divisionText) filterText += `Division: ${divisionText}`;
+            if (regionText) filterText += divisionText ? `, Region: ${regionText}` : `Region: ${regionText}`;
+            
+            elements.selectedFiltersText.textContent = filterText;
+            elements.filterStatusText.textContent = `Showing data for ${filterText}`;
+        } else {
+            elements.selectedFilters.classList.add('hidden');
+            elements.filterStatus.classList.add('hidden');
+        }
+    }
+    
+    // Initialize
+    updateFilterStatus();
+});
+</script>
+{% endblock %}
