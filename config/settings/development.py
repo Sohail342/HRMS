@@ -1,11 +1,11 @@
 from .base import *
 
 
-ALLOWED_HOSTS = ["127.0.0.1",'.vercel.app', 'localhost:8000']
-
-
 # This allows detailed error pages and other development features
 DEBUG = os.getenv("DEBUG", "True")
+
+ALLOWED_HOSTS = ["127.0.0.1",'.vercel.app', 'localhost:8000']
+
 
 MIDDLEWARE = [
     'django.middleware.cache.UpdateCacheMiddleware',

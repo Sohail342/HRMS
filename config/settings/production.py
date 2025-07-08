@@ -1,8 +1,9 @@
 from .base import *
 
 
-ALLOWED_HOSTS = [os.getenv("ALLOW_HOST")]
-DEBUG = os.getenv("DEBUG", "False")
+DEBUG = os.getenv("DEBUG", "False").lower() == "true"
+
+ALLOWED_HOSTS = os.getenv("ALLOW_HOSTS", "").split(",")
 
 MIDDLEWARE = [
     'django.middleware.cache.UpdateCacheMiddleware',
