@@ -1,0 +1,90 @@
+{% extends 'admin/change_list.html' %}
+{% load i18n admin_urls static admin_list %}
+
+{% block extrahead %}
+{{ block.super }}
+<style>
+    /* Modern button styles */
+    .action-button {
+        display: inline-block;
+        padding: 6px 12px;
+        margin-bottom: 0;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 1.42857143;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        cursor: pointer;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        text-decoration: none;
+    }
+    
+    .approve-button {
+        color: #fff;
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+    
+    .approve-button:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
+    }
+    
+    .reject-button {
+        color: #fff;
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+    
+    .reject-button:hover {
+        background-color: #c82333;
+        border-color: #bd2130;
+    }
+    
+    /* Fix for HTML rendering in Django admin */
+    .field-action_buttons a {
+        text-decoration: none !important;
+    }
+</style>
+{% endblock %}
+
+{% block result_list %}
+    {% if action_form and actions_on_top and cl.show_admin_actions %}
+        <div class="actions">
+            {% block actions %}
+                {% for field in action_form %}
+                    {% if field.label %}
+                        <label>{{ field.label }}</label>
+                    {% endif %}
+                    {{ field }}
+                {% endfor %}
+                <button type="submit" class="button" title="{% trans "Run the selected action" %}" name="index" value="0">{% trans "Go" %}</button>
+                {% if actions_selection_counter %}
+                    <span class="action-counter" data-actions-icnt="{{ cl.result_list|length }}">{{ selection_note }}</span>
+                    {% if cl.result_count != cl.result_list|length %}
+                        <span class="all">{{ selection_note_all }}</span>
+                        <span class="question">
+                            <a href="#" title="{% trans "Click here to select the objects across all pages" %}">{% blocktrans with cl.result_count as total_count %}Select all {{ total_count }} {{ module_name }}{% endblocktrans %}</a>
+                        </span>
+                        <span class="clear"><a href="#">{% trans "Clear selection" %}</a></span>
+                    {% endif %}
+                {% endif %}
+            {% endblock %}
+        </div>
+    {% endif %}
+    {{ block.super }}
+{% endblock %}
+
+{% block object_tools %}
+    <div class="object-tools">
+        {% block object_tools_items %}
+            {% if has_add_permission %}
+                <a href="{% url cl.opts|admin_urlname:'add' %}{% if is_popup %}?_popup=1{% endif %}" class="addlink">
+                    {% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}
+                </a>
+            {% endif %}
+        {% endblock %}
+    </div>
+{% endblock %}
