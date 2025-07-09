@@ -1442,12 +1442,29 @@
             allowTaint: true,
             backgroundColor: '#ffffff',
             onclone: function(clonedDoc) {
-                // Fix for oklch color function issue
-                Array.from(clonedDoc.querySelectorAll('[class*="bg-"], [class*="text-"]')).forEach(el => {
-                    // Force standard colors by applying inline styles
-                    const computedStyle = window.getComputedStyle(el);
-                    el.style.backgroundColor = computedStyle.backgroundColor;
-                    el.style.color = computedStyle.color;
+                // Enhanced fix for oklch color function issue
+                // Process all elements with Tailwind color classes
+                Array.from(clonedDoc.querySelectorAll('*')).forEach(el => {
+                    // Check if element has any classes
+                    if (el.classList && el.classList.length > 0) {
+                        // Get computed styles
+                        const computedStyle = window.getComputedStyle(el);
+                        
+                        // Check for background color classes
+                        if (Array.from(el.classList).some(cls => cls.startsWith('bg-'))) {
+                            el.style.backgroundColor = computedStyle.backgroundColor;
+                        }
+                        
+                        // Check for text color classes
+                        if (Array.from(el.classList).some(cls => cls.startsWith('text-'))) {
+                            el.style.color = computedStyle.color;
+                        }
+                        
+                        // Check for border color classes
+                        if (Array.from(el.classList).some(cls => cls.startsWith('border-'))) {
+                            el.style.borderColor = computedStyle.borderColor;
+                        }
+                    }
                 });
             }
         }).then(canvas => {
