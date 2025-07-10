@@ -73,7 +73,7 @@
             </div>
             {% endif %}
             
-            {% if not request.user.employee_user %} <!--Start Admin and Admin Employee Attributes-->
+            {% if not request.user.employee_user %}
                 {% if request.user.is_authenticated %}
                 
                 <nav class="flex flex-col gap-0.5 min-w-[240px] font-sans text-base font-normal text-gray-700">
@@ -212,6 +212,17 @@
                                     </svg>
                                 </div>
                                 <span class="nav-text">Analytics</span>
+                            </div>
+                        </a>
+                        <a href="{% url 'filemanagement:dashboard' %}">
+                            <div class="nav-item">
+                                <div class="nav-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 1v5h5v10H6V4h7zm-2 8H8v-1h3v1zm0 2H8v-1h3v1zm0 2H8v-1h3v1zm5-6h-3v-1h3v1zm0 2h-3v-1h3v1zm0 2h-3v-1h3v1z"/>
+                                        <path d="M13 9h5L13 4v5z"/>
+                                    </svg>
+                                </div>
+                                <span class="nav-text">File Management</span>
                             </div>
                         </a>
                     </div>

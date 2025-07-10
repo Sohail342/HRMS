@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'apps.employee_search',
     'apps.leave_management',
     'apps.analytics',
+    'apps.filemanagement',
 ]
 
 

@@ -16,5 +16,6 @@ urlpatterns = [
     path('employee-search/', include("apps.employee_search.urls")),
     path('', include("apps.leave_management.urls")),
     path("analytics/", include("apps.analytics.urls")),
+    path('files/', include("apps.filemanagement.urls")),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
