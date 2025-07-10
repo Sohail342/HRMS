@@ -1,0 +1,110 @@
+{% extends "sidebar.html" %}
+{% load static %}
+
+{% block content %}
+<div class="p-8 bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen">
+    <div class="max-w-3xl mx-auto">
+        <div class="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200 transition-all duration-300 hover:shadow-2xl">
+            <!-- Header Section -->
+            <div class="bg-gradient-to-r from-blue-600 to-blue-700 p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl font-bold text-white">Send File</h1>
+                        <p class="text-blue-100 mt-2">{{ file.file_name }}</p>
+                    </div>
+                    <a href="{% url 'filemanagement:dashboard' %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-blue-600 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        Back to Dashboard
+                    </a>
+                </div>
+            </div>
+            
+            <!-- File Information -->
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">File Information</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">File Name</p>
+                        <p class="text-sm text-gray-900">{{ file.file_name }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">File Type</p>
+                        <p class="text-sm text-gray-900">{{ file.file_type.name }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Employee</p>
+                        <p class="text-sm text-gray-900">{{ file.employee.name }} ({{ file.employee.SAP_ID }})</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Upload Date</p>
+                        <p class="text-sm text-gray-900">{{ file.upload_timestamp|date:"F j, Y, g:i a" }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Send Form -->
+            <form method="post" class="p-6">
+                {% csrf_token %}
+                
+                {% if messages %}
+                <div class="mb-6">
+                    {% for message in messages %}
+                        <div class="{% if message.tags == 'success' %}bg-green-50 text-green-800 border-green-200{% elif message.tags == 'error' %}bg-red-50 text-red-800 border-red-200{% else %}bg-blue-50 text-blue-800 border-blue-200{% endif %} p-4 mb-4 rounded-md border">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <div class="space-y-6">
+                    <div>
+                        <label for="receiver_email" class="block text-sm font-medium text-gray-700">Recipient Email Address</label>
+                        <div class="mt-1">
+                            <input type="email" name="receiver_email" id="receiver_email" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md" placeholder="email@example.com" value="{{ file.receiver_email|default:'' }}" required>
+                        </div>
+                        <p class="mt-2 text-sm text-gray-500">Enter the email address of the person you want to send this file to.</p>
+                    </div>
+                    
+                    <div>
+                        <label for="subject" class="block text-sm font-medium text-gray-700">Email Subject</label>
+                        <div class="mt-1">
+                            <input type="text" name="subject" id="subject" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md" placeholder="File from HRMS" value="{{ subject|default:'File from HRMS: '|add:file.file_name }}" required>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="message" class="block text-sm font-medium text-gray-700">Email Message</label>
+                        <div class="mt-1">
+                            <textarea id="message" name="message" rows="4" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md" placeholder="Add a personal message...">{{ message|default:'Please find the attached file from our HRMS system.' }}</textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="flex items-center h-5">
+                            <input id="update_status" name="update_status" type="checkbox" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded" checked>
+                        </div>
+                        <div class="ml-3 text-sm">
+                            <label for="update_status" class="font-medium text-gray-700">Update file status to "Sent"</label>
+                            <p class="text-gray-500">This will update the file status in the system.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-8 flex justify-end">
+                    <a href="{% url 'filemanagement:dashboard' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mr-3">
+                        Cancel
+                    </a>
+                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        Send File
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

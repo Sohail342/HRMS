@@ -1,0 +1,58 @@
+{% extends "sidebar.html" %}
+{% load static %}
+
+{% block content %}
+<div class="p-8 bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen">
+    <div class="max-w-md mx-auto">
+        <div class="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200 transition-all duration-300 hover:shadow-2xl">
+            <!-- Header Section -->
+            <div class="bg-gradient-to-r from-red-600 to-red-700 p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl font-bold text-white">Error</h1>
+                        <p class="text-red-100 mt-2">{{ error_title|default:"An error occurred" }}</p>
+                    </div>
+                    <a href="{% url 'filemanagement:dashboard' %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-red-600 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        Back to Dashboard
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Error Content -->
+            <div class="p-6">
+                <div class="flex items-center justify-center mb-6">
+                    <div class="bg-red-100 rounded-full p-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                    </div>
+                </div>
+                
+                <h2 class="text-xl font-bold text-gray-900 text-center mb-4">{{ error_title|default:"An error occurred" }}</h2>
+                <p class="text-gray-600 text-center mb-6">{{ error_message|default:"There was a problem processing your request. Please try again or contact the system administrator." }}</p>
+                
+                {% if error_details %}
+                <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                    <h3 class="text-sm font-medium text-gray-500 mb-2">Error Details</h3>
+                    <p class="text-sm text-gray-900">{{ error_details }}</p>
+                </div>
+                {% endif %}
+                
+                <div class="flex justify-center space-x-4">
+                    <a href="{% url 'filemanagement:dashboard' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Back to Dashboard
+                    </a>
+                    {% if back_url %}
+                    <a href="{{ back_url }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        {{ back_text|default:"Go Back" }}
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
