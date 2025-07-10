@@ -1,0 +1,281 @@
+{% extends "sidebar.html" %}
+{% load static %}
+
+{% block content %}
+<div class="p-8 bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen">
+    <div class="max-w-7xl mx-auto">
+        <div class="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200 transition-all duration-300 hover:shadow-2xl">
+            <!-- Header Section -->
+            <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-8 flex justify-between items-center">
+                <div class="flex items-center">
+                    <div class="bg-white/10 p-3 rounded-lg mr-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-white">File Management Dashboard</h1>
+                        <p class="text-blue-100 mt-2">Manage and track employee files efficiently</p>
+                    </div>
+                </div>
+                <a href="{% url 'filemanagement:upload_file' %}" class="inline-flex items-center px-5 py-2.5 border border-white/20 text-sm font-medium rounded-lg shadow-lg text-white bg-white/10 hover:bg-white hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Upload New File
+                </a>
+            </div>
+            
+            <!-- Filter Panel -->
+            <div class="bg-gray-50 border-b border-gray-200 p-6">
+                <div class="mb-4">
+                    <div class="flex items-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                        </svg>
+                        <h2 class="text-xl font-semibold text-gray-800">Filter Files</h2>
+                    </div>
+                    <form method="get" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-6">
+                            <!-- Employee Name -->
+                            <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition duration-150 ease-in-out">
+                                <label for="{{ filter_form.employee_name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">Employee Name</label>
+                                {{ filter_form.employee_name }}
+                            </div>
+                            
+                            <!-- Employee ID (SAP ID) -->
+                            <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition duration-150 ease-in-out">
+                                <label for="{{ filter_form.employee_id.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">Employee ID (SAP ID)</label>
+                                {{ filter_form.employee_id }}
+                            </div>
+                            
+                            <!-- Designation -->
+                            <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition duration-150 ease-in-out">
+                                <label for="{{ filter_form.designation.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">Designation</label>
+                                {{ filter_form.designation }}
+                            </div>
+                            
+                            <!-- Department -->
+                            <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition duration-150 ease-in-out">
+                                <label for="{{ filter_form.department.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">Department</label>
+                                {{ filter_form.department }}
+                            </div>
+                            
+                            <!-- Division -->
+                            <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition duration-150 ease-in-out">
+                                <label for="{{ filter_form.division.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">Division</label>
+                                {{ filter_form.division }}
+                            </div>
+                            
+                            <!-- Branch Name -->
+                            <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition duration-150 ease-in-out">
+                                <label for="{{ filter_form.branch_name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">Branch Name</label>
+                                {{ filter_form.branch_name }}
+                            </div>
+                            
+                            <!-- Region/Zone -->
+                            <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition duration-150 ease-in-out">
+                                <label for="{{ filter_form.region.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">Region/Zone</label>
+                                {{ filter_form.region }}
+                            </div>
+                            
+                            <!-- Employment Type -->
+                            <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition duration-150 ease-in-out">
+                                <label for="{{ filter_form.employment_type.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">Employment Type</label>
+                                {{ filter_form.employment_type }}
+                            </div>
+                            
+                            <!-- File Status -->
+                            <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition duration-150 ease-in-out">
+                                <label for="{{ filter_form.file_status.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">File Status</label>
+                                {{ filter_form.file_status }}
+                            </div>
+                            
+                            <!-- Upload Date Range -->
+                            <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition duration-150 ease-in-out">
+                                <label for="{{ filter_form.upload_date_start.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">Upload Date (From)</label>
+                                {{ filter_form.upload_date_start }}
+                            </div>
+                            
+                            <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition duration-150 ease-in-out">
+                                <label for="{{ filter_form.upload_date_end.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">Upload Date (To)</label>
+                                {{ filter_form.upload_date_end }}
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-end space-x-4 mt-4">
+                            <a href="{% url 'filemanagement:dashboard' %}" class="inline-flex items-center px-5 py-2.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                                Clear Filters
+                            </a>
+                            <button type="submit" class="inline-flex items-center px-5 py-2.5 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                                </svg>
+                                Apply Filters
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Files Table -->
+            <div class="overflow-x-auto bg-white rounded-lg shadow-md">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Employee ID</th>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Employee Name</th>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Designation</th>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Department</th>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Division</th>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Branch Name</th>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Region/Zone</th>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Location</th>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Upload Date</th>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">File Name</th>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Receiver Email</th>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">File Type</th>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Status</th>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for file in files %}
+                        <tr class="hover:bg-blue-50 transition-colors duration-200">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ file.employee.SAP_ID }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ file.employee.name }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ file.employee.designation.title }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ file.employee.division.division_name }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ file.employee.division.division_name }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ file.employee.branch.branch_name }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ file.employee.region.name }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ file.employee.place_of_posting }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ file.upload_timestamp|date:"M d, Y H:i" }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 font-medium">{{ file.file_name }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ file.receiver_email|default:"-" }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ file.file_type.name }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-{{ file.file_status.color_code }} text-white shadow-sm">
+                                    {{ file.file_status.name }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <div class="flex space-x-3">
+                                    <!-- Download -->
+                                    <a href="{% url 'filemanagement:download_file' file.id %}" 
+                                       class="p-1.5 bg-blue-50 rounded-full text-blue-600 hover:text-white hover:bg-blue-600 transition-colors duration-200 shadow-sm" 
+                                       title="Download File">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                        </svg>
+                                    </a>
+                                    
+                                    <!-- Send -->
+                                    <a href="{% url 'filemanagement:send_file' file.id %}" 
+                                       class="p-1.5 bg-green-50 rounded-full text-green-600 hover:text-white hover:bg-green-600 transition-colors duration-200 shadow-sm" 
+                                       title="Send File">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                        </svg>
+                                    </a>
+                                    
+                                    <!-- Preview -->
+                                    <a href="{% url 'filemanagement:preview_file' file.id %}" 
+                                       class="p-1.5 bg-indigo-50 rounded-full text-indigo-600 hover:text-white hover:bg-indigo-600 transition-colors duration-200 shadow-sm" 
+                                       title="Preview File">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
+                                    </a>
+                                    
+                                    <!-- Delete -->
+                                    <a href="{% url 'filemanagement:delete_file' file.id %}" 
+                                       class="p-1.5 bg-red-50 rounded-full text-red-600 hover:text-white hover:bg-red-600 transition-colors duration-200 shadow-sm" 
+                                       title="Delete File" 
+                                       onclick="return confirm('Are you sure you want to delete this file?');">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="14" class="px-6 py-4 text-center text-sm text-gray-500">
+                                <div class="flex flex-col items-center justify-center py-10 bg-gray-50 rounded-lg border border-gray-100 shadow-sm my-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-blue-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                                    </svg>
+                                    <p class="text-xl font-medium text-gray-700">No files found</p>
+                                    <p class="text-gray-500 mt-2 mb-2">Try adjusting your filters or upload a new file</p>
+                                    <a href="{% url 'filemanagement:upload_file' %}" class="mt-4 inline-flex items-center px-5 py-2.5 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                        </svg>
+                                        Upload New File
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            {% if files.has_other_pages %}
+            <div class="bg-white px-6 py-4 flex items-center justify-between border-t border-gray-200 sm:px-6 rounded-b-lg shadow-md">
+                <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                        <p class="text-sm text-gray-700">
+                            Showing <span class="font-medium text-blue-600">{{ files.start_index }}</span> to <span class="font-medium text-blue-600">{{ files.end_index }}</span> of <span class="font-medium text-blue-600">{{ files.paginator.count }}</span> results
+                        </p>
+                    </div>
+                    <div>
+                        <nav class="relative z-0 inline-flex rounded-md shadow-sm" aria-label="Pagination">
+                            {% if files.has_previous %}
+                            <a href="?page={{ files.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                               class="relative inline-flex items-center px-3 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-150 ease-in-out">
+                                <span class="sr-only">Previous</span>
+                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                </svg>
+                            </a>
+                            {% endif %}
+                            
+                            {% for i in files.paginator.page_range %}
+                                {% if files.number == i %}
+                                <span class="relative inline-flex items-center px-4 py-2 border border-blue-500 bg-blue-50 text-sm font-medium text-blue-600 shadow-sm">
+                                    {{ i }}
+                                </span>
+                                {% elif i > files.number|add:'-3' and i < files.number|add:'3' %}
+                                <a href="?page={{ i }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                                   class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300 transition-colors duration-150 ease-in-out">
+                                    {{ i }}
+                                </a>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if files.has_next %}
+                            <a href="?page={{ files.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                               class="relative inline-flex items-center px-3 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-150 ease-in-out">
+                                <span class="sr-only">Next</span>
+                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                                </svg>
+                            </a>
+                            {% endif %}
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

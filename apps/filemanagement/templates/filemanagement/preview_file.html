@@ -1,0 +1,156 @@
+{% extends "sidebar.html" %}
+{% load static %}
+
+{% block content %}
+<div class="p-8 bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen">
+    <div class="max-w-5xl mx-auto">
+        <div class="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200 transition-all duration-300 hover:shadow-2xl">
+            <!-- Header Section -->
+            <div class="bg-gradient-to-r from-blue-600 to-blue-700 p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl font-bold text-white">File Preview</h1>
+                        <p class="text-blue-100 mt-2">{{ file.file_name }}</p>
+                    </div>
+                    <a href="{% url 'filemanagement:dashboard' %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-blue-600 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        Back to Dashboard
+                    </a>
+                </div>
+            </div>
+            
+            <!-- File Details -->
+            <div class="p-6 border-b border-gray-200">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-800 mb-4">File Information</h2>
+                        <dl class="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2">
+                            <div class="sm:col-span-1">
+                                <dt class="text-sm font-medium text-gray-500">File Name</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ file.file_name }}</dd>
+                            </div>
+                            <div class="sm:col-span-1">
+                                <dt class="text-sm font-medium text-gray-500">File Type</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ file.file_type.name }}</dd>
+                            </div>
+                            <div class="sm:col-span-1">
+                                <dt class="text-sm font-medium text-gray-500">Upload Date</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ file.upload_timestamp|date:"F j, Y, g:i a" }}</dd>
+                            </div>
+                            <div class="sm:col-span-1">
+                                <dt class="text-sm font-medium text-gray-500">Status</dt>
+                                <dd class="mt-1 text-sm text-gray-900">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-{{ file.file_status.color_code }} text-white">
+                                        {{ file.file_status.name }}
+                                    </span>
+                                </dd>
+                            </div>
+                            {% if file.receiver_email %}
+                            <div class="sm:col-span-2">
+                                <dt class="text-sm font-medium text-gray-500">Receiver Email</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ file.receiver_email }}</dd>
+                            </div>
+                            {% endif %}
+                            {% if file.notes %}
+                            <div class="sm:col-span-2">
+                                <dt class="text-sm font-medium text-gray-500">Notes</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ file.notes }}</dd>
+                            </div>
+                            {% endif %}
+                        </dl>
+                    </div>
+                    
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-800 mb-4">Employee Information</h2>
+                        <dl class="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2">
+                            <div class="sm:col-span-1">
+                                <dt class="text-sm font-medium text-gray-500">Name</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ file.employee.name }}</dd>
+                            </div>
+                            <div class="sm:col-span-1">
+                                <dt class="text-sm font-medium text-gray-500">Employee ID (SAP ID)</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ file.employee.SAP_ID }}</dd>
+                            </div>
+                            <div class="sm:col-span-1">
+                                <dt class="text-sm font-medium text-gray-500">Designation</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ file.employee.designation.title }}</dd>
+                            </div>
+                            <div class="sm:col-span-1">
+                                <dt class="text-sm font-medium text-gray-500">Department/Division</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ file.employee.division.division_name }}</dd>
+                            </div>
+                            <div class="sm:col-span-1">
+                                <dt class="text-sm font-medium text-gray-500">Branch</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ file.employee.branch.branch_name }}</dd>
+                            </div>
+                            <div class="sm:col-span-1">
+                                <dt class="text-sm font-medium text-gray-500">Region/Zone</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ file.employee.region.name }}</dd>
+                            </div>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- File Preview -->
+            <div class="p-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">File Preview</h2>
+                
+                {% if file.file_path %}
+                    {% if file.file_path|lower|slice:"-4:" == '.pdf' %}
+                        <!-- PDF Preview -->
+                        <div class="border border-gray-300 rounded-lg overflow-hidden">
+                            <iframe src="{{ file.file_path }}" width="100%" height="600" class="border-0"></iframe>
+                        </div>
+                    {% elif file.file_path|lower|slice:"-4:" == '.jpg' or file.file_path|lower|slice:"-4:" == '.png' or file.file_path|lower|slice:"-5:" == '.jpeg' or file.file_path|lower|slice:"-4:" == '.gif' %}
+                        <!-- Image Preview -->
+                        <div class="flex justify-center">
+                            <img src="{{ file.file_path }}" alt="{{ file.file_name }}" class="max-w-full h-auto rounded-lg shadow-md">
+                        </div>
+                    {% else %}
+                        <!-- Other File Types -->
+                        <div class="bg-gray-50 rounded-lg p-8 text-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <p class="text-gray-600 mb-4">Preview not available for this file type</p>
+                            <a href="{% url 'filemanagement:download_file' file.id %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                </svg>
+                                Download File
+                            </a>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="bg-yellow-50 rounded-lg p-8 text-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-yellow-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        <p class="text-yellow-800 mb-2 text-lg font-medium">File Not Available</p>
+                        <p class="text-yellow-700 mb-4">The file content is not available for preview</p>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="bg-gray-50 px-6 py-4 flex justify-end space-x-3">
+                <a href="{% url 'filemanagement:download_file' file.id %}" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Download
+                </a>
+                <a href="{% url 'filemanagement:send_file' file.id %}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    Send
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
